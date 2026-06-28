@@ -135,6 +135,19 @@ export function useDeleteStrategy() {
   })
 }
 
+export function useUploadBacktest(strategyId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (body: { expected_pnl: number; notes?: string }) =>
+      apiSend("/backtest/upload", "POST", { strategy_id: strategyId, ...body }),
+    onSuccess: () => {
+      toast.success("Backtest subido correctamente")
+      qc.invalidateQueries({ queryKey: qk.metrics(strategyId) })
+    },
+    onError: () => toast.error("No se pudo subir el backtest"),
+  })
+}
+
 export function useSetWeight() {
   const qc = useQueryClient()
   return useMutation({
