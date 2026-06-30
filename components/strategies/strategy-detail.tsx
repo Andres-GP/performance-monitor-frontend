@@ -43,7 +43,7 @@ export function StrategyDetail({ id }: { id: string }) {
     return (
       <div className="flex flex-col items-start gap-4">
         <p className="text-muted-foreground">No se encontró la estrategia solicitada.</p>
-        <Button variant="outline" render={<Link href="/strategies" />}>
+        <Button variant="outline" nativeButton={false} render={<Link href="/strategies" />}>
           <ArrowLeft className="size-4" /> Volver a estrategias
         </Button>
       </div>
@@ -60,6 +60,7 @@ export function StrategyDetail({ id }: { id: string }) {
           variant="ghost"
           size="sm"
           className="-ml-2 w-fit text-muted-foreground"
+          nativeButton={false}
           render={<Link href="/strategies" />}
         >
           <ArrowLeft className="size-4" /> Estrategias

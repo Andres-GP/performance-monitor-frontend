@@ -95,6 +95,7 @@ export function StrategiesTable({
                     variant="ghost"
                     size="icon-sm"
                     aria-label={`Ver ${s.name}`}
+                    nativeButton={false}
                     render={<Link href={`/strategies/${s.id}`} />}
                   >
                     <ChevronRight className="size-4" />
