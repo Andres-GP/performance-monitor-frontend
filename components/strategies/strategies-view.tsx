@@ -60,7 +60,11 @@ export function StrategiesView() {
             className="pl-9"
           />
         </div>
-        <Select value={status} onValueChange={(v) => setStatus(v as string)}>
+        <Select
+          items={{ all: "Todos los estados", Running: "En ejecución", Stopped: "Detenida" }}
+          value={status}
+          onValueChange={(v) => setStatus(v as string)}
+        >
           <SelectTrigger className="w-full sm:w-40">
             <SelectValue placeholder="Estado" />
           </SelectTrigger>
@@ -70,7 +74,16 @@ export function StrategiesView() {
             <SelectItem value="Stopped">Detenida</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={health} onValueChange={(v) => setHealth(v as string)}>
+        <Select
+          items={{
+            all: "Toda la salud",
+            healthy: "Saludable",
+            edge_decay: "Edge Decay",
+            unhealthy: "No saludable",
+          }}
+          value={health}
+          onValueChange={(v) => setHealth(v as string)}
+        >
           <SelectTrigger className="w-full sm:w-44">
             <SelectValue placeholder="Salud" />
           </SelectTrigger>

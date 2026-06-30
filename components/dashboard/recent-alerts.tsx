@@ -27,8 +27,8 @@ export function RecentAlerts() {
           <CardTitle>Últimas Alertas de Salud</CardTitle>
           <CardDescription>Eventos recientes de las estrategias</CardDescription>
         </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/alerts">Ver todas</Link>
+        <Button variant="outline" size="sm" render={<Link href="/alerts" />}>
+          Ver todas
         </Button>
       </CardHeader>
       <CardContent>
