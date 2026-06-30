@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Activity,
@@ -8,16 +8,16 @@ import {
   Signal,
   TrendingUp,
   Waves,
-} from "lucide-react"
-import { StatCard } from "@/components/shared/stat-card"
-import { OfflineBanner } from "@/components/shared/offline-banner"
-import { RegimeWidget } from "./regime-widget"
-import { useMarketRegime } from "@/lib/queries"
-import { formatDate, formatNumber, formatPercent } from "@/lib/format"
+} from "lucide-react";
+import { StatCard } from "@/components/shared/stat-card";
+import { OfflineBanner } from "@/components/shared/offline-banner";
+import { RegimeWidget } from "./regime-widget";
+import { useMarketRegime } from "@/lib/queries";
+import { formatDate, formatNumber, formatPercent } from "@/lib/format";
 
 export function MarketRegimeView() {
-  const { data, isLoading } = useMarketRegime()
-  const r = data?.data
+  const { data, isLoading } = useMarketRegime();
+  const r = data?.data;
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
@@ -116,5 +116,5 @@ export function MarketRegimeView() {
         height={420}
       />
     </div>
-  )
+  );
 }

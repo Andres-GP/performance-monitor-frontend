@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1782841338281" clover="3.2.0">
-  <project timestamp="1782841338281" name="All files">
+<coverage generated="1782841808446" clover="3.2.0">
+  <project timestamp="1782841808446" name="All files">
     <metrics statements="330" coveredstatements="289" conditionals="145" coveredconditionals="126" methods="109" coveredmethods="79" elements="584" coveredelements="494" complexity="0" loc="330" ncloc="330" packages="9" files="21" classes="21"/>
     <package name="components.alerts">
       <metrics statements="54" coveredstatements="45" conditionals="28" coveredconditionals="19" methods="18" coveredmethods="10"/>
-      <file name="alerts-view.tsx" path="/vercel/share/v0-project/components/alerts/alerts-view.tsx">
+      <file name="alerts-view.tsx" path="/Users/luyandy/Documents/performance-monitor-frontend/components/alerts/alerts-view.tsx">
         <metrics statements="54" coveredstatements="45" conditionals="28" coveredconditionals="19" methods="18" coveredmethods="10"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
@@ -64,7 +64,7 @@
     </package>
     <package name="components.layout">
       <metrics statements="26" coveredstatements="26" conditionals="14" coveredconditionals="13" methods="5" coveredmethods="5"/>
-      <file name="header.tsx" path="/vercel/share/v0-project/components/layout/header.tsx">
+      <file name="header.tsx" path="/Users/luyandy/Documents/performance-monitor-frontend/components/layout/header.tsx">
         <metrics statements="14" coveredstatements="14" conditionals="6" coveredconditionals="5" methods="3" coveredmethods="3"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
@@ -81,13 +81,13 @@
         <line num="20" count="4" type="stmt"/>
         <line num="21" count="4" type="stmt"/>
       </file>
-      <file name="nav-items.ts" path="/vercel/share/v0-project/components/layout/nav-items.ts">
+      <file name="nav-items.ts" path="/Users/luyandy/Documents/performance-monitor-frontend/components/layout/nav-items.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="9" count="3" type="stmt"/>
         <line num="18" count="9" type="stmt"/>
         <line num="27" count="4" type="stmt"/>
       </file>
-      <file name="sidebar-nav.tsx" path="/vercel/share/v0-project/components/layout/sidebar-nav.tsx">
+      <file name="sidebar-nav.tsx" path="/Users/luyandy/Documents/performance-monitor-frontend/components/layout/sidebar-nav.tsx">
         <metrics statements="9" coveredstatements="9" conditionals="8" coveredconditionals="8" methods="2" coveredmethods="2"/>
         <line num="3" count="2" type="stmt"/>
         <line num="4" count="2" type="stmt"/>
@@ -102,7 +102,7 @@
     </package>
     <package name="components.market-regime">
       <metrics statements="15" coveredstatements="15" conditionals="1" coveredconditionals="1" methods="6" coveredmethods="6"/>
-      <file name="regime-widget.tsx" path="/vercel/share/v0-project/components/market-regime/regime-widget.tsx">
+      <file name="regime-widget.tsx" path="/Users/luyandy/Documents/performance-monitor-frontend/components/market-regime/regime-widget.tsx">
         <metrics statements="15" coveredstatements="15" conditionals="1" coveredconditionals="1" methods="6" coveredmethods="6"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
@@ -117,13 +117,13 @@
         <line num="32" count="4" type="stmt"/>
         <line num="35" count="5" type="stmt"/>
         <line num="37" count="5" type="stmt"/>
-        <line num="61" count="11" type="stmt"/>
-        <line num="65" count="1" type="stmt"/>
+        <line num="60" count="11" type="stmt"/>
+        <line num="64" count="1" type="stmt"/>
       </file>
     </package>
     <package name="components.shared">
       <metrics statements="15" coveredstatements="15" conditionals="21" coveredconditionals="18" methods="5" coveredmethods="5"/>
-      <file name="badges.tsx" path="/vercel/share/v0-project/components/shared/badges.tsx">
+      <file name="badges.tsx" path="/Users/luyandy/Documents/performance-monitor-frontend/components/shared/badges.tsx">
         <metrics statements="8" coveredstatements="8" conditionals="8" coveredconditionals="7" methods="3" coveredmethods="3"/>
         <line num="1" count="3" type="stmt"/>
         <line num="2" count="3" type="stmt"/>
@@ -134,13 +134,13 @@
         <line num="42" count="3" type="stmt"/>
         <line num="48" count="26" type="stmt"/>
       </file>
-      <file name="offline-banner.tsx" path="/vercel/share/v0-project/components/shared/offline-banner.tsx">
+      <file name="offline-banner.tsx" path="/Users/luyandy/Documents/performance-monitor-frontend/components/shared/offline-banner.tsx">
         <metrics statements="3" coveredstatements="3" conditionals="3" coveredconditionals="3" methods="1" coveredmethods="1"/>
         <line num="1" count="3" type="stmt"/>
         <line num="3" count="3" type="cond" truecount="1" falsecount="0"/>
         <line num="4" count="3" type="cond" truecount="2" falsecount="0"/>
       </file>
-      <file name="stat-card.tsx" path="/vercel/share/v0-project/components/shared/stat-card.tsx">
+      <file name="stat-card.tsx" path="/Users/luyandy/Documents/performance-monitor-frontend/components/shared/stat-card.tsx">
         <metrics statements="4" coveredstatements="4" conditionals="10" coveredconditionals="8" methods="1" coveredmethods="1"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -150,7 +150,7 @@
     </package>
     <package name="components.strategies">
       <metrics statements="35" coveredstatements="34" conditionals="22" coveredconditionals="18" methods="11" coveredmethods="9"/>
-      <file name="strategies-table.tsx" path="/vercel/share/v0-project/components/strategies/strategies-table.tsx">
+      <file name="strategies-table.tsx" path="/Users/luyandy/Documents/performance-monitor-frontend/components/strategies/strategies-table.tsx">
         <metrics statements="11" coveredstatements="11" conditionals="4" coveredconditionals="3" methods="3" coveredmethods="3"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
@@ -164,7 +164,7 @@
         <line num="51" count="8" type="stmt"/>
         <line num="90" count="1" type="stmt"/>
       </file>
-      <file name="trades-table.tsx" path="/vercel/share/v0-project/components/strategies/trades-table.tsx">
+      <file name="trades-table.tsx" path="/Users/luyandy/Documents/performance-monitor-frontend/components/strategies/trades-table.tsx">
         <metrics statements="24" coveredstatements="23" conditionals="18" coveredconditionals="15" methods="8" coveredmethods="6"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
@@ -194,7 +194,7 @@
     </package>
     <package name="components.tradingview">
       <metrics statements="20" coveredstatements="20" conditionals="3" coveredconditionals="2" methods="3" coveredmethods="3"/>
-      <file name="tv-widget.tsx" path="/vercel/share/v0-project/components/tradingview/tv-widget.tsx">
+      <file name="tv-widget.tsx" path="/Users/luyandy/Documents/performance-monitor-frontend/components/tradingview/tv-widget.tsx">
         <metrics statements="20" coveredstatements="20" conditionals="3" coveredconditionals="2" methods="3" coveredmethods="3"/>
         <line num="3" count="1" type="stmt"/>
         <line num="20" count="3" type="cond" truecount="1" falsecount="0"/>
@@ -220,7 +220,7 @@
     </package>
     <package name="lib">
       <metrics statements="135" coveredstatements="104" conditionals="41" coveredconditionals="40" methods="56" coveredmethods="36"/>
-      <file name="api-client.ts" path="/vercel/share/v0-project/lib/api-client.ts">
+      <file name="api-client.ts" path="/Users/luyandy/Documents/performance-monitor-frontend/lib/api-client.ts">
         <metrics statements="20" coveredstatements="20" conditionals="10" coveredconditionals="10" methods="4" coveredmethods="4"/>
         <line num="4" count="1" type="stmt"/>
         <line num="6" count="2" type="stmt"/>
@@ -243,7 +243,7 @@
         <line num="52" count="1" type="stmt"/>
         <line num="54" count="1" type="stmt"/>
       </file>
-      <file name="format.ts" path="/vercel/share/v0-project/lib/format.ts">
+      <file name="format.ts" path="/Users/luyandy/Documents/performance-monitor-frontend/lib/format.ts">
         <metrics statements="19" coveredstatements="19" conditionals="22" coveredconditionals="22" methods="5" coveredmethods="5"/>
         <line num="1" count="25" type="stmt"/>
         <line num="2" count="25" type="cond" truecount="4" falsecount="0"/>
@@ -265,7 +265,7 @@
         <line num="35" count="2" type="cond" truecount="2" falsecount="0"/>
         <line num="36" count="1" type="stmt"/>
       </file>
-      <file name="mock-data.ts" path="/vercel/share/v0-project/lib/mock-data.ts">
+      <file name="mock-data.ts" path="/Users/luyandy/Documents/performance-monitor-frontend/lib/mock-data.ts">
         <metrics statements="26" coveredstatements="26" conditionals="6" coveredconditionals="6" methods="6" coveredmethods="6"/>
         <line num="16" count="9" type="stmt"/>
         <line num="80" count="8" type="stmt"/>
@@ -294,7 +294,7 @@
         <line num="210" count="3" type="stmt"/>
         <line num="223" count="93" type="stmt"/>
       </file>
-      <file name="queries.ts" path="/vercel/share/v0-project/lib/queries.ts">
+      <file name="queries.ts" path="/Users/luyandy/Documents/performance-monitor-frontend/lib/queries.ts">
         <metrics statements="62" coveredstatements="31" conditionals="3" coveredconditionals="2" methods="36" coveredmethods="16"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
@@ -359,14 +359,14 @@
         <line num="158" count="0" type="stmt"/>
         <line num="160" count="0" type="stmt"/>
       </file>
-      <file name="store.ts" path="/vercel/share/v0-project/lib/store.ts">
+      <file name="store.ts" path="/Users/luyandy/Documents/performance-monitor-frontend/lib/store.ts">
         <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="4"/>
         <line num="1" count="1" type="stmt"/>
         <line num="9" count="10" type="stmt"/>
         <line num="11" count="1" type="stmt"/>
         <line num="12" count="2" type="stmt"/>
       </file>
-      <file name="utils.ts" path="/vercel/share/v0-project/lib/utils.ts">
+      <file name="utils.ts" path="/Users/luyandy/Documents/performance-monitor-frontend/lib/utils.ts">
         <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="1" count="9" type="stmt"/>
         <line num="2" count="9" type="stmt"/>
@@ -376,7 +376,7 @@
     </package>
     <package name="lib.i18n">
       <metrics statements="17" coveredstatements="17" conditionals="6" coveredconditionals="6" methods="3" coveredmethods="3"/>
-      <file name="config.ts" path="/vercel/share/v0-project/lib/i18n/config.ts">
+      <file name="config.ts" path="/Users/luyandy/Documents/performance-monitor-frontend/lib/i18n/config.ts">
         <metrics statements="6" coveredstatements="6" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="1" count="2" type="stmt"/>
         <line num="5" count="3" type="stmt"/>
@@ -385,7 +385,7 @@
         <line num="14" count="8" type="stmt"/>
         <line num="15" count="8" type="cond" truecount="2" falsecount="0"/>
       </file>
-      <file name="dictionaries.ts" path="/vercel/share/v0-project/lib/i18n/dictionaries.ts">
+      <file name="dictionaries.ts" path="/Users/luyandy/Documents/performance-monitor-frontend/lib/i18n/dictionaries.ts">
         <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="3" count="3" type="stmt"/>
         <line num="274" count="2" type="stmt"/>
@@ -393,7 +393,7 @@
         <line num="545" count="3" type="stmt"/>
         <line num="546" count="3" type="cond" truecount="2" falsecount="0"/>
       </file>
-      <file name="server.ts" path="/vercel/share/v0-project/lib/i18n/server.ts">
+      <file name="server.ts" path="/Users/luyandy/Documents/performance-monitor-frontend/lib/i18n/server.ts">
         <metrics statements="6" coveredstatements="6" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -405,7 +405,7 @@
     </package>
     <package name="lib.server">
       <metrics statements="13" coveredstatements="13" conditionals="9" coveredconditionals="9" methods="2" coveredmethods="2"/>
-      <file name="backend.ts" path="/vercel/share/v0-project/lib/server/backend.ts">
+      <file name="backend.ts" path="/Users/luyandy/Documents/performance-monitor-frontend/lib/server/backend.ts">
         <metrics statements="13" coveredstatements="13" conditionals="9" coveredconditionals="9" methods="2" coveredmethods="2"/>
         <line num="1" count="5" type="stmt"/>
         <line num="2" count="5" type="stmt"/>

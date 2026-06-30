@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { SeverityBadge } from "@/components/shared/badges"
-import { OfflineBanner } from "@/components/shared/offline-banner"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { SeverityBadge } from "@/components/shared/badges";
+import { OfflineBanner } from "@/components/shared/offline-banner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -23,52 +23,60 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { useAlerts, useStrategies } from "@/lib/queries"
-import { formatDate } from "@/lib/format"
+} from "@/components/ui/table";
+import { useAlerts, useStrategies } from "@/lib/queries";
+import { formatDate } from "@/lib/format";
 
 export function AlertsView() {
-  const { data, isLoading } = useAlerts(200)
-  const strategies = useStrategies()
+  const { data, isLoading } = useAlerts(200);
+  const strategies = useStrategies();
 
-  const [strategy, setStrategy] = useState("all")
-  const [severity, setSeverity] = useState("all")
-  const [from, setFrom] = useState("")
-  const [to, setTo] = useState("")
-  const [pageSize, setPageSize] = useState(10)
-  const [page, setPage] = useState(0)
+  const [strategy, setStrategy] = useState("all");
+  const [severity, setSeverity] = useState("all");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [pageSize, setPageSize] = useState(10);
+  const [page, setPage] = useState(0);
 
-  const alerts = data?.data ?? []
-  const strategyList = strategies.data?.data ?? []
+  const alerts = data?.data ?? [];
+  const strategyList = strategies.data?.data ?? [];
 
   const strategyItems: Record<string, string> = {
     all: "Todas",
     ...Object.fromEntries(strategyList.map((s) => [s.id, s.name])),
-  }
-  const severityItems = { all: "Todas", high: "Alta", medium: "Media", low: "Baja" }
+  };
+  const severityItems = {
+    all: "Todas",
+    high: "Alta",
+    medium: "Media",
+    low: "Baja",
+  };
 
   const filtered = useMemo(() => {
-    const fromTime = from ? new Date(from).getTime() : null
-    const toTime = to ? new Date(to).getTime() + 86_400_000 : null
+    const fromTime = from ? new Date(from).getTime() : null;
+    const toTime = to ? new Date(to).getTime() + 86_400_000 : null;
     return alerts.filter((a) => {
-      const t = new Date(a.timestamp).getTime()
-      const matchStrategy = strategy === "all" || a.strategy_id === strategy
-      const matchSeverity = severity === "all" || a.severity === severity
-      const matchFrom = fromTime == null || t >= fromTime
-      const matchTo = toTime == null || t <= toTime
-      return matchStrategy && matchSeverity && matchFrom && matchTo
-    })
-  }, [alerts, strategy, severity, from, to])
+      const t = new Date(a.timestamp).getTime();
+      const matchStrategy = strategy === "all" || a.strategy_id === strategy;
+      const matchSeverity = severity === "all" || a.severity === severity;
+      const matchFrom = fromTime == null || t >= fromTime;
+      const matchTo = toTime == null || t <= toTime;
+      return matchStrategy && matchSeverity && matchFrom && matchTo;
+    });
+  }, [alerts, strategy, severity, from, to]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
-  const safePage = Math.min(page, totalPages - 1)
-  const pageAlerts = filtered.slice(safePage * pageSize, safePage * pageSize + pageSize)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageAlerts = filtered.slice(
+    safePage * pageSize,
+    safePage * pageSize + pageSize,
+  );
 
   function resetPage<T>(setter: (v: T) => void) {
     return (v: T) => {
-      setter(v)
-      setPage(0)
-    }
+      setter(v);
+      setPage(0);
+    };
   }
 
   return (
@@ -105,7 +113,9 @@ export function AlertsView() {
             </Select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label className="text-xs text-muted-foreground">Severidad</Label>
+            <Label className="text-xs text-muted-foreground">
+              Severidadaaa
+            </Label>
             <Select
               items={severityItems}
               value={severity}
@@ -164,8 +174,12 @@ export function AlertsView() {
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
                   <TableHead>Problema</TableHead>
-                  <TableHead className="hidden md:table-cell">Detalles</TableHead>
-                  <TableHead className="hidden sm:table-cell">Estrategia</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Detalles
+                  </TableHead>
+                  <TableHead className="hidden sm:table-cell">
+                    Estrategia
+                  </TableHead>
                   <TableHead>Severidad</TableHead>
                   <TableHead className="text-right">Fecha</TableHead>
                 </TableRow>
@@ -198,8 +212,8 @@ export function AlertsView() {
               <Select
                 value={String(pageSize)}
                 onValueChange={(v) => {
-                  setPageSize(Number(v))
-                  setPage(0)
+                  setPageSize(Number(v));
+                  setPage(0);
                 }}
               >
                 <SelectTrigger className="w-20">
@@ -215,7 +229,8 @@ export function AlertsView() {
 
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <span>
-                {filtered.length} alertas · página {safePage + 1} de {totalPages}
+                {filtered.length} alertas · página {safePage + 1} de{" "}
+                {totalPages}
               </span>
               <div className="flex items-center gap-2">
                 <Button
@@ -232,7 +247,9 @@ export function AlertsView() {
                   size="icon-sm"
                   aria-label="Página siguiente"
                   disabled={safePage >= totalPages - 1}
-                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  onClick={() =>
+                    setPage((p) => Math.min(totalPages - 1, p + 1))
+                  }
                 >
                   <ChevronRight className="size-4" />
                 </Button>
@@ -242,5 +259,5 @@ export function AlertsView() {
         </>
       )}
     </div>
-  )
+  );
 }

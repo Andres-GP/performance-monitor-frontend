@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { SeverityBadge } from "@/components/shared/badges"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import Link from "next/link";
+import { SeverityBadge } from "@/components/shared/badges";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -12,22 +18,29 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { formatDate } from "@/lib/format"
-import { useAlerts } from "@/lib/queries"
+} from "@/components/ui/table";
+import { formatDate } from "@/lib/format";
+import { useAlerts } from "@/lib/queries";
 
 export function RecentAlerts() {
-  const { data, isLoading } = useAlerts()
-  const alerts = (data?.data ?? []).slice(0, 5)
+  const { data, isLoading } = useAlerts();
+  const alerts = (data?.data ?? []).slice(0, 5);
 
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between">
         <div className="space-y-1.5">
           <CardTitle>Últimas Alertas de Salud</CardTitle>
-          <CardDescription>Eventos recientes de las estrategias</CardDescription>
+          <CardDescription>
+            Eventos recientes de las estrategias
+          </CardDescription>
         </div>
-        <Button variant="outline" size="sm" nativeButton={false} render={<Link href="/alerts" />}>
+        <Button
+          variant="outline"
+          size="sm"
+          nativeButton={false}
+          render={<Link href="/alerts" />}
+        >
           Ver todas
         </Button>
       </CardHeader>
@@ -43,7 +56,9 @@ export function RecentAlerts() {
             <TableHeader>
               <TableRow>
                 <TableHead>Problema</TableHead>
-                <TableHead className="hidden sm:table-cell">Estrategia</TableHead>
+                <TableHead className="hidden sm:table-cell">
+                  Estrategia
+                </TableHead>
                 <TableHead>Severidad</TableHead>
                 <TableHead className="text-right">Fecha</TableHead>
               </TableRow>
@@ -68,5 +83,5 @@ export function RecentAlerts() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

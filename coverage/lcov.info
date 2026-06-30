@@ -208,8 +208,8 @@ FN:22,RegimeWidget
 FN:32,(anonymous_2)
 FN:35,(anonymous_3)
 FN:37,(anonymous_4)
-FN:61,(anonymous_5)
-FN:65,(anonymous_6)
+FN:60,(anonymous_5)
+FN:64,(anonymous_6)
 FNF:6
 FNH:6
 FNDA:15,RegimeWidget
@@ -231,8 +231,8 @@ DA:31,15
 DA:32,4
 DA:35,5
 DA:37,5
-DA:61,11
-DA:65,1
+DA:60,11
+DA:64,1
 LF:15
 LH:15
 BRDA:26,0,0,15

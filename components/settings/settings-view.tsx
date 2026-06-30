@@ -1,20 +1,26 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { Bell, Mail, Moon, Server } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { apiGet } from "@/lib/api-client"
-import { cn } from "@/lib/utils"
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Bell, Mail, Moon, Server } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { apiGet } from "@/lib/api-client";
+import { cn } from "@/lib/utils";
 
 function Toggle({
   checked,
   onChange,
   label,
 }: {
-  checked: boolean
-  onChange: (v: boolean) => void
-  label: string
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
 }) {
   return (
     <button
@@ -24,7 +30,7 @@ function Toggle({
       aria-label={label}
       onClick={() => onChange(!checked)}
       className={cn(
-        "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+        "cursor-pointer inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
         checked ? "bg-primary" : "bg-muted",
       )}
     >
@@ -35,7 +41,7 @@ function Toggle({
         )}
       />
     </button>
-  )
+  );
 }
 
 function SettingRow({
@@ -44,10 +50,10 @@ function SettingRow({
   description,
   children,
 }: {
-  icon: typeof Bell
-  title: string
-  description: string
-  children: React.ReactNode
+  icon: typeof Bell;
+  title: string;
+  description: string;
+  children: React.ReactNode;
 }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-border py-4 last:border-0">
@@ -62,26 +68,26 @@ function SettingRow({
       </div>
       {children}
     </div>
-  )
+  );
 }
 
 export function SettingsView() {
-  const [emailAlerts, setEmailAlerts] = useState(true)
-  const [pushAlerts, setPushAlerts] = useState(false)
-  const [dailyDigest, setDailyDigest] = useState(true)
+  const [emailAlerts, setEmailAlerts] = useState(true);
+  const [pushAlerts, setPushAlerts] = useState(false);
+  const [dailyDigest, setDailyDigest] = useState(true);
 
   const health = useQuery({
     queryKey: ["health"],
     queryFn: async () => {
       try {
-        await apiGet<{ status: string }>("/health")
-        return "online" as const
+        await apiGet<{ status: string }>("/health");
+        return "online" as const;
       } catch {
-        return "offline" as const
+        return "offline" as const;
       }
     },
     refetchInterval: 30_000,
-  })
+  });
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -95,7 +101,9 @@ export function SettingsView() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Notificaciones</CardTitle>
-          <CardDescription>Controla cómo recibes las alertas de salud</CardDescription>
+          <CardDescription>
+            Controla cómo recibes las alertas de salud
+          </CardDescription>
         </CardHeader>
         <CardContent className="py-0">
           <SettingRow
@@ -103,21 +111,33 @@ export function SettingsView() {
             title="Alertas por email"
             description="Recibe un correo cuando una estrategia presenta problemas"
           >
-            <Toggle checked={emailAlerts} onChange={setEmailAlerts} label="Alertas por email" />
+            <Toggle
+              checked={emailAlerts}
+              onChange={setEmailAlerts}
+              label="Alertas por email"
+            />
           </SettingRow>
           <SettingRow
             icon={Bell}
             title="Alertas push"
             description="Notificaciones en tiempo real en el navegador"
           >
-            <Toggle checked={pushAlerts} onChange={setPushAlerts} label="Alertas push" />
+            <Toggle
+              checked={pushAlerts}
+              onChange={setPushAlerts}
+              label="Alertas push"
+            />
           </SettingRow>
           <SettingRow
             icon={Mail}
             title="Resumen diario"
             description="Un resumen del rendimiento de la cartera cada día"
           >
-            <Toggle checked={dailyDigest} onChange={setDailyDigest} label="Resumen diario" />
+            <Toggle
+              checked={dailyDigest}
+              onChange={setDailyDigest}
+              label="Resumen diario"
+            />
           </SettingRow>
         </CardContent>
       </Card>
@@ -133,7 +153,7 @@ export function SettingsView() {
             title="Modo oscuro"
             description="El panel está optimizado exclusivamente para tema oscuro"
           >
-            <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+            <span className="cursor-none rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
               Activo
             </span>
           </SettingRow>
@@ -143,7 +163,9 @@ export function SettingsView() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Sistema</CardTitle>
-          <CardDescription>Conexión con el backend vía proxy seguro</CardDescription>
+          <CardDescription>
+            Conexión con el backend vía proxy seguro
+          </CardDescription>
         </CardHeader>
         <CardContent className="py-0">
           <SettingRow
@@ -171,11 +193,15 @@ export function SettingsView() {
                       : "bg-muted-foreground",
                 )}
               />
-              {health.isLoading ? "Comprobando" : health.data === "online" ? "En línea" : "Sin conexión"}
+              {health.isLoading
+                ? "Comprobando"
+                : health.data === "online"
+                  ? "En línea"
+                  : "Sin conexión"}
             </span>
           </SettingRow>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
