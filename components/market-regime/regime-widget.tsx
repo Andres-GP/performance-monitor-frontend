@@ -37,7 +37,6 @@ export function RegimeWidget({
         .map((s) => [s] as [string]),
       chartOnly: false,
       locale: "en",
-      isTransparent: true,
       showVolume: false,
       showMA: false,
       scalePosition: "right",
