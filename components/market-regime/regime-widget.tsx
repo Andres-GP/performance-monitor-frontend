@@ -1,19 +1,25 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { TvWidget } from "@/components/tradingview/lazy"
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { TvWidget } from "@/components/tradingview/lazy";
 
 const SYMBOL_OVERVIEW_SRC =
-  "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js"
+  "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js";
 
 interface RegimeWidgetProps {
-  title: string
-  description: string
-  defaultSymbols: string
-  height?: number
+  title: string;
+  description: string;
+  defaultSymbols: string;
+  height?: number;
 }
 
 // Configurable TradingView "Symbol Overview" widget. Symbols are entered as a
@@ -23,10 +29,10 @@ export function RegimeWidget({
   title,
   description,
   defaultSymbols,
-  height = 400,
+  height = 1000,
 }: RegimeWidgetProps) {
-  const [draft, setDraft] = useState(defaultSymbols)
-  const [applied, setApplied] = useState(defaultSymbols)
+  const [draft, setDraft] = useState(defaultSymbols);
+  const [applied, setApplied] = useState(defaultSymbols);
 
   const config = useMemo(
     () => ({
@@ -45,7 +51,7 @@ export function RegimeWidget({
       dateRanges: ["1m|30", "3m|60", "12m|1D", "60m|1W"],
     }),
     [applied],
-  )
+  );
 
   return (
     <Card>
@@ -53,7 +59,7 @@ export function RegimeWidget({
         <CardTitle className="text-base">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-3">
+      <CardContent className="flex flex-col gap-3 h-120">
         <div className="flex flex-col gap-2 sm:flex-row">
           <Input
             value={draft}
@@ -61,12 +67,20 @@ export function RegimeWidget({
             placeholder="AMEX:SPY, NASDAQ:QQQ"
             aria-label={`Símbolos para ${title}`}
           />
-          <Button variant="outline" onClick={() => setApplied(draft)} className="shrink-0">
+          <Button
+            variant="outline"
+            onClick={() => setApplied(draft)}
+            className="shrink-0"
+          >
             Aplicar
           </Button>
         </div>
-        <TvWidget scriptSrc={SYMBOL_OVERVIEW_SRC} config={config} height={height} />
+        <TvWidget
+          scriptSrc={SYMBOL_OVERVIEW_SRC}
+          config={config}
+          height={height}
+        />
       </CardContent>
     </Card>
-  )
+  );
 }

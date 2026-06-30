@@ -1,12 +1,22 @@
-"use client"
+"use client";
 
-import { Activity, Receipt, TrendingDown } from "lucide-react"
-import { CapitalPie, DrawdownChart, WeightsBar } from "@/components/charts/lazy"
-import { CorrelationHeatmap } from "@/components/charts/correlation-heatmap"
-import { StatCard } from "@/components/shared/stat-card"
-import { OfflineBanner } from "@/components/shared/offline-banner"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Activity, Receipt, TrendingDown } from "lucide-react";
+import {
+  CapitalPie,
+  DrawdownChart,
+  WeightsBar,
+} from "@/components/charts/lazy";
+import { CorrelationHeatmap } from "@/components/charts/correlation-heatmap";
+import { StatCard } from "@/components/shared/stat-card";
+import { OfflineBanner } from "@/components/shared/offline-banner";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -14,27 +24,33 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { useCapitalSummary, usePortfolioMetrics, usePortfolioWeights } from "@/lib/queries"
-import { formatCurrency, formatNumber, formatPercent } from "@/lib/format"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/table";
+import {
+  useCapitalSummary,
+  usePortfolioMetrics,
+  usePortfolioWeights,
+} from "@/lib/queries";
+import { formatCurrency, formatNumber, formatPercent } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 const accountLabels: Record<string, string> = {
   demo: "Demo",
   real: "Real",
   funded: "Fondeada",
-}
+};
 
 export function PortfolioView() {
-  const capital = useCapitalSummary()
-  const weights = usePortfolioWeights()
-  const metrics = usePortfolioMetrics()
+  const capital = useCapitalSummary();
+  const weights = usePortfolioWeights();
+  const metrics = usePortfolioMetrics();
 
   const isFallback =
-    capital.data?.isFallback || weights.data?.isFallback || metrics.data?.isFallback
-  const summary = capital.data?.data
-  const weightList = weights.data?.data ?? []
-  const pm = metrics.data?.data
+    capital.data?.isFallback ||
+    weights.data?.isFallback ||
+    metrics.data?.isFallback;
+  const summary = capital.data?.data;
+  const weightList = weights.data?.data ?? [];
+  const pm = metrics.data?.data;
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
@@ -83,8 +99,12 @@ export function PortfolioView() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Capital por Tipo de Cuenta</CardTitle>
-            <CardDescription>Distribución entre cuentas demo, real y fondeada</CardDescription>
+            <CardTitle className="text-base">
+              Capital por Tipo de Cuenta
+            </CardTitle>
+            <CardDescription>
+              Distribución entre cuentas demo, real y fondeada
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {capital.isLoading ? (
@@ -94,11 +114,16 @@ export function PortfolioView() {
             )}
             <div className="mt-4 flex flex-col gap-2">
               {(summary?.accounts ?? []).map((a) => (
-                <div key={a.account_type} className="flex items-center justify-between text-sm">
+                <div
+                  key={a.account_type}
+                  className="flex items-center justify-between text-sm"
+                >
                   <span className="text-muted-foreground">
                     {accountLabels[a.account_type] ?? a.account_type}
                   </span>
-                  <span className="font-medium tabular-nums">{formatCurrency(a.capital)}</span>
+                  <span className="font-medium tabular-nums">
+                    {formatCurrency(a.capital)}
+                  </span>
                 </div>
               ))}
             </div>
@@ -107,8 +132,12 @@ export function PortfolioView() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Pesos Objetivo vs Reales</CardTitle>
-            <CardDescription>Asignación planificada contra la actual</CardDescription>
+            <CardTitle className="text-base">
+              Pesos Objetivo vs Reales
+            </CardTitle>
+            <CardDescription>
+              Asignación planificada contra la actual
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {weights.isLoading ? (
@@ -138,7 +167,8 @@ export function PortfolioView() {
               </TableHeader>
               <TableBody>
                 {weightList.map((w) => {
-                  const deviation = (w.actual_weight ?? 0) - (w.target_weight ?? 0)
+                  const deviation =
+                    (w.actual_weight ?? 0) - (w.target_weight ?? 0);
                   return (
                     <TableRow key={w.strategy_id}>
                       <TableCell className="font-medium">
@@ -153,14 +183,16 @@ export function PortfolioView() {
                       <TableCell
                         className={cn(
                           "text-right tabular-nums",
-                          Math.abs(deviation) > 0.03 ? "text-chart-4" : "text-muted-foreground",
+                          Math.abs(deviation) > 0.03
+                            ? "text-chart-4"
+                            : "text-muted-foreground",
                         )}
                       >
                         {deviation >= 0 ? "+" : ""}
                         {formatPercent(deviation)}
                       </TableCell>
                     </TableRow>
-                  )
+                  );
                 })}
               </TableBody>
             </Table>
@@ -172,7 +204,9 @@ export function PortfolioView() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Matriz de Correlación</CardTitle>
-            <CardDescription>Correlación entre estrategias del portafolio</CardDescription>
+            <CardDescription>
+              Correlación entre estrategias del portafolio
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {metrics.isLoading ? (
@@ -183,7 +217,9 @@ export function PortfolioView() {
                 matrix={pm.correlation_matrix.matrix}
               />
             ) : (
-              <p className="text-sm text-muted-foreground">Sin datos de correlación.</p>
+              <p className="text-sm text-muted-foreground">
+                Sin datos de correlación.
+              </p>
             )}
           </CardContent>
         </Card>
@@ -191,7 +227,9 @@ export function PortfolioView() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Drawdown Combinado</CardTitle>
-            <CardDescription>Evolución del drawdown de la cartera</CardDescription>
+            <CardDescription>
+              Evolución del drawdown de la cartera
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {metrics.isLoading ? (
@@ -203,5 +241,5 @@ export function PortfolioView() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
