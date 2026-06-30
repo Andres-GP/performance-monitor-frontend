@@ -135,10 +135,30 @@
 <a name='L70'></a><a href='#L70'>70</a>
 <a name='L71'></a><a href='#L71'>71</a>
 <a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -198,6 +218,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -207,22 +229,34 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">"use client"
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">"use client";
 &nbsp;
-import { useMemo, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { TvWidget } from "@/components/tradingview/lazy"
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { TvWidget } from "@/components/tradingview/lazy";
 &nbsp;
 const SYMBOL_OVERVIEW_SRC =
-  "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js"
+  "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js";
 &nbsp;
 interface RegimeWidgetProps {
-  title: string
-  description: string
-  defaultSymbols: string
-  height?: number
+  title: string;
+  description: string;
+  defaultSymbols: string;
+  height?: number;
 }
 &nbsp;
 // Configurable TradingView "Symbol Overview" widget. Symbols are entered as a
@@ -232,10 +266,10 @@ export function RegimeWidget({
   title,
   description,
   defaultSymbols,
-  height = 400,
+  height = 1000,
 }: RegimeWidgetProps) {
-  const [draft, setDraft] = useState(defaultSymbols)
-  const [applied, setApplied] = useState(defaultSymbols)
+  const [draft, setDraft] = useState(defaultSymbols);
+  const [applied, setApplied] = useState(defaultSymbols);
 &nbsp;
   const config = useMemo(
     () =&gt; ({
@@ -254,7 +288,7 @@ export function RegimeWidget({
       dateRanges: ["1m|30", "3m|60", "12m|1D", "60m|1W"],
     }),
     [applied],
-  )
+  );
 &nbsp;
   return (
     &lt;Card&gt;
@@ -262,7 +296,7 @@ export function RegimeWidget({
         &lt;CardTitle className="text-base"&gt;{title}&lt;/CardTitle&gt;
         &lt;CardDescription&gt;{description}&lt;/CardDescription&gt;
       &lt;/CardHeader&gt;
-      &lt;CardContent className="flex flex-col gap-3"&gt;
+      &lt;CardContent className="flex flex-col gap-3 h-120"&gt;
         &lt;div className="flex flex-col gap-2 sm:flex-row"&gt;
           &lt;Input
             value={draft}
@@ -270,14 +304,22 @@ export function RegimeWidget({
             placeholder="AMEX:SPY, NASDAQ:QQQ"
             aria-label={`Símbolos para ${title}`}
           /&gt;
-          &lt;Button variant="outline" onClick={() =&gt; setApplied(draft)} className="shrink-0"&gt;
+          &lt;Button
+            variant="outline"
+            onClick={() =&gt; setApplied(draft)}
+            className="shrink-0"
+          &gt;
             Aplicar
           &lt;/Button&gt;
         &lt;/div&gt;
-        &lt;TvWidget scriptSrc={SYMBOL_OVERVIEW_SRC} config={config} height={height} /&gt;
+        &lt;TvWidget
+          scriptSrc={SYMBOL_OVERVIEW_SRC}
+          config={config}
+          height={height}
+        /&gt;
       &lt;/CardContent&gt;
     &lt;/Card&gt;
-  )
+  );
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -286,7 +328,7 @@ export function RegimeWidget({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-30T17:50:08.426Z
+                at 2026-06-30T23:10:18.451Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

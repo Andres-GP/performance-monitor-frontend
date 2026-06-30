@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.3% </span>
+                <span class="strong">92.85% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>24/26</span>
+                <span class='fraction'>26/28</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">77.77% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>15/18</span>
+                <span class='fraction'>14/18</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">95.83% </span>
+                <span class="strong">96.15% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>23/24</span>
+                <span class='fraction'>25/26</span>
             </div>
         
             
@@ -202,7 +202,9 @@
 <a name='L137'></a><a href='#L137'>137</a>
 <a name='L138'></a><a href='#L138'>138</a>
 <a name='L139'></a><a href='#L139'>139</a>
-<a name='L140'></a><a href='#L140'>140</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -221,22 +223,24 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -246,7 +250,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -359,11 +363,13 @@ import {
 import { OfflineBanner } from "@/components/shared/offline-banner"
 import { useTrades } from "@/lib/queries"
 import { formatCurrency, formatDate, formatNumber } from "@/lib/format"
+import { useI18n } from "@/lib/i18n/context"
 import { cn } from "@/lib/utils"
 &nbsp;
 const PAGE_SIZE = 12
 &nbsp;
 export function TradesTable({ strategyId }: { strategyId: string }) {
+  const { dict, t } = useI18n()
   const { data, isLoading } = useTrades(strategyId)
   const [page, setPage] = useState(0)
 &nbsp;
@@ -385,11 +391,11 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
     )
   }
 &nbsp;
-  if (trades.length === 0) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (trades.length === 0) {
     return (
       &lt;Card&gt;
         &lt;CardContent className="p-12 text-center text-sm text-muted-foreground"&gt;
-          No hay operaciones registradas para esta estrategia.
+          {dict.trades.empty}
         &lt;/CardContent&gt;
       &lt;/Card&gt;
     )
@@ -403,48 +409,48 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
         &lt;Table&gt;
           &lt;TableHeader&gt;
             &lt;TableRow className="hover:bg-transparent"&gt;
-              &lt;TableHead&gt;Símbolo&lt;/TableHead&gt;
-              &lt;TableHead&gt;Lado&lt;/TableHead&gt;
-              &lt;TableHead className="text-right"&gt;Entrada&lt;/TableHead&gt;
-              &lt;TableHead className="text-right"&gt;Salida&lt;/TableHead&gt;
-              &lt;TableHead className="text-right"&gt;Cant.&lt;/TableHead&gt;
-              &lt;TableHead className="text-right"&gt;PnL&lt;/TableHead&gt;
-              &lt;TableHead className="hidden text-right md:table-cell"&gt;Fecha&lt;/TableHead&gt;
+              &lt;TableHead&gt;{dict.trades.colSymbol}&lt;/TableHead&gt;
+              &lt;TableHead&gt;{dict.trades.colSide}&lt;/TableHead&gt;
+              &lt;TableHead className="text-right"&gt;{dict.trades.colEntry}&lt;/TableHead&gt;
+              &lt;TableHead className="text-right"&gt;{dict.trades.colExit}&lt;/TableHead&gt;
+              &lt;TableHead className="text-right"&gt;{dict.trades.colQty}&lt;/TableHead&gt;
+              &lt;TableHead className="text-right"&gt;{dict.trades.colPnl}&lt;/TableHead&gt;
+              &lt;TableHead className="hidden text-right md:table-cell"&gt;{dict.trades.colDate}&lt;/TableHead&gt;
             &lt;/TableRow&gt;
           &lt;/TableHeader&gt;
           &lt;TableBody&gt;
-            {pageTrades.map((t) =&gt; (
-              &lt;TableRow key={t.id}&gt;
-                &lt;TableCell className="font-medium"&gt;{t.symbol ?? <span class="branch-1 cbranch-no" title="branch not covered" >"—"}&lt;/TableCell&gt;</span>
+            {pageTrades.map((trade) =&gt; (
+              &lt;TableRow key={trade.id}&gt;
+                &lt;TableCell className="font-medium"&gt;{trade.symbol ?? <span class="branch-1 cbranch-no" title="branch not covered" >dict.common.none}</span>&lt;/TableCell&gt;
                 &lt;TableCell&gt;
                   &lt;span
                     className={cn(
-                      "rounded-md px-2 py-0.5 text-xs font-medium capitalize",
-                      t.side === "long"
+                      "rounded-md px-2 py-0.5 text-xs font-medium",
+                      trade.side === "long"
                         ? "bg-chart-1/10 text-chart-1"
                         : "bg-chart-2/10 text-chart-2",
                     )}
                   &gt;
-                    {t.side === "long" ? "Largo" : "Corto"}
+                    {trade.side === "long" ? dict.trades.long : dict.trades.short}
                   &lt;/span&gt;
                 &lt;/TableCell&gt;
                 &lt;TableCell className="text-right tabular-nums"&gt;
-                  {formatNumber(t.entry_price)}
+                  {formatNumber(trade.entry_price)}
                 &lt;/TableCell&gt;
                 &lt;TableCell className="text-right tabular-nums"&gt;
-                  {formatNumber(t.exit_price)}
+                  {formatNumber(trade.exit_price)}
                 &lt;/TableCell&gt;
-                &lt;TableCell className="text-right tabular-nums"&gt;{t.quantity ?? <span class="branch-1 cbranch-no" title="branch not covered" >"—"}&lt;/TableCell&gt;</span>
+                &lt;TableCell className="text-right tabular-nums"&gt;{trade.quantity ?? <span class="branch-1 cbranch-no" title="branch not covered" >dict.common.none}</span>&lt;/TableCell&gt;
                 &lt;TableCell
                   className={cn(
                     "text-right font-medium tabular-nums",
-                    t.pnl &gt;= 0 ? "text-chart-1" : "text-destructive",
+                    trade.pnl &gt;= 0 ? "text-chart-1" : "text-destructive",
                   )}
                 &gt;
-                  {formatCurrency(t.pnl)}
+                  {formatCurrency(trade.pnl)}
                 &lt;/TableCell&gt;
                 &lt;TableCell className="hidden text-right text-muted-foreground md:table-cell"&gt;
-                  {formatDate(t.entry_time)}
+                  {formatDate(trade.entry_time)}
                 &lt;/TableCell&gt;
               &lt;/TableRow&gt;
             ))}
@@ -487,7 +493,7 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-30T17:50:08.426Z
+                at 2026-06-30T23:10:18.451Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

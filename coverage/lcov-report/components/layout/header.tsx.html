@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">94.73% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>15/15</span>
+                <span class='fraction'>18/19</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>5/6</span>
+                <span class='fraction'>3/6</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>14/14</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -117,7 +117,12 @@
 <a name='L52'></a><a href='#L52'>52</a>
 <a name='L53'></a><a href='#L53'>53</a>
 <a name='L54'></a><a href='#L54'>54</a>
-<a name='L55'></a><a href='#L55'>55</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -126,18 +131,23 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -178,19 +188,23 @@ import { usePathname } from "next/navigation"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { useI18n } from "@/lib/i18n/context"
+import { LanguageSelector } from "./language-selector"
 import { navItems } from "./nav-items"
 import { SidebarNav } from "./sidebar-nav"
 &nbsp;
 function useTitle() {
   const pathname = usePathname()
-  if (pathname.startsWith("/strategies/")) return "Detalle de Estrategia"
+  const { dict } = useI18n()
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (pathname.startsWith("/strategies/")) <span class="cstat-no" title="statement not covered" >return dict.header.strategyDetail</span>
   const match = navItems.find((i) =&gt;
-    i.href === "/" ? pathname === "/" : pathname.startsWith(i.href),
+    i.href === "/" ? pathname === "/" : <span class="branch-1 cbranch-no" title="branch not covered" >pathname.startsWith(i.href),</span>
   )
-  return match?.label ?? <span class="branch-1 cbranch-no" title="branch not covered" >"Performance Monitor"</span>
+  return match ? dict.nav[match.labelKey] : <span class="branch-1 cbranch-no" title="branch not covered" >dict.common.appName</span>
 }
 &nbsp;
 export function Header() {
+  const { dict } = useI18n()
   const title = useTitle()
 &nbsp;
   return (
@@ -202,14 +216,14 @@ export function Header() {
               variant="ghost"
               size="icon"
               className="md:hidden"
-              aria-label="Abrir menú de navegación"
+              aria-label={dict.header.openMenu}
             /&gt;
           }
         &gt;
           &lt;Menu className="size-5" /&gt;
         &lt;/SheetTrigger&gt;
         &lt;SheetContent side="left" className="w-72 bg-sidebar p-0"&gt;
-          &lt;SheetTitle className="sr-only"&gt;Navegación&lt;/SheetTitle&gt;
+          &lt;SheetTitle className="sr-only"&gt;{dict.header.navigation}&lt;/SheetTitle&gt;
           &lt;SidebarNav /&gt;
         &lt;/SheetContent&gt;
       &lt;/Sheet&gt;
@@ -217,7 +231,8 @@ export function Header() {
       &lt;h1 className="text-base font-semibold md:text-lg"&gt;{title}&lt;/h1&gt;
 &nbsp;
       &lt;div className="ml-auto flex items-center gap-3"&gt;
-        &lt;span className="hidden text-sm text-muted-foreground sm:inline"&gt;Trader&lt;/span&gt;
+        &lt;LanguageSelector /&gt;
+        &lt;span className="hidden text-sm text-muted-foreground sm:inline"&gt;{dict.header.user}&lt;/span&gt;
         &lt;Avatar className="size-9"&gt;
           &lt;AvatarFallback className="bg-primary/15 text-primary"&gt;TR&lt;/AvatarFallback&gt;
         &lt;/Avatar&gt;
@@ -232,7 +247,7 @@ export function Header() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-30T17:50:08.426Z
+                at 2026-06-30T23:10:18.451Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
