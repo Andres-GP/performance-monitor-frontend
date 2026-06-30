@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1782841198759" clover="3.2.0">
+  <project timestamp="1782841198759" name="All files">
+    <metrics statements="330" coveredstatements="239" conditionals="145" coveredconditionals="113" methods="109" coveredmethods="60" elements="584" coveredelements="412" complexity="0" loc="330" ncloc="330" packages="9" files="21" classes="21"/>
+    <package name="components.alerts">
+      <metrics statements="54" coveredstatements="45" conditionals="28" coveredconditionals="19" methods="18" coveredmethods="10"/>
+      <file name="alerts-view.tsx" path="/vercel/share/v0-project/components/alerts/alerts-view.tsx">
+        <metrics statements="54" coveredstatements="45" conditionals="28" coveredconditionals="19" methods="18" coveredmethods="10"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="26" count="1" type="stmt"/>
+        <line num="27" count="1" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="30" count="4" type="stmt"/>
+        <line num="31" count="5" type="stmt"/>
+        <line num="32" count="5" type="stmt"/>
+        <line num="34" count="5" type="stmt"/>
+        <line num="35" count="5" type="stmt"/>
+        <line num="36" count="5" type="stmt"/>
+        <line num="37" count="5" type="stmt"/>
+        <line num="38" count="5" type="stmt"/>
+        <line num="39" count="5" type="stmt"/>
+        <line num="41" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="42" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="44" count="5" type="stmt"/>
+        <line num="46" count="5" type="stmt"/>
+        <line num="48" count="5" type="stmt"/>
+        <line num="50" count="5" type="stmt"/>
+        <line num="51" count="4" type="cond" truecount="1" falsecount="1"/>
+        <line num="52" count="4" type="cond" truecount="1" falsecount="1"/>
+        <line num="53" count="4" type="stmt"/>
+        <line num="54" count="28" type="stmt"/>
+        <line num="55" count="28" type="cond" truecount="1" falsecount="1"/>
+        <line num="56" count="28" type="cond" truecount="1" falsecount="1"/>
+        <line num="57" count="28" type="cond" truecount="1" falsecount="1"/>
+        <line num="58" count="28" type="cond" truecount="1" falsecount="1"/>
+        <line num="59" count="28" type="cond" truecount="4" falsecount="0"/>
+        <line num="63" count="5" type="stmt"/>
+        <line num="64" count="5" type="stmt"/>
+        <line num="65" count="5" type="stmt"/>
+        <line num="68" count="10" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="70" count="0" type="stmt"/>
+        <line num="92" count="0" type="stmt"/>
+        <line num="100" count="5" type="stmt"/>
+        <line num="112" count="0" type="stmt"/>
+        <line num="133" count="0" type="stmt"/>
+        <line num="144" count="0" type="stmt"/>
+        <line num="153" count="6" type="stmt"/>
+        <line num="175" count="23" type="stmt"/>
+        <line num="201" count="0" type="stmt"/>
+        <line num="202" count="0" type="stmt"/>
+        <line num="226" count="0" type="stmt"/>
+        <line num="235" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.layout">
+      <metrics statements="26" coveredstatements="26" conditionals="14" coveredconditionals="13" methods="5" coveredmethods="5"/>
+      <file name="header.tsx" path="/vercel/share/v0-project/components/layout/header.tsx">
+        <metrics statements="14" coveredstatements="14" conditionals="6" coveredconditionals="5" methods="3" coveredmethods="3"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="12" count="4" type="stmt"/>
+        <line num="13" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="14" count="3" type="stmt"/>
+        <line num="15" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="17" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="20" count="4" type="stmt"/>
+        <line num="21" count="4" type="stmt"/>
+      </file>
+      <file name="nav-items.ts" path="/vercel/share/v0-project/components/layout/nav-items.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="9" count="3" type="stmt"/>
+        <line num="18" count="9" type="stmt"/>
+        <line num="27" count="4" type="stmt"/>
+      </file>
+      <file name="sidebar-nav.tsx" path="/vercel/share/v0-project/components/layout/sidebar-nav.tsx">
+        <metrics statements="9" coveredstatements="9" conditionals="8" coveredconditionals="8" methods="2" coveredmethods="2"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="8" count="7" type="stmt"/>
+        <line num="9" count="3" type="stmt"/>
+        <line num="26" count="18" type="cond" truecount="2" falsecount="0"/>
+        <line num="29" count="18" type="stmt"/>
+        <line num="30" count="18" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.market-regime">
+      <metrics statements="15" coveredstatements="15" conditionals="1" coveredconditionals="1" methods="6" coveredmethods="6"/>
+      <file name="regime-widget.tsx" path="/vercel/share/v0-project/components/market-regime/regime-widget.tsx">
+        <metrics statements="15" coveredstatements="15" conditionals="1" coveredconditionals="1" methods="6" coveredmethods="6"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="22" count="3" type="stmt"/>
+        <line num="28" count="15" type="stmt"/>
+        <line num="29" count="15" type="stmt"/>
+        <line num="31" count="15" type="stmt"/>
+        <line num="32" count="4" type="stmt"/>
+        <line num="35" count="5" type="stmt"/>
+        <line num="37" count="5" type="stmt"/>
+        <line num="61" count="11" type="stmt"/>
+        <line num="65" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.shared">
+      <metrics statements="15" coveredstatements="15" conditionals="21" coveredconditionals="18" methods="5" coveredmethods="5"/>
+      <file name="badges.tsx" path="/vercel/share/v0-project/components/shared/badges.tsx">
+        <metrics statements="8" coveredstatements="8" conditionals="8" coveredconditionals="7" methods="3" coveredmethods="3"/>
+        <line num="1" count="3" type="stmt"/>
+        <line num="2" count="3" type="stmt"/>
+        <line num="5" count="10" type="stmt"/>
+        <line num="27" count="3" type="stmt"/>
+        <line num="33" count="12" type="stmt"/>
+        <line num="34" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="42" count="3" type="stmt"/>
+        <line num="48" count="26" type="stmt"/>
+      </file>
+      <file name="offline-banner.tsx" path="/vercel/share/v0-project/components/shared/offline-banner.tsx">
+        <metrics statements="3" coveredstatements="3" conditionals="3" coveredconditionals="3" methods="1" coveredmethods="1"/>
+        <line num="1" count="3" type="stmt"/>
+        <line num="3" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="4" count="3" type="cond" truecount="2" falsecount="0"/>
+      </file>
+      <file name="stat-card.tsx" path="/vercel/share/v0-project/components/shared/stat-card.tsx">
+        <metrics statements="4" coveredstatements="4" conditionals="10" coveredconditionals="8" methods="1" coveredmethods="1"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="15" count="3" type="cond" truecount="1" falsecount="0"/>
+      </file>
+    </package>
+    <package name="components.strategies">
+      <metrics statements="35" coveredstatements="34" conditionals="22" coveredconditionals="18" methods="11" coveredmethods="9"/>
+      <file name="strategies-table.tsx" path="/vercel/share/v0-project/components/strategies/strategies-table.tsx">
+        <metrics statements="11" coveredstatements="11" conditionals="4" coveredconditionals="3" methods="3" coveredmethods="3"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="19" count="3" type="stmt"/>
+        <line num="26" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="51" count="8" type="stmt"/>
+        <line num="90" count="1" type="stmt"/>
+      </file>
+      <file name="trades-table.tsx" path="/vercel/share/v0-project/components/strategies/trades-table.tsx">
+        <metrics statements="24" coveredstatements="23" conditionals="18" coveredconditionals="15" methods="8" coveredmethods="6"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="23" count="3" type="stmt"/>
+        <line num="24" count="4" type="stmt"/>
+        <line num="25" count="4" type="stmt"/>
+        <line num="27" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="28" count="4" type="stmt"/>
+        <line num="30" count="4" type="stmt"/>
+        <line num="31" count="4" type="stmt"/>
+        <line num="35" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="39" count="6" type="stmt"/>
+        <line num="45" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="74" count="20" type="stmt"/>
+        <line num="122" count="0" type="stmt"/>
+        <line num="131" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.tradingview">
+      <metrics statements="20" coveredstatements="20" conditionals="3" coveredconditionals="2" methods="3" coveredmethods="3"/>
+      <file name="tv-widget.tsx" path="/vercel/share/v0-project/components/tradingview/tv-widget.tsx">
+        <metrics statements="20" coveredstatements="20" conditionals="3" coveredconditionals="2" methods="3" coveredmethods="3"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="20" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="21" count="3" type="stmt"/>
+        <line num="23" count="3" type="stmt"/>
+        <line num="24" count="3" type="stmt"/>
+        <line num="25" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="27" count="3" type="stmt"/>
+        <line num="31" count="3" type="stmt"/>
+        <line num="32" count="3" type="stmt"/>
+        <line num="33" count="3" type="stmt"/>
+        <line num="34" count="3" type="stmt"/>
+        <line num="35" count="3" type="stmt"/>
+        <line num="37" count="3" type="stmt"/>
+        <line num="38" count="3" type="stmt"/>
+        <line num="39" count="3" type="stmt"/>
+        <line num="40" count="3" type="stmt"/>
+        <line num="41" count="3" type="stmt"/>
+        <line num="50" count="3" type="stmt"/>
+        <line num="52" count="3" type="stmt"/>
+        <line num="53" count="3" type="stmt"/>
+      </file>
+    </package>
+    <package name="lib">
+      <metrics statements="135" coveredstatements="73" conditionals="41" coveredconditionals="38" methods="56" coveredmethods="20"/>
+      <file name="api-client.ts" path="/vercel/share/v0-project/lib/api-client.ts">
+        <metrics statements="20" coveredstatements="20" conditionals="10" coveredconditionals="10" methods="4" coveredmethods="4"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="14" count="3" type="stmt"/>
+        <line num="15" count="5" type="stmt"/>
+        <line num="18" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="21" count="2" type="stmt"/>
+        <line num="24" count="3" type="stmt"/>
+        <line num="29" count="3" type="stmt"/>
+        <line num="37" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="40" count="2" type="stmt"/>
+        <line num="41" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="46" count="2" type="stmt"/>
+        <line num="50" count="2" type="stmt"/>
+        <line num="51" count="2" type="stmt"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="54" count="1" type="stmt"/>
+      </file>
+      <file name="format.ts" path="/vercel/share/v0-project/lib/format.ts">
+        <metrics statements="19" coveredstatements="19" conditionals="22" coveredconditionals="22" methods="5" coveredmethods="5"/>
+        <line num="1" count="25" type="stmt"/>
+        <line num="2" count="25" type="cond" truecount="4" falsecount="0"/>
+        <line num="3" count="22" type="stmt"/>
+        <line num="10" count="21" type="cond" truecount="1" falsecount="0"/>
+        <line num="11" count="21" type="cond" truecount="4" falsecount="0"/>
+        <line num="12" count="18" type="stmt"/>
+        <line num="15" count="53" type="cond" truecount="1" falsecount="0"/>
+        <line num="16" count="53" type="cond" truecount="4" falsecount="0"/>
+        <line num="17" count="50" type="stmt"/>
+        <line num="20" count="47" type="stmt"/>
+        <line num="21" count="47" type="cond" truecount="2" falsecount="0"/>
+        <line num="22" count="45" type="stmt"/>
+        <line num="23" count="45" type="cond" truecount="2" falsecount="0"/>
+        <line num="24" count="44" type="stmt"/>
+        <line num="32" count="3" type="stmt"/>
+        <line num="33" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="34" count="2" type="stmt"/>
+        <line num="35" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="36" count="1" type="stmt"/>
+      </file>
+      <file name="mock-data.ts" path="/vercel/share/v0-project/lib/mock-data.ts">
+        <metrics statements="26" coveredstatements="26" conditionals="6" coveredconditionals="6" methods="6" coveredmethods="6"/>
+        <line num="16" count="7" type="stmt"/>
+        <line num="80" count="6" type="stmt"/>
+        <line num="81" count="6" type="stmt"/>
+        <line num="82" count="6" type="stmt"/>
+        <line num="83" count="6" type="stmt"/>
+        <line num="84" count="186" type="stmt"/>
+        <line num="85" count="186" type="stmt"/>
+        <line num="94" count="6" type="stmt"/>
+        <line num="97" count="3" type="stmt"/>
+        <line num="99" count="2" type="stmt"/>
+        <line num="100" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="101" count="2" type="stmt"/>
+        <line num="104" count="2" type="stmt"/>
+        <line num="105" count="2" type="stmt"/>
+        <line num="106" count="2" type="stmt"/>
+        <line num="107" count="2" type="stmt"/>
+        <line num="108" count="80" type="stmt"/>
+        <line num="109" count="80" type="stmt"/>
+        <line num="112" count="240" type="cond" truecount="2" falsecount="0"/>
+        <line num="122" count="2" type="stmt"/>
+        <line num="125" count="2" type="stmt"/>
+        <line num="178" count="2" type="stmt"/>
+        <line num="187" count="2" type="stmt"/>
+        <line num="203" count="2" type="stmt"/>
+        <line num="210" count="2" type="stmt"/>
+        <line num="223" count="62" type="stmt"/>
+      </file>
+      <file name="queries.ts" path="/vercel/share/v0-project/lib/queries.ts">
+        <metrics statements="62" coveredstatements="0" conditionals="3" coveredconditionals="0" methods="36" coveredmethods="0"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="28" count="0" type="stmt"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="41" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="46" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="53" count="0" type="stmt"/>
+        <line num="54" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="57" count="0" type="stmt"/>
+        <line num="58" count="0" type="stmt"/>
+        <line num="60" count="0" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
+        <line num="67" count="0" type="stmt"/>
+        <line num="70" count="0" type="stmt"/>
+        <line num="76" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="77" count="0" type="stmt"/>
+        <line num="79" count="0" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="85" count="0" type="stmt"/>
+        <line num="88" count="0" type="stmt"/>
+        <line num="93" count="0" type="stmt"/>
+        <line num="94" count="0" type="stmt"/>
+        <line num="96" count="0" type="stmt"/>
+        <line num="101" count="0" type="stmt"/>
+        <line num="102" count="0" type="stmt"/>
+        <line num="104" count="0" type="stmt"/>
+        <line num="109" count="0" type="stmt"/>
+        <line num="110" count="0" type="stmt"/>
+        <line num="112" count="0" type="stmt"/>
+        <line num="117" count="0" type="stmt"/>
+        <line num="118" count="0" type="stmt"/>
+        <line num="121" count="0" type="stmt"/>
+        <line num="126" count="0" type="stmt"/>
+        <line num="127" count="0" type="stmt"/>
+        <line num="128" count="0" type="stmt"/>
+        <line num="129" count="0" type="stmt"/>
+        <line num="131" count="0" type="stmt"/>
+        <line num="132" count="0" type="stmt"/>
+        <line num="134" count="0" type="stmt"/>
+        <line num="138" count="0" type="stmt"/>
+        <line num="139" count="0" type="stmt"/>
+        <line num="140" count="0" type="stmt"/>
+        <line num="142" count="0" type="stmt"/>
+        <line num="144" count="0" type="stmt"/>
+        <line num="145" count="0" type="stmt"/>
+        <line num="147" count="0" type="stmt"/>
+        <line num="151" count="0" type="stmt"/>
+        <line num="152" count="0" type="stmt"/>
+        <line num="153" count="0" type="stmt"/>
+        <line num="155" count="0" type="stmt"/>
+        <line num="157" count="0" type="stmt"/>
+        <line num="158" count="0" type="stmt"/>
+        <line num="160" count="0" type="stmt"/>
+      </file>
+      <file name="store.ts" path="/vercel/share/v0-project/lib/store.ts">
+        <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="4"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="9" count="10" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="12" count="2" type="stmt"/>
+      </file>
+      <file name="utils.ts" path="/vercel/share/v0-project/lib/utils.ts">
+        <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="9" type="stmt"/>
+        <line num="2" count="9" type="stmt"/>
+        <line num="4" count="867" type="stmt"/>
+        <line num="5" count="867" type="stmt"/>
+      </file>
+    </package>
+    <package name="lib.i18n">
+      <metrics statements="17" coveredstatements="11" conditionals="6" coveredconditionals="4" methods="3" coveredmethods="2"/>
+      <file name="config.ts" path="/vercel/share/v0-project/lib/i18n/config.ts">
+        <metrics statements="6" coveredstatements="6" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="14" count="5" type="stmt"/>
+        <line num="15" count="5" type="cond" truecount="2" falsecount="0"/>
+      </file>
+      <file name="dictionaries.ts" path="/vercel/share/v0-project/lib/i18n/dictionaries.ts">
+        <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="3" count="3" type="stmt"/>
+        <line num="274" count="2" type="stmt"/>
+        <line num="543" count="2" type="stmt"/>
+        <line num="545" count="3" type="stmt"/>
+        <line num="546" count="3" type="cond" truecount="2" falsecount="0"/>
+      </file>
+      <file name="server.ts" path="/vercel/share/v0-project/lib/i18n/server.ts">
+        <metrics statements="6" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="9" count="0" type="cond" truecount="0" falsecount="2"/>
+      </file>
+    </package>
+    <package name="lib.server">
+      <metrics statements="13" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="2" coveredmethods="0"/>
+      <file name="backend.ts" path="/vercel/share/v0-project/lib/server/backend.ts">
+        <metrics statements="13" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="10" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="21" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="22" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="25" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="26" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="27" count="0" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>
