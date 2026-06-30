@@ -3,9 +3,11 @@
 import { Bell, LineChart, TrendingUp, Wallet } from "lucide-react"
 import { StatCard } from "@/components/shared/stat-card"
 import { formatCurrency, formatPercent } from "@/lib/format"
+import { useI18n } from "@/lib/i18n/context"
 import { useAlerts, useCapitalSummary, useStrategies } from "@/lib/queries"
 
 export function DashboardStats() {
+  const { dict } = useI18n()
   const capital = useCapitalSummary()
   const strategies = useStrategies()
   const alerts = useAlerts()
@@ -21,33 +23,33 @@ export function DashboardStats() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard
-        label="Capital Total"
+        label={dict.dashboard.capitalTotal}
         value={formatCurrency(capital.data?.data.total)}
         icon={Wallet}
-        hint="Todas las cuentas"
+        hint={dict.dashboard.capitalHint}
         loading={capital.isLoading}
       />
       <StatCard
-        label="Estrategias Activas"
+        label={dict.dashboard.activeStrategies}
         value={`${activeCount} / ${strategyList.length}`}
         icon={LineChart}
-        hint="En ejecución"
+        hint={dict.dashboard.activeHint}
         trend="up"
         loading={strategies.isLoading}
       />
       <StatCard
-        label="Alertas no Leídas"
+        label={dict.dashboard.unreadAlerts}
         value={String(unreadAlerts)}
         icon={Bell}
-        hint="Requieren atención"
+        hint={dict.dashboard.unreadHint}
         trend={unreadAlerts > 0 ? "down" : "neutral"}
         loading={alerts.isLoading}
       />
       <StatCard
-        label="Win Rate Promedio"
+        label={dict.dashboard.avgWinRate}
         value={formatPercent(avgWinRate)}
         icon={TrendingUp}
-        hint="Media de estrategias"
+        hint={dict.dashboard.avgWinRateHint}
         trend="up"
         loading={strategies.isLoading}
       />

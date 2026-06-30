@@ -12,7 +12,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { HealthBadge, StatusBadge } from "@/components/shared/badges"
-import { formatCurrency, formatNumber, formatPercent } from "@/lib/format"
+import { formatNumber, formatPercent } from "@/lib/format"
+import { useI18n } from "@/lib/i18n/context"
 import { cn } from "@/lib/utils"
 import type { Strategy } from "@/types"
 
@@ -23,10 +24,12 @@ export function StrategiesTable({
   strategies: Strategy[]
   onDelete: (s: Strategy) => void
 }) {
+  const { dict, t } = useI18n()
+
   if (strategies.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-        No hay estrategias que coincidan con los filtros.
+        {dict.strategies.empty}
       </div>
     )
   }
@@ -36,14 +39,14 @@ export function StrategiesTable({
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead>Estrategia</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead>Salud</TableHead>
-            <TableHead className="text-right">Win Rate</TableHead>
-            <TableHead className="text-right">Profit Factor</TableHead>
-            <TableHead className="text-right">Drawdown</TableHead>
-            <TableHead className="text-right">Trades</TableHead>
-            <TableHead className="w-24 text-right">Acciones</TableHead>
+            <TableHead>{dict.strategies.colStrategy}</TableHead>
+            <TableHead>{dict.strategies.colStatus}</TableHead>
+            <TableHead>{dict.strategies.colHealth}</TableHead>
+            <TableHead className="text-right">{dict.strategies.colWinRate}</TableHead>
+            <TableHead className="text-right">{dict.strategies.colProfitFactor}</TableHead>
+            <TableHead className="text-right">{dict.strategies.colDrawdown}</TableHead>
+            <TableHead className="text-right">{dict.strategies.colTrades}</TableHead>
+            <TableHead className="w-24 text-right">{dict.strategies.colActions}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -86,7 +89,7 @@ export function StrategiesTable({
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Eliminar ${s.name}`}
+                    aria-label={t(dict.strategies.deleteAria, { name: s.name })}
                     onClick={() => onDelete(s)}
                   >
                     <Trash2 className="size-4 text-muted-foreground transition-colors hover:text-destructive" />
@@ -94,7 +97,7 @@ export function StrategiesTable({
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Ver ${s.name}`}
+                    aria-label={t(dict.strategies.viewAria, { name: s.name })}
                     nativeButton={false}
                     render={<Link href={`/strategies/${s.id}`} />}
                   >

@@ -5,19 +5,23 @@ import { usePathname } from "next/navigation"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { useI18n } from "@/lib/i18n/context"
+import { LanguageSelector } from "./language-selector"
 import { navItems } from "./nav-items"
 import { SidebarNav } from "./sidebar-nav"
 
 function useTitle() {
   const pathname = usePathname()
-  if (pathname.startsWith("/strategies/")) return "Detalle de Estrategia"
+  const { dict } = useI18n()
+  if (pathname.startsWith("/strategies/")) return dict.header.strategyDetail
   const match = navItems.find((i) =>
     i.href === "/" ? pathname === "/" : pathname.startsWith(i.href),
   )
-  return match?.label ?? "Performance Monitor"
+  return match ? dict.nav[match.labelKey] : dict.common.appName
 }
 
 export function Header() {
+  const { dict } = useI18n()
   const title = useTitle()
 
   return (
@@ -29,14 +33,14 @@ export function Header() {
               variant="ghost"
               size="icon"
               className="md:hidden"
-              aria-label="Abrir menú de navegación"
+              aria-label={dict.header.openMenu}
             />
           }
         >
           <Menu className="size-5" />
         </SheetTrigger>
         <SheetContent side="left" className="w-72 bg-sidebar p-0">
-          <SheetTitle className="sr-only">Navegación</SheetTitle>
+          <SheetTitle className="sr-only">{dict.header.navigation}</SheetTitle>
           <SidebarNav />
         </SheetContent>
       </Sheet>
@@ -44,7 +48,8 @@ export function Header() {
       <h1 className="text-base font-semibold md:text-lg">{title}</h1>
 
       <div className="ml-auto flex items-center gap-3">
-        <span className="hidden text-sm text-muted-foreground sm:inline">Trader</span>
+        <LanguageSelector />
+        <span className="hidden text-sm text-muted-foreground sm:inline">{dict.header.user}</span>
         <Avatar className="size-9">
           <AvatarFallback className="bg-primary/15 text-primary">TR</AvatarFallback>
         </Avatar>

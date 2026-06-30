@@ -16,11 +16,13 @@ import {
 import { OfflineBanner } from "@/components/shared/offline-banner"
 import { useTrades } from "@/lib/queries"
 import { formatCurrency, formatDate, formatNumber } from "@/lib/format"
+import { useI18n } from "@/lib/i18n/context"
 import { cn } from "@/lib/utils"
 
 const PAGE_SIZE = 12
 
 export function TradesTable({ strategyId }: { strategyId: string }) {
+  const { dict, t } = useI18n()
   const { data, isLoading } = useTrades(strategyId)
   const [page, setPage] = useState(0)
 
@@ -46,7 +48,7 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
     return (
       <Card>
         <CardContent className="p-12 text-center text-sm text-muted-foreground">
-          No hay operaciones registradas para esta estrategia.
+          {dict.trades.empty}
         </CardContent>
       </Card>
     )
@@ -60,48 +62,48 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead>Símbolo</TableHead>
-              <TableHead>Lado</TableHead>
-              <TableHead className="text-right">Entrada</TableHead>
-              <TableHead className="text-right">Salida</TableHead>
-              <TableHead className="text-right">Cant.</TableHead>
-              <TableHead className="text-right">PnL</TableHead>
-              <TableHead className="hidden text-right md:table-cell">Fecha</TableHead>
+              <TableHead>{dict.trades.colSymbol}</TableHead>
+              <TableHead>{dict.trades.colSide}</TableHead>
+              <TableHead className="text-right">{dict.trades.colEntry}</TableHead>
+              <TableHead className="text-right">{dict.trades.colExit}</TableHead>
+              <TableHead className="text-right">{dict.trades.colQty}</TableHead>
+              <TableHead className="text-right">{dict.trades.colPnl}</TableHead>
+              <TableHead className="hidden text-right md:table-cell">{dict.trades.colDate}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {pageTrades.map((t) => (
-              <TableRow key={t.id}>
-                <TableCell className="font-medium">{t.symbol ?? "—"}</TableCell>
+            {pageTrades.map((trade) => (
+              <TableRow key={trade.id}>
+                <TableCell className="font-medium">{trade.symbol ?? dict.common.none}</TableCell>
                 <TableCell>
                   <span
                     className={cn(
-                      "rounded-md px-2 py-0.5 text-xs font-medium capitalize",
-                      t.side === "long"
+                      "rounded-md px-2 py-0.5 text-xs font-medium",
+                      trade.side === "long"
                         ? "bg-chart-1/10 text-chart-1"
                         : "bg-chart-2/10 text-chart-2",
                     )}
                   >
-                    {t.side === "long" ? "Largo" : "Corto"}
+                    {trade.side === "long" ? dict.trades.long : dict.trades.short}
                   </span>
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
-                  {formatNumber(t.entry_price)}
+                  {formatNumber(trade.entry_price)}
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
-                  {formatNumber(t.exit_price)}
+                  {formatNumber(trade.exit_price)}
                 </TableCell>
-                <TableCell className="text-right tabular-nums">{t.quantity ?? "—"}</TableCell>
+                <TableCell className="text-right tabular-nums">{trade.quantity ?? dict.common.none}</TableCell>
                 <TableCell
                   className={cn(
                     "text-right font-medium tabular-nums",
-                    t.pnl >= 0 ? "text-chart-1" : "text-destructive",
+                    trade.pnl >= 0 ? "text-chart-1" : "text-destructive",
                   )}
                 >
-                  {formatCurrency(t.pnl)}
+                  {formatCurrency(trade.pnl)}
                 </TableCell>
                 <TableCell className="hidden text-right text-muted-foreground md:table-cell">
-                  {formatDate(t.entry_time)}
+                  {formatDate(trade.entry_time)}
                 </TableCell>
               </TableRow>
             ))}

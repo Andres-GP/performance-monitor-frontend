@@ -12,12 +12,14 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { OfflineBanner } from "@/components/shared/offline-banner"
+import { useI18n } from "@/lib/i18n/context"
 import { useDeleteStrategy, useStrategies } from "@/lib/queries"
 import type { Strategy } from "@/types"
 import { StrategiesTable } from "./strategies-table"
 import { DeleteStrategyDialog } from "./delete-strategy-dialog"
 
 export function StrategiesView() {
+  const { dict, t } = useI18n()
   const { data, isLoading } = useStrategies()
   const deleteStrategy = useDeleteStrategy()
 
@@ -42,9 +44,9 @@ export function StrategiesView() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="text-xl font-semibold">Estrategias</h2>
+        <h2 className="text-xl font-semibold">{dict.strategies.title}</h2>
         <p className="text-sm text-muted-foreground">
-          {strategies.length} estrategias monitoreadas en NinjaTrader y MetaTrader
+          {t(dict.strategies.subtitle, { count: strategies.length })}
         </p>
       </div>
 
@@ -54,44 +56,48 @@ export function StrategiesView() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Buscar por nombre o instrumento..."
+            placeholder={dict.strategies.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
           />
         </div>
         <Select
-          items={{ all: "Todos los estados", Running: "En ejecución", Stopped: "Detenida" }}
+          items={{
+            all: dict.strategies.statusAll,
+            Running: dict.strategies.statusRunning,
+            Stopped: dict.strategies.statusStopped,
+          }}
           value={status}
           onValueChange={(v) => setStatus(v as string)}
         >
           <SelectTrigger className="w-full sm:w-40">
-            <SelectValue placeholder="Estado" />
+            <SelectValue placeholder={dict.strategies.statusPlaceholder} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos los estados</SelectItem>
-            <SelectItem value="Running">En ejecución</SelectItem>
-            <SelectItem value="Stopped">Detenida</SelectItem>
+            <SelectItem value="all">{dict.strategies.statusAll}</SelectItem>
+            <SelectItem value="Running">{dict.strategies.statusRunning}</SelectItem>
+            <SelectItem value="Stopped">{dict.strategies.statusStopped}</SelectItem>
           </SelectContent>
         </Select>
         <Select
           items={{
-            all: "Toda la salud",
-            healthy: "Saludable",
-            edge_decay: "Edge Decay",
-            unhealthy: "No saludable",
+            all: dict.strategies.healthAll,
+            healthy: dict.strategies.healthHealthy,
+            edge_decay: dict.strategies.healthEdgeDecay,
+            unhealthy: dict.strategies.healthUnhealthy,
           }}
           value={health}
           onValueChange={(v) => setHealth(v as string)}
         >
           <SelectTrigger className="w-full sm:w-44">
-            <SelectValue placeholder="Salud" />
+            <SelectValue placeholder={dict.strategies.healthPlaceholder} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Toda la salud</SelectItem>
-            <SelectItem value="healthy">Saludable</SelectItem>
-            <SelectItem value="edge_decay">Edge Decay</SelectItem>
-            <SelectItem value="unhealthy">No saludable</SelectItem>
+            <SelectItem value="all">{dict.strategies.healthAll}</SelectItem>
+            <SelectItem value="healthy">{dict.strategies.healthHealthy}</SelectItem>
+            <SelectItem value="edge_decay">{dict.strategies.healthEdgeDecay}</SelectItem>
+            <SelectItem value="unhealthy">{dict.strategies.healthUnhealthy}</SelectItem>
           </SelectContent>
         </Select>
       </div>

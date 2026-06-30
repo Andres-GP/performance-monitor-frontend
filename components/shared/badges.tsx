@@ -1,8 +1,12 @@
+"use client"
+
 import { Badge } from "@/components/ui/badge"
+import { useI18n } from "@/lib/i18n/context"
 import { cn } from "@/lib/utils"
 import type { HealthStatus, Severity, StrategyStatus } from "@/types"
 
 export function StatusBadge({ status }: { status: StrategyStatus }) {
+  const { dict } = useI18n()
   return (
     <Badge
       variant="outline"
@@ -19,22 +23,23 @@ export function StatusBadge({ status }: { status: StrategyStatus }) {
           status === "Running" ? "bg-primary" : "bg-muted-foreground",
         )}
       />
-      {status}
+      {dict.status[status] ?? status}
     </Badge>
   )
 }
 
-const healthMap: Record<HealthStatus, { label: string; className: string }> = {
-  healthy: { label: "Healthy", className: "border-chart-1/40 bg-chart-1/10 text-chart-1" },
-  edge_decay: { label: "Edge Decay", className: "border-chart-4/40 bg-chart-4/10 text-chart-4" },
-  unhealthy: { label: "Unhealthy", className: "border-destructive/40 bg-destructive/10 text-destructive" },
+const healthClass: Record<HealthStatus, string> = {
+  healthy: "border-chart-1/40 bg-chart-1/10 text-chart-1",
+  edge_decay: "border-chart-4/40 bg-chart-4/10 text-chart-4",
+  unhealthy: "border-destructive/40 bg-destructive/10 text-destructive",
 }
 
 export function HealthBadge({ status }: { status: HealthStatus }) {
-  const cfg = healthMap[status] ?? healthMap.unhealthy
+  const { dict } = useI18n()
+  const className = healthClass[status] ?? healthClass.unhealthy
   return (
-    <Badge variant="outline" className={cn(cfg.className)}>
-      {cfg.label}
+    <Badge variant="outline" className={cn(className)}>
+      {dict.health[status] ?? status}
     </Badge>
   )
 }
@@ -46,9 +51,10 @@ const severityMap: Record<Severity, string> = {
 }
 
 export function SeverityBadge({ severity }: { severity: Severity }) {
+  const { dict } = useI18n()
   return (
-    <Badge variant="outline" className={cn("capitalize", severityMap[severity] ?? severityMap.low)}>
-      {severity}
+    <Badge variant="outline" className={cn(severityMap[severity] ?? severityMap.low)}>
+      {dict.severity[severity] ?? severity}
     </Badge>
   )
 }
