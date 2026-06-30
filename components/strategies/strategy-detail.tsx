@@ -14,6 +14,7 @@ import { OfflineBanner } from "@/components/shared/offline-banner"
 import { EquityChart, MetricChart } from "@/components/charts/lazy"
 import { useDeleteStrategy, useMetrics, useStrategy } from "@/lib/queries"
 import { formatCurrency, formatNumber, formatPercent } from "@/lib/format"
+import { useI18n } from "@/lib/i18n/context"
 import { TradesTable } from "./trades-table"
 import { EdgeHealthPanel } from "./edge-health-panel"
 import { BacktestPanel } from "./backtest-panel"
@@ -21,6 +22,7 @@ import { DeleteStrategyDialog } from "./delete-strategy-dialog"
 
 export function StrategyDetail({ id }: { id: string }) {
   const router = useRouter()
+  const { dict, t } = useI18n()
   const { strategy, isFallback, isLoading } = useStrategy(id)
   const metrics = useMetrics(id)
   const deleteStrategy = useDeleteStrategy()
@@ -42,9 +44,9 @@ export function StrategyDetail({ id }: { id: string }) {
   if (!strategy) {
     return (
       <div className="flex flex-col items-start gap-4">
-        <p className="text-muted-foreground">No se encontró la estrategia solicitada.</p>
+        <p className="text-muted-foreground">{dict.strategyDetail.notFound}</p>
         <Button variant="outline" nativeButton={false} render={<Link href="/strategies" />}>
-          <ArrowLeft className="size-4" /> Volver a estrategias
+          <ArrowLeft className="size-4" /> {dict.strategyDetail.backToStrategies}
         </Button>
       </div>
     )
@@ -63,7 +65,7 @@ export function StrategyDetail({ id }: { id: string }) {
           nativeButton={false}
           render={<Link href="/strategies" />}
         >
-          <ArrowLeft className="size-4" /> Estrategias
+          <ArrowLeft className="size-4" /> {dict.strategyDetail.back}
         </Button>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3">
@@ -76,48 +78,52 @@ export function StrategyDetail({ id }: { id: string }) {
             size="sm"
             disabled={!canDelete}
             onClick={() => setConfirmDelete(true)}
-            title={canDelete ? undefined : "Solo se pueden eliminar estrategias detenidas"}
+            title={canDelete ? undefined : dict.strategyDetail.onlyStoppedCanBeDeleted}
           >
-            <Trash2 className="size-4" /> Eliminar
+            <Trash2 className="size-4" /> {dict.strategyDetail.delete}
           </Button>
         </div>
         <p className="text-sm text-muted-foreground">
-          {strategy.instrument} · {strategy.platform} · {strategy.trades_count} trades ·{" "}
-          {formatCurrency(strategy.capital)} en capital
+          {t(dict.strategyDetail.subtitle, {
+            instrument: strategy.instrument,
+            platform: strategy.platform,
+            trades: strategy.trades_count,
+            capital: formatCurrency(strategy.capital),
+          })}
         </p>
       </div>
 
       {isFallback && <OfflineBanner />}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Win Rate" value={formatPercent(strategy.win_rate)} icon={Percent} />
+        <StatCard label={dict.strategyDetail.winRate} value={formatPercent(strategy.win_rate)} icon={Percent} />
         <StatCard
-          label="Profit Factor"
+          label={dict.strategyDetail.profitFactor}
           value={formatNumber(strategy.profit_factor)}
           icon={TrendingUp}
         />
         <StatCard
-          label="Drawdown"
+          label={dict.strategyDetail.drawdown}
           value={formatPercent(strategy.drawdown)}
           icon={TrendingDown}
-          hint={strategy.drawdown >= 0.15 ? "Por encima del umbral" : "Dentro de rango"}
+          hint={strategy.drawdown >= 0.15 ? dict.strategyDetail.aboveThreshold : dict.strategyDetail.withinRange}
           trend={strategy.drawdown >= 0.15 ? "down" : "neutral"}
         />
-        <StatCard label="Sharpe" value={formatNumber(strategy.sharpe)} icon={Gauge} />
+        <StatCard label={dict.strategyDetail.sharpe} value={formatNumber(strategy.sharpe)} icon={Gauge} />
       </div>
 
       <Tabs defaultValue="metrics">
         <TabsList>
-          <TabsTrigger value="metrics">Métricas</TabsTrigger>
-          <TabsTrigger value="trades">Operaciones</TabsTrigger>
-          <TabsTrigger value="health">Edge Health</TabsTrigger>
-          <TabsTrigger value="backtest">Backtest</TabsTrigger>
+          <TabsTrigger value="metrics">{dict.strategyDetail.tabMetrics}</TabsTrigger>
+          <TabsTrigger value="trades">{dict.strategyDetail.tabTrades}</TabsTrigger>
+          <TabsTrigger value="health">{dict.strategyDetail.tabHealth}</TabsTrigger>
+          <TabsTrigger value="backtest">{dict.strategyDetail.tabBacktest}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="metrics" className="mt-4 flex flex-col gap-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Curva de Equity</CardTitle>
+              <CardTitle className="text-base">{dict.strategyDetail.equityCurve}</CardTitle>
             </CardHeader>
             <CardContent>
               <EquityChart data={series} />
@@ -126,34 +132,34 @@ export function StrategyDetail({ id }: { id: string }) {
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Win Rate</CardTitle>
+                <CardTitle className="text-base">{dict.strategyDetail.winRate}</CardTitle>
               </CardHeader>
               <CardContent>
-                <MetricChart data={series} dataKey="win_rate" label="Win Rate" asPercent />
+                <MetricChart data={series} dataKey="win_rate" label={dict.strategyDetail.winRate} asPercent />
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Profit Factor</CardTitle>
+                <CardTitle className="text-base">{dict.strategyDetail.profitFactor}</CardTitle>
               </CardHeader>
               <CardContent>
-                <MetricChart data={series} dataKey="profit_factor" label="Profit Factor" />
+                <MetricChart data={series} dataKey="profit_factor" label={dict.strategyDetail.profitFactor} />
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Drawdown</CardTitle>
+                <CardTitle className="text-base">{dict.strategyDetail.drawdown}</CardTitle>
               </CardHeader>
               <CardContent>
-                <MetricChart data={series} dataKey="drawdown" label="Drawdown" asPercent />
+                <MetricChart data={series} dataKey="drawdown" label={dict.strategyDetail.drawdown} asPercent />
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Sharpe</CardTitle>
+                <CardTitle className="text-base">{dict.strategyDetail.sharpe}</CardTitle>
               </CardHeader>
               <CardContent>
-                <MetricChart data={series} dataKey="sharpe" label="Sharpe" />
+                <MetricChart data={series} dataKey="sharpe" label={dict.strategyDetail.sharpe} />
               </CardContent>
             </Card>
           </div>

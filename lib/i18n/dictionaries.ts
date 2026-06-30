@@ -142,6 +142,13 @@ export const en = {
     tabBacktest: "Backtest",
     equityCurve: "Equity Curve",
   },
+  strategyDelete: {
+    title: "Delete strategy",
+    description:
+      "Are you sure you want to delete {name}? This action cannot be undone and it will stop being monitored.",
+    confirm: "Delete",
+    deleting: "Deleting...",
+  },
   trades: {
     colSymbol: "Symbol",
     colSide: "Side",
@@ -412,6 +419,13 @@ export const es: Dictionary = {
     tabHealth: "Edge Health",
     tabBacktest: "Backtest",
     equityCurve: "Curva de Equity",
+  },
+  strategyDelete: {
+    title: "Eliminar estrategia",
+    description:
+      "¿Seguro que deseas eliminar {name}? Esta acción no se puede deshacer y dejará de monitorearse.",
+    confirm: "Eliminar",
+    deleting: "Eliminando...",
   },
   trades: {
     colSymbol: "Símbolo",

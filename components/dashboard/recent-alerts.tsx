@@ -14,9 +14,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { formatDate } from "@/lib/format"
+import { useI18n } from "@/lib/i18n/context"
 import { useAlerts } from "@/lib/queries"
 
 export function RecentAlerts() {
+  const { dict } = useI18n()
   const { data, isLoading } = useAlerts()
   const alerts = (data?.data ?? []).slice(0, 5)
 
@@ -24,11 +26,11 @@ export function RecentAlerts() {
     <Card>
       <CardHeader className="flex-row items-center justify-between">
         <div className="space-y-1.5">
-          <CardTitle>Últimas Alertas de Salud</CardTitle>
-          <CardDescription>Eventos recientes de las estrategias</CardDescription>
+          <CardTitle>{dict.dashboard.latestAlerts}</CardTitle>
+          <CardDescription>{dict.dashboard.latestAlertsDesc}</CardDescription>
         </div>
         <Button variant="outline" size="sm" nativeButton={false} render={<Link href="/alerts" />}>
-          Ver todas
+          {dict.dashboard.viewAll}
         </Button>
       </CardHeader>
       <CardContent>
@@ -42,10 +44,10 @@ export function RecentAlerts() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Problema</TableHead>
-                <TableHead className="hidden sm:table-cell">Estrategia</TableHead>
-                <TableHead>Severidad</TableHead>
-                <TableHead className="text-right">Fecha</TableHead>
+                <TableHead>{dict.alerts.colProblem}</TableHead>
+                <TableHead className="hidden sm:table-cell">{dict.alerts.colStrategy}</TableHead>
+                <TableHead>{dict.alerts.colSeverity}</TableHead>
+                <TableHead className="text-right">{dict.alerts.colDate}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Providers } from '@/components/providers'
+import { getLocale } from '@/lib/i18n/server'
 import './globals.css'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
@@ -38,18 +39,20 @@ export const viewport: Viewport = {
   themeColor: '#0a0a0a',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const locale = await getLocale()
+
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`dark ${geistSans.variable} ${geistMono.variable}`}
     >
       <body className="font-sans antialiased bg-background text-foreground">
-        <Providers>{children}</Providers>
+        <Providers locale={locale}>{children}</Providers>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
