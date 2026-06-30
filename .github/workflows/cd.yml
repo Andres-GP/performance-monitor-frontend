@@ -11,22 +11,28 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Determine service and environment
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine service ID
         id: vars
         run: |
           if [[ "${{ github.ref_name }}" == "main" ]]; then
             echo "service_id=${{ secrets.RENDER_SERVICE_ID_PROD }}" >> $GITHUB_OUTPUT
-            echo "env=prod" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref_name }}" == "staging" || "${{ github.ref_name }}" == "develop" ]]; then
             echo "service_id=${{ secrets.RENDER_SERVICE_ID_STAGING }}" >> $GITHUB_OUTPUT
-            echo "env=staging" >> $GITHUB_OUTPUT
           else
             echo "Branch not configured for deploy"
             exit 1
           fi
-      - name: Deploy to Render
-        uses: render-oss/render-deploy-action@v1
-        with:
-          service-id: ${{ steps.vars.outputs.service_id }}
-          api-key: ${{ secrets.RENDER_API_KEY }}
+
+      - name: Trigger Render deploy via webhook
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          SERVICE_ID: ${{ steps.vars.outputs.service_id }}
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": true}' \
+            "https://api.render.com/v1/services/$SERVICE_ID/deploys"
