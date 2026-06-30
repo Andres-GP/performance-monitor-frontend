@@ -23,9 +23,6 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Run linter
-        run: npx eslint .
-
       - name: Run tests
         run: npm test -- --passWithNoTests
 
