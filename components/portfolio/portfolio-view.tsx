@@ -32,14 +32,11 @@ import {
 } from "@/lib/queries";
 import { formatCurrency, formatNumber, formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
-
-const accountLabels: Record<string, string> = {
-  demo: "Demo",
-  real: "Real",
-  funded: "Fondeada",
-};
+import { useI18n } from "@/lib/i18n/context";
 
 export function PortfolioView() {
+  const { dict } = useI18n();
+
   const capital = useCapitalSummary();
   const weights = usePortfolioWeights();
   const metrics = usePortfolioMetrics();
@@ -52,12 +49,19 @@ export function PortfolioView() {
   const weightList = weights.data?.data ?? [];
   const pm = metrics.data?.data;
 
+  // Etiquetas de tipos de cuenta traducidas
+  const accountLabels: Record<string, string> = {
+    demo: dict.portfolio.accountDemo,
+    real: dict.portfolio.accountReal,
+    funded: dict.portfolio.accountFunded,
+  };
+
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
       <div>
-        <h2 className="text-xl font-semibold">Portafolio</h2>
+        <h2 className="text-xl font-semibold">{dict.portfolio.title}</h2>
         <p className="text-sm text-muted-foreground">
-          Asignación de capital, correlaciones y riesgo combinado de la cartera
+          {dict.portfolio.subtitle}
         </p>
       </div>
 
@@ -65,33 +69,33 @@ export function PortfolioView() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Capital Total"
+          label={dict.portfolio.capitalTotal}
           value={formatCurrency(summary?.total)}
           icon={Activity}
-          hint="Todas las cuentas"
+          hint={dict.portfolio.capitalHint}
           loading={capital.isLoading}
         />
         <StatCard
-          label="Sharpe Portafolio"
+          label={dict.portfolio.portfolioSharpe}
           value={formatNumber(pm?.sharpe)}
           icon={Activity}
-          hint="Retorno ajustado a riesgo"
+          hint={dict.portfolio.portfolioSharpeHint}
           trend="up"
           loading={metrics.isLoading}
         />
         <StatCard
-          label="Drawdown Combinado"
+          label={dict.portfolio.combinedDrawdown}
           value={formatPercent(pm?.combined_drawdown)}
           icon={TrendingDown}
-          hint="Máxima caída de la cartera"
+          hint={dict.portfolio.combinedDrawdownHint}
           trend="down"
           loading={metrics.isLoading}
         />
         <StatCard
-          label="Costos de Transacción"
+          label={dict.portfolio.transactionCosts}
           value={formatCurrency(pm?.transaction_costs)}
           icon={Receipt}
-          hint="Acumulado"
+          hint={dict.portfolio.transactionCostsHint}
           loading={metrics.isLoading}
         />
       </div>
@@ -100,10 +104,10 @@ export function PortfolioView() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              Capital por Tipo de Cuenta
+              {dict.portfolio.capitalByAccount}
             </CardTitle>
             <CardDescription>
-              Distribución entre cuentas demo, real y fondeada
+              {dict.portfolio.capitalByAccountDesc}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -133,11 +137,9 @@ export function PortfolioView() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              Pesos Objetivo vs Reales
+              {dict.portfolio.weightsTitle}
             </CardTitle>
-            <CardDescription>
-              Asignación planificada contra la actual
-            </CardDescription>
+            <CardDescription>{dict.portfolio.weightsDesc}</CardDescription>
           </CardHeader>
           <CardContent>
             {weights.isLoading ? (
@@ -151,18 +153,26 @@ export function PortfolioView() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Asignación de Pesos</CardTitle>
-          <CardDescription>Detalle por estrategia</CardDescription>
+          <CardTitle className="text-base">
+            {dict.portfolio.allocationTitle}
+          </CardTitle>
+          <CardDescription>{dict.portfolio.allocationDesc}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-hidden rounded-lg border border-border">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead>Estrategia</TableHead>
-                  <TableHead className="text-right">Objetivo</TableHead>
-                  <TableHead className="text-right">Real</TableHead>
-                  <TableHead className="text-right">Desviación</TableHead>
+                  <TableHead>{dict.portfolio.colStrategy}</TableHead>
+                  <TableHead className="text-right">
+                    {dict.portfolio.colTarget}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {dict.portfolio.colActual}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {dict.portfolio.colDeviation}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -203,10 +213,10 @@ export function PortfolioView() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Matriz de Correlación</CardTitle>
-            <CardDescription>
-              Correlación entre estrategias del portafolio
-            </CardDescription>
+            <CardTitle className="text-base">
+              {dict.portfolio.correlationTitle}
+            </CardTitle>
+            <CardDescription>{dict.portfolio.correlationDesc}</CardDescription>
           </CardHeader>
           <CardContent>
             {metrics.isLoading ? (
@@ -218,7 +228,7 @@ export function PortfolioView() {
               />
             ) : (
               <p className="text-sm text-muted-foreground">
-                Sin datos de correlación.
+                {dict.portfolio.noCorrelation}
               </p>
             )}
           </CardContent>
@@ -226,10 +236,10 @@ export function PortfolioView() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Drawdown Combinado</CardTitle>
-            <CardDescription>
-              Evolución del drawdown de la cartera
-            </CardDescription>
+            <CardTitle className="text-base">
+              {dict.portfolio.drawdownTitle}
+            </CardTitle>
+            <CardDescription>{dict.portfolio.drawdownDesc}</CardDescription>
           </CardHeader>
           <CardContent>
             {metrics.isLoading ? (

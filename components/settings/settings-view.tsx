@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { apiGet } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 
 function Toggle({
   checked,
@@ -72,6 +73,7 @@ function SettingRow({
 }
 
 export function SettingsView() {
+  const { dict } = useI18n();
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [pushAlerts, setPushAlerts] = useState(false);
   const [dailyDigest, setDailyDigest] = useState(true);
@@ -89,72 +91,51 @@ export function SettingsView() {
     refetchInterval: 30_000,
   });
 
+  // Determinar el estado del backend para mostrarlo
+  const backendStatus = health.isLoading
+    ? dict.settings.checking
+    : health.data === "online"
+      ? dict.settings.online
+      : dict.settings.offline;
+
+  const statusClass =
+    health.data === "online"
+      ? "bg-chart-1/10 text-chart-1"
+      : health.data === "offline"
+        ? "bg-destructive/10 text-destructive"
+        : "bg-muted text-muted-foreground";
+
+  const dotClass =
+    health.data === "online"
+      ? "bg-chart-1"
+      : health.data === "offline"
+        ? "bg-destructive"
+        : "bg-muted-foreground";
+
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <div>
-        <h2 className="text-xl font-semibold">Ajustes</h2>
+        <h2 className="text-xl font-semibold">{dict.settings.title}</h2>
         <p className="text-sm text-muted-foreground">
-          Preferencias de notificaciones, apariencia y estado del sistema
+          {dict.settings.subtitle}
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Notificaciones</CardTitle>
-          <CardDescription>
-            Controla cómo recibes las alertas de salud
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="py-0">
-          <SettingRow
-            icon={Mail}
-            title="Alertas por email"
-            description="Recibe un correo cuando una estrategia presenta problemas"
-          >
-            <Toggle
-              checked={emailAlerts}
-              onChange={setEmailAlerts}
-              label="Alertas por email"
-            />
-          </SettingRow>
-          <SettingRow
-            icon={Bell}
-            title="Alertas push"
-            description="Notificaciones en tiempo real en el navegador"
-          >
-            <Toggle
-              checked={pushAlerts}
-              onChange={setPushAlerts}
-              label="Alertas push"
-            />
-          </SettingRow>
-          <SettingRow
-            icon={Mail}
-            title="Resumen diario"
-            description="Un resumen del rendimiento de la cartera cada día"
-          >
-            <Toggle
-              checked={dailyDigest}
-              onChange={setDailyDigest}
-              label="Resumen diario"
-            />
-          </SettingRow>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Apariencia</CardTitle>
-          <CardDescription>Tema de la interfaz</CardDescription>
+          <CardTitle className="text-base">
+            {dict.settings.appearance}
+          </CardTitle>
+          <CardDescription>{dict.settings.appearanceDesc}</CardDescription>
         </CardHeader>
         <CardContent className="py-0">
           <SettingRow
             icon={Moon}
-            title="Modo oscuro"
-            description="El panel está optimizado exclusivamente para tema oscuro"
+            title={dict.settings.darkMode}
+            description={dict.settings.darkModeDesc}
           >
-            <span className="cursor-none rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-              Activo
+            <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+              {dict.settings.active}
             </span>
           </SettingRow>
         </CardContent>
@@ -162,42 +143,23 @@ export function SettingsView() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Sistema</CardTitle>
-          <CardDescription>
-            Conexión con el backend vía proxy seguro
-          </CardDescription>
+          <CardTitle className="text-base">{dict.settings.system}</CardTitle>
+          <CardDescription>{dict.settings.systemDesc}</CardDescription>
         </CardHeader>
         <CardContent className="py-0">
           <SettingRow
             icon={Server}
-            title="Estado del backend"
-            description="Las peticiones se enrutan por el middleware server-side de Next.js"
+            title={dict.settings.backendStatus}
+            description={dict.settings.backendStatusDesc}
           >
             <span
               className={cn(
                 "flex items-center gap-2 rounded-md px-2 py-1 text-xs font-medium",
-                health.data === "online"
-                  ? "bg-chart-1/10 text-chart-1"
-                  : health.data === "offline"
-                    ? "bg-destructive/10 text-destructive"
-                    : "bg-muted text-muted-foreground",
+                statusClass,
               )}
             >
-              <span
-                className={cn(
-                  "size-1.5 rounded-full",
-                  health.data === "online"
-                    ? "bg-chart-1"
-                    : health.data === "offline"
-                      ? "bg-destructive"
-                      : "bg-muted-foreground",
-                )}
-              />
-              {health.isLoading
-                ? "Comprobando"
-                : health.data === "online"
-                  ? "En línea"
-                  : "Sin conexión"}
+              <span className={cn("size-1.5 rounded-full", dotClass)} />
+              {backendStatus}
             </span>
           </SettingRow>
         </CardContent>

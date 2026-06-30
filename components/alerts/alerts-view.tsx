@@ -26,8 +26,10 @@ import {
 } from "@/components/ui/table";
 import { useAlerts, useStrategies } from "@/lib/queries";
 import { formatDate } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/context";
 
 export function AlertsView() {
+  const { dict } = useI18n();
   const { data, isLoading } = useAlerts(200);
   const strategies = useStrategies();
 
@@ -41,15 +43,23 @@ export function AlertsView() {
   const alerts = data?.data ?? [];
   const strategyList = strategies.data?.data ?? [];
 
-  const strategyItems: Record<string, string> = {
-    all: "Todas",
-    ...Object.fromEntries(strategyList.map((s) => [s.id, s.name])),
-  };
+  // Opciones traducidas para el select de estrategia
+  const strategyItems = useMemo(() => {
+    const items: Record<string, string> = {
+      all: dict.alerts.all,
+    };
+    strategyList.forEach((s) => {
+      items[s.id] = s.name; // El nombre de la estrategia ya viene del backend, no se traduce
+    });
+    return items;
+  }, [strategyList, dict.alerts.all]);
+
+  // Opciones traducidas para severidad
   const severityItems = {
-    all: "Todas",
-    high: "Alta",
-    medium: "Media",
-    low: "Baja",
+    all: dict.alerts.all,
+    high: dict.alerts.high,
+    medium: dict.alerts.medium,
+    low: dict.alerts.low,
   };
 
   const filtered = useMemo(() => {
@@ -79,13 +89,17 @@ export function AlertsView() {
     };
   }
 
+  // Función auxiliar para interpolación de placeholders
+  const interpolate = (
+    template: string,
+    values: Record<string, string | number>,
+  ) => template.replace(/\{(\w+)\}/g, (_, key) => String(values[key] ?? ""));
+
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
       <div>
-        <h2 className="text-xl font-semibold">Alertas de Salud</h2>
-        <p className="text-sm text-muted-foreground">
-          Eventos de salud detectados en todas las estrategias monitoreadas
-        </p>
+        <h2 className="text-xl font-semibold">{dict.alerts.title}</h2>
+        <p className="text-sm text-muted-foreground">{dict.alerts.subtitle}</p>
       </div>
 
       {data?.isFallback && <OfflineBanner />}
@@ -93,17 +107,19 @@ export function AlertsView() {
       <Card>
         <CardContent className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col gap-1.5">
-            <Label className="text-xs text-muted-foreground">Estrategia</Label>
+            <Label className="text-xs text-muted-foreground">
+              {dict.alerts.filterStrategy}
+            </Label>
             <Select
               items={strategyItems}
               value={strategy}
               onValueChange={resetPage((v) => setStrategy(v as string))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Estrategia" />
+                <SelectValue placeholder={dict.alerts.filterStrategy} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
+                <SelectItem value="all">{dict.alerts.all}</SelectItem>
                 {strategyList.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
                     {s.name}
@@ -114,7 +130,7 @@ export function AlertsView() {
           </div>
           <div className="flex flex-col gap-1.5">
             <Label className="text-xs text-muted-foreground">
-              Severidadaaa
+              {dict.alerts.filterSeverity}
             </Label>
             <Select
               items={severityItems}
@@ -122,19 +138,19 @@ export function AlertsView() {
               onValueChange={resetPage((v) => setSeverity(v as string))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Severidad" />
+                <SelectValue placeholder={dict.alerts.filterSeverity} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="high">Alta</SelectItem>
-                <SelectItem value="medium">Media</SelectItem>
-                <SelectItem value="low">Baja</SelectItem>
+                <SelectItem value="all">{dict.alerts.all}</SelectItem>
+                <SelectItem value="high">{dict.alerts.high}</SelectItem>
+                <SelectItem value="medium">{dict.alerts.medium}</SelectItem>
+                <SelectItem value="low">{dict.alerts.low}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="from" className="text-xs text-muted-foreground">
-              Desde
+              {dict.alerts.filterFrom}
             </Label>
             <Input
               id="from"
@@ -145,7 +161,7 @@ export function AlertsView() {
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="to" className="text-xs text-muted-foreground">
-              Hasta
+              {dict.alerts.filterTo}
             </Label>
             <Input
               id="to"
@@ -165,7 +181,7 @@ export function AlertsView() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-          No hay alertas que coincidan con los filtros.
+          {dict.alerts.empty}
         </div>
       ) : (
         <>
@@ -173,15 +189,17 @@ export function AlertsView() {
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead>Problema</TableHead>
+                  <TableHead>{dict.alerts.colProblem}</TableHead>
                   <TableHead className="hidden md:table-cell">
-                    Detalles
+                    {dict.alerts.colDetails}
                   </TableHead>
                   <TableHead className="hidden sm:table-cell">
-                    Estrategia
+                    {dict.alerts.colStrategy}
                   </TableHead>
-                  <TableHead>Severidad</TableHead>
-                  <TableHead className="text-right">Fecha</TableHead>
+                  <TableHead>{dict.alerts.colSeverity}</TableHead>
+                  <TableHead className="text-right">
+                    {dict.alerts.colDate}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -208,7 +226,7 @@ export function AlertsView() {
 
           <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Por página</span>
+              <span>{dict.alerts.perPage}</span>
               <Select
                 value={String(pageSize)}
                 onValueChange={(v) => {
@@ -229,14 +247,17 @@ export function AlertsView() {
 
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <span>
-                {filtered.length} alertas · página {safePage + 1} de{" "}
-                {totalPages}
+                {interpolate(dict.alerts.count, {
+                  count: filtered.length,
+                  page: safePage + 1,
+                  total: totalPages,
+                })}
               </span>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="icon-sm"
-                  aria-label="Página anterior"
+                  aria-label={dict.alerts.prevPage}
                   disabled={safePage === 0}
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                 >
@@ -245,7 +266,7 @@ export function AlertsView() {
                 <Button
                   variant="outline"
                   size="icon-sm"
-                  aria-label="Página siguiente"
+                  aria-label={dict.alerts.nextPage}
                   disabled={safePage >= totalPages - 1}
                   onClick={() =>
                     setPage((p) => Math.min(totalPages - 1, p + 1))

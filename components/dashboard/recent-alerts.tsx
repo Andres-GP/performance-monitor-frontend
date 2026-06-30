@@ -18,15 +18,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { formatDate } from "@/lib/format"
-import { useI18n } from "@/lib/i18n/context"
-import { useAlerts } from "@/lib/queries"
+} from "@/components/ui/table";
+import { formatDate } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/context";
+import { useAlerts } from "@/lib/queries";
 
 export function RecentAlerts() {
-  const { dict } = useI18n()
-  const { data, isLoading } = useAlerts()
-  const alerts = (data?.data ?? []).slice(0, 5)
+  const { dict } = useI18n();
+  const { data, isLoading } = useAlerts();
+  const alerts = (data?.data ?? []).slice(0, 5);
 
   return (
     <Card>
@@ -35,7 +35,12 @@ export function RecentAlerts() {
           <CardTitle>{dict.dashboard.latestAlerts}</CardTitle>
           <CardDescription>{dict.dashboard.latestAlertsDesc}</CardDescription>
         </div>
-        <Button variant="outline" size="sm" nativeButton={false} render={<Link href="/alerts" />}>
+        <Button
+          variant="outline"
+          size="sm"
+          nativeButton={false}
+          render={<Link href="/alerts" />}
+        >
           {dict.dashboard.viewAll}
         </Button>
       </CardHeader>
@@ -51,9 +56,13 @@ export function RecentAlerts() {
             <TableHeader>
               <TableRow>
                 <TableHead>{dict.alerts.colProblem}</TableHead>
-                <TableHead className="hidden sm:table-cell">{dict.alerts.colStrategy}</TableHead>
+                <TableHead className="hidden sm:table-cell">
+                  {dict.alerts.colStrategy}
+                </TableHead>
                 <TableHead>{dict.alerts.colSeverity}</TableHead>
-                <TableHead className="text-right">{dict.alerts.colDate}</TableHead>
+                <TableHead className="text-right">
+                  {dict.alerts.colDate}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
