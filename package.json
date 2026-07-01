@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
+    "@clerk/nextjs": "^7.5.11",
+    "@heroicons/react": "^2.2.0",
     "@tanstack/react-query": "^5.101.1",
     "@vercel/analytics": "1.6.1",
     "class-variance-authority": "^0.7.1",

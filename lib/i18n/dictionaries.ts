@@ -1,6 +1,16 @@
-import type { Locale } from "./config"
+import type { Locale } from "./config";
 
 export const en = {
+  signIn: {
+    description: "Watch all relevant data about Quant Trading",
+    email: "Email",
+    password: "Password",
+    signIn: "Sign in",
+    onLine: "Online",
+    liveSystem: "Live system",
+    entering: "Entering...",
+    couldntSignIn: "Couldn't sign in",
+  },
   common: {
     appName: "Performance Monitor",
     apply: "Apply",
@@ -129,7 +139,8 @@ export const en = {
     backToStrategies: "Back to strategies",
     delete: "Delete",
     onlyStoppedCanBeDeleted: "Only stopped strategies can be deleted",
-    subtitle: "{instrument} · {platform} · {trades} trades · {capital} in capital",
+    subtitle:
+      "{instrument} · {platform} · {trades} trades · {capital} in capital",
     winRate: "Win Rate",
     profitFactor: "Profit Factor",
     drawdown: "Drawdown",
@@ -269,16 +280,27 @@ export const en = {
     system: "System",
     systemDesc: "Connection to the backend via secure proxy",
     backendStatus: "Backend status",
-    backendStatusDesc: "Requests are routed through the Next.js server-side middleware",
+    backendStatusDesc:
+      "Requests are routed through the Next.js server-side middleware",
     checking: "Checking",
     online: "Online",
     offline: "Offline",
   },
-} as const
+} as const;
 
-export type Dictionary = typeof en
+export type Dictionary = typeof en;
 
 export const es: Dictionary = {
+  signIn: {
+    description: "Mira todos los datos relevantes sobre Quant Trading",
+    email: "Correo Electrónico",
+    password: "Contraseña",
+    signIn: "Iniciar sesión",
+    onLine: "En línea",
+    liveSystem: "Sistema en vivo",
+    entering: "Ingresando...",
+    couldntSignIn: "No se pudo iniciar sesión",
+  },
   common: {
     appName: "Performance Monitor",
     apply: "Aplicar",
@@ -311,7 +333,8 @@ export const es: Dictionary = {
     footer: "Backend conectado vía proxy seguro",
   },
   offline: {
-    message: "Backend no disponible — mostrando datos en caché de demostración.",
+    message:
+      "Backend no disponible — mostrando datos en caché de demostración.",
   },
   status: {
     Running: "En ejecución",
@@ -366,7 +389,8 @@ export const es: Dictionary = {
     corrSpyQqq: "Corr. SPY/QQQ",
     corrSpyTlt: "SPY/TLT: {value}",
     title: "Régimen de Mercado",
-    subtitle: "Indicadores macro de tendencia, volatilidad y amplitud del mercado",
+    subtitle:
+      "Indicadores macro de tendencia, volatilidad y amplitud del mercado",
     updated: "Actualizado {value}",
     widgetCorrTitle: "Correlaciones Clave",
     widgetCorrDesc: "Evolución comparada de SPY, QQQ y TLT",
@@ -407,7 +431,8 @@ export const es: Dictionary = {
     backToStrategies: "Volver a estrategias",
     delete: "Eliminar",
     onlyStoppedCanBeDeleted: "Solo se pueden eliminar estrategias detenidas",
-    subtitle: "{instrument} · {platform} · {trades} trades · {capital} en capital",
+    subtitle:
+      "{instrument} · {platform} · {trades} trades · {capital} en capital",
     winRate: "Win Rate",
     profitFactor: "Profit Factor",
     drawdown: "Drawdown",
@@ -475,7 +500,8 @@ export const es: Dictionary = {
   },
   portfolio: {
     title: "Portafolio",
-    subtitle: "Asignación de capital, correlaciones y riesgo combinado de la cartera",
+    subtitle:
+      "Asignación de capital, correlaciones y riesgo combinado de la cartera",
     capitalTotal: "Capital Total",
     capitalHint: "Todas las cuentas",
     portfolioSharpe: "Sharpe Portafolio",
@@ -508,7 +534,8 @@ export const es: Dictionary = {
   },
   alerts: {
     title: "Alertas de Salud",
-    subtitle: "Eventos de salud detectados en todas las estrategias monitoreadas",
+    subtitle:
+      "Eventos de salud detectados en todas las estrategias monitoreadas",
     filterStrategy: "Estrategia",
     filterSeverity: "Severidad",
     filterFrom: "Desde",
@@ -534,7 +561,8 @@ export const es: Dictionary = {
     notifications: "Notificaciones",
     notificationsDesc: "Controla cómo recibes las alertas de salud",
     emailAlerts: "Alertas por email",
-    emailAlertsDesc: "Recibe un correo cuando una estrategia presenta problemas",
+    emailAlertsDesc:
+      "Recibe un correo cuando una estrategia presenta problemas",
     pushAlerts: "Alertas push",
     pushAlertsDesc: "Notificaciones en tiempo real en el navegador",
     dailyDigest: "Resumen diario",
@@ -547,15 +575,16 @@ export const es: Dictionary = {
     system: "Sistema",
     systemDesc: "Conexión con el backend vía proxy seguro",
     backendStatus: "Estado del backend",
-    backendStatusDesc: "Las peticiones se enrutan por el middleware server-side de Next.js",
+    backendStatusDesc:
+      "Las peticiones se enrutan por el middleware server-side de Next.js",
     checking: "Comprobando",
     online: "En línea",
     offline: "Sin conexión",
   },
-}
+};
 
-export const dictionaries: Record<Locale, Dictionary> = { en, es }
+export const dictionaries: Record<Locale, Dictionary> = { en, es };
 
 export function getDictionary(locale: Locale): Dictionary {
-  return dictionaries[locale] ?? en
+  return dictionaries[locale] ?? en;
 }

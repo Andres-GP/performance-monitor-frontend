@@ -1,19 +1,20 @@
-"use client"
+"use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { useState } from "react"
-import { Toaster } from "@/components/ui/sonner"
-import type { Locale } from "@/lib/i18n/config"
-import { I18nProvider } from "@/lib/i18n/context"
+import { ClerkProvider } from "@clerk/nextjs";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
+import { Toaster } from "@/components/ui/sonner";
+import type { Locale } from "@/lib/i18n/config";
+import { I18nProvider } from "@/lib/i18n/context";
 
 export function Providers({
   children,
   locale,
 }: {
-  children: React.ReactNode
-  locale: Locale
+  children: React.ReactNode;
+  locale: Locale;
 }) {
-  const [client] = useState(
+  const [queryClient] = useState(
     () =>
       new QueryClient({
         defaultOptions: {
@@ -24,14 +25,16 @@ export function Providers({
           },
         },
       }),
-  )
+  );
 
   return (
-    <QueryClientProvider client={client}>
-      <I18nProvider initialLocale={locale}>
-        {children}
-        <Toaster theme="dark" position="top-right" richColors />
-      </I18nProvider>
-    </QueryClientProvider>
-  )
+    <ClerkProvider>
+      <QueryClientProvider client={queryClient}>
+        <I18nProvider initialLocale={locale}>
+          {children}
+          <Toaster theme="dark" position="top-right" richColors />
+        </I18nProvider>
+      </QueryClientProvider>
+    </ClerkProvider>
+  );
 }

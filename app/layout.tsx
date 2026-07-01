@@ -1,9 +1,9 @@
-import { Analytics } from '@vercel/analytics/next'
-import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
-import { Providers } from '@/components/providers'
-import { getLocale } from '@/lib/i18n/server'
-import './globals.css'
+import { Analytics } from "@vercel/analytics/next";
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { Providers } from "@/components/providers";
+import { getLocale } from "@/lib/i18n/server";
+import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Performance Monitor",
-  description: "Monitor de rendimiento para estrategias de trading",
+  description: "Watch all relevant data about Quant Trading",
 };
 
 export const viewport: Viewport = {
@@ -26,7 +26,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getLocale()
+  const locale = await getLocale();
 
   return (
     <html
@@ -35,7 +35,7 @@ export default async function RootLayout({
     >
       <body className="font-sans antialiased bg-background text-foreground">
         <Providers locale={locale}>{children}</Providers>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>
   );
