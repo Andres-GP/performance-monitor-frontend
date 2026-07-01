@@ -24,10 +24,13 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_OIDC_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-production: ${{ github.ref_name == 'main' }}
-          vercel-args: "--yes"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_OIDC_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            npx vercel deploy --token $VERCEL_TOKEN --yes --prod
+          else
+            npx vercel deploy --token $VERCEL_TOKEN --yes
+          fi
