@@ -14,25 +14,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Determine service ID
-        id: vars
-        run: |
-          if [[ "${{ github.ref_name }}" == "main" ]]; then
-            echo "service_id=${{ secrets.RENDER_SERVICE_ID_PROD }}" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.ref_name }}" == "staging" || "${{ github.ref_name }}" == "develop" ]]; then
-            echo "service_id=${{ secrets.RENDER_SERVICE_ID_STAGING }}" >> $GITHUB_OUTPUT
-          else
-            echo "Branch not configured for deploy"
-            exit 1
-          fi
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
 
-      - name: Trigger Render deploy via webhook
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          SERVICE_ID: ${{ steps.vars.outputs.service_id }}
-        run: |
-          curl -X POST \
-            -H "Authorization: Bearer $RENDER_API_KEY" \
-            -H "Content-Type: application/json" \
-            -d '{"clearCache": true}' \
-            "https://api.render.com/v1/services/$SERVICE_ID/deploys"
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_OIDC_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-production: ${{ github.ref_name == 'main' }}
+          vercel-args: "--yes"
