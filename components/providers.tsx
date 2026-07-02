@@ -1,6 +1,5 @@
 "use client";
 
-import { ClerkProvider } from "@clerk/nextjs";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
@@ -29,13 +28,11 @@ export function Providers({
   );
 
   return (
-    <ClerkProvider>
-      <QueryClientProvider client={queryClient}>
-        <I18nProvider initialLocale={locale}>
-          {children}
-          <Toaster theme="dark" position="top-right" richColors />
-        </I18nProvider>
-      </QueryClientProvider>
-    </ClerkProvider>
+    <QueryClientProvider client={queryClient}>
+      <I18nProvider initialLocale={locale}>
+        {children}
+        <Toaster theme="dark" position="top-right" richColors />
+      </I18nProvider>
+    </QueryClientProvider>
   );
 }

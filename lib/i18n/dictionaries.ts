@@ -36,6 +36,7 @@ export const en = {
     user: "Trader",
     openMenu: "Open navigation menu",
     navigation: "Navigation",
+    closeSession: "Log out",
   },
   sidebar: {
     brandTop: "Performance",
@@ -326,6 +327,7 @@ export const es: Dictionary = {
     user: "Trader",
     openMenu: "Abrir menú de navegación",
     navigation: "Navegación",
+    closeSession: "Cerrar sesión",
   },
   sidebar: {
     brandTop: "Performance",

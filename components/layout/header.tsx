@@ -1,28 +1,62 @@
-"use client"
+"use client";
 
-import { Menu } from "lucide-react"
-import { usePathname } from "next/navigation"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { useI18n } from "@/lib/i18n/context"
-import { LanguageSelector } from "./language-selector"
-import { navItems } from "./nav-items"
-import { SidebarNav } from "./sidebar-nav"
+import { Menu, LogOut, User, Settings } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { useI18n } from "@/lib/i18n/context";
+import { LanguageSelector } from "./language-selector";
+import { navItems } from "./nav-items";
+import { SidebarNav } from "./sidebar-nav";
+import { useClerk, useUser } from "@clerk/nextjs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function useTitle() {
-  const pathname = usePathname()
-  const { dict } = useI18n()
-  if (pathname.startsWith("/strategies/")) return dict.header.strategyDetail
+  const pathname = usePathname();
+  const { dict } = useI18n();
+  if (pathname.startsWith("/strategies/")) return dict.header.strategyDetail;
   const match = navItems.find((i) =>
     i.href === "/" ? pathname === "/" : pathname.startsWith(i.href),
-  )
-  return match ? dict.nav[match.labelKey] : dict.common.appName
+  );
+  return match ? dict.nav[match.labelKey] : dict.common.appName;
 }
 
 export function Header() {
-  const { dict } = useI18n()
-  const title = useTitle()
+  const { dict } = useI18n();
+  const title = useTitle();
+  const { signOut } = useClerk();
+  const { user } = useUser();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut();
+    window.location.href = "/sign-in";
+  };
+
+  // Obtener iniciales del usuario
+  const getInitials = () => {
+    if (!user) return "?";
+    const firstName = user.firstName || "";
+    const lastName = user.lastName || "";
+    if (firstName && lastName)
+      return `${firstName[0]}${lastName[0]}`.toUpperCase();
+    if (firstName) return firstName[0].toUpperCase();
+    if (user.emailAddresses?.[0]?.emailAddress) {
+      return user.emailAddresses[0].emailAddress[0].toUpperCase();
+    }
+    return "?";
+  };
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur md:px-6">
@@ -49,11 +83,28 @@ export function Header() {
 
       <div className="ml-auto flex items-center gap-3">
         <LanguageSelector />
-        <span className="hidden text-sm text-muted-foreground sm:inline">{dict.header.user}</span>
-        <Avatar className="size-9">
-          <AvatarFallback className="bg-primary/15 text-primary">TR</AvatarFallback>
-        </Avatar>
+        <span className="hidden text-sm text-muted-foreground sm:inline">
+          {user?.firstName ||
+            user?.emailAddresses?.[0]?.emailAddress ||
+            dict.header.user}
+        </span>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Avatar className="size-9 cursor-pointer">
+              <AvatarFallback className="bg-primary/15 text-primary">
+                {getInitials()}
+              </AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 size-4" />
+              <span>{dict.header.closeSession}</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
-  )
+  );
 }
