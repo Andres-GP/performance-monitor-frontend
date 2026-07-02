@@ -12,10 +12,14 @@ export class ApiError extends Error {
 
 export async function apiGet<T>(
   path: string,
-  options?: { signal?: AbortSignal },
+  options?: { signal?: AbortSignal; token?: string },
 ): Promise<T> {
+  const headers: Record<string, string> = { accept: "application/json" };
+  if (options?.token) {
+    headers["authorization"] = `Bearer ${options.token}`;
+  }
   const res = await fetch(`${PROXY_BASE}${path}`, {
-    headers: { accept: "application/json" },
+    headers,
     signal: options?.signal,
   });
   if (!res.ok) {
@@ -29,14 +33,18 @@ export async function apiSend<T>(
   path: string,
   method: "POST" | "PUT" | "PATCH" | "DELETE",
   body?: unknown,
-  options?: { signal?: AbortSignal },
+  options?: { signal?: AbortSignal; token?: string },
 ): Promise<T> {
+  const headers: Record<string, string> = {
+    accept: "application/json",
+    ...(body ? { "content-type": "application/json" } : {}),
+  };
+  if (options?.token) {
+    headers["authorization"] = `Bearer ${options.token}`;
+  }
   const res = await fetch(`${PROXY_BASE}${path}`, {
     method,
-    headers: {
-      accept: "application/json",
-      ...(body ? { "content-type": "application/json" } : {}),
-    },
+    headers,
     body: body ? JSON.stringify(body) : undefined,
     signal: options?.signal,
   });
@@ -56,7 +64,7 @@ export async function apiSend<T>(
 export async function getWithFallback<T>(
   path: string,
   fallback: T,
-  options?: { signal?: AbortSignal },
+  options?: { signal?: AbortSignal; token?: string },
 ): Promise<{ data: T; isFallback: boolean }> {
   try {
     const data = await apiGet<T>(path, options);
