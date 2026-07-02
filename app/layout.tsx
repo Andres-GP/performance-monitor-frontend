@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { getLocale } from "@/lib/i18n/server";
 import "./globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
@@ -29,14 +30,16 @@ export default async function RootLayout({
   const locale = await getLocale();
 
   return (
-    <html
-      lang={locale}
-      className={`dark ${geistSans.variable} ${geistMono.variable}`}
-    >
-      <body className="font-sans antialiased bg-background text-foreground">
-        <Providers locale={locale}>{children}</Providers>
-        {process.env.NODE_ENV === "production" && <Analytics />}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html
+        lang={locale}
+        className={`dark ${geistSans.variable} ${geistMono.variable}`}
+      >
+        <body className="font-sans antialiased bg-background text-foreground">
+          <Providers locale={locale}>{children}</Providers>
+          {process.env.NODE_ENV === "production" && <Analytics />}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

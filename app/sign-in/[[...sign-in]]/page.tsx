@@ -1,24 +1,26 @@
 "use client";
 
-import { useSignIn, useUser } from "@clerk/nextjs";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState, useEffect, useRef } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import {
   EnvelopeIcon,
   LockClosedIcon,
   ArrowRightIcon,
+  EyeIcon,
+  EyeSlashIcon,
 } from "@heroicons/react/24/outline";
 import { useI18n } from "@/lib/i18n/context";
 
 export default function SignInPage() {
   const { dict } = useI18n();
-  const { isLoaded, signIn, setActive } = useSignIn();
   const { isLoaded: isUserLoaded, isSignedIn } = useUser();
+  const { setActive, client } = useClerk();
   const router = useRouter();
 
   useEffect(() => {
     if (isUserLoaded && isSignedIn) {
-      router.push("/");
+      router.replace("/");
     }
   }, [isUserLoaded, isSignedIn, router]);
 
@@ -26,20 +28,34 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showVerification, setShowVerification] = useState(false);
-  const [verificationCode, setVerificationCode] = useState("");
-  const [verificationStrategy, setVerificationStrategy] = useState<
-    "email_code" | "reset_password_email_code" | null
-  >(null);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const codeInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (showVerification && codeInputRef.current) {
-      codeInputRef.current.focus();
-      setError(null);
-    }
-  }, [showVerification]);
+  if (!isUserLoaded) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <svg
+          className="animate-spin h-8 w-8 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          />
+        </svg>
+      </div>
+    );
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -47,207 +63,45 @@ export default function SignInPage() {
     setLoading(true);
 
     try {
-      const result = await signIn.create({
+      if (!client || !client.signIn) {
+        throw new Error("El cliente de Clerk no está disponible.");
+      }
+
+      const result = await client.signIn.create({
         identifier: email,
         password,
       });
 
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        router.push("/");
-        return;
-      }
-
-      // Manejo de needs_client_trust
-      if (result.status === "needs_client_trust") {
-        const factor = result.supported_first_factors?.find(
-          (f) =>
-            f.strategy === "email_code" ||
-            f.strategy === "reset_password_email_code",
-        );
-
-        if (!factor) {
-          setError(
-            "No hay método de verificación disponible. Contacta soporte.",
-          );
-          setLoading(false);
-          return;
-        }
-
-        const prepareResult = await signIn.prepareFirstFactor({
-          strategy: factor.strategy,
-        });
-
-        if (prepareResult.status === "needs_first_factor") {
-          setVerificationStrategy(factor.strategy);
-          setShowVerification(true);
-          setLoading(false);
-          return;
-        }
-
-        if (prepareResult.status === "complete") {
-          await setActive({ session: prepareResult.createdSessionId });
-          router.push("/");
-          return;
-        }
-
-        setError("No se pudo iniciar la verificación. Intenta nuevamente.");
-        setLoading(false);
-        return;
-      }
-
-      // Manejo de needs_second_factor (por si acaso)
-      if (result.status === "needs_second_factor") {
-        const emailCodeFactor = result.supported_second_factors?.find(
-          (f) => f.strategy === "email_code",
-        );
-        if (emailCodeFactor) {
-          const prepareResult = await signIn.prepareSecondFactor({
-            strategy: "email_code",
-          });
-          if (prepareResult.status === "needs_second_factor") {
-            setVerificationStrategy("email_code");
-            setShowVerification(true);
-            setLoading(false);
-            return;
-          }
-        }
-        setError("Se requiere segundo factor, pero no hay método disponible.");
-        setLoading(false);
+        router.replace("/");
         return;
       }
 
       setError(`Estado inesperado: ${result.status}. Contacta soporte.`);
     } catch (err: any) {
-      // Si el error es por sesión existente, redirigir directamente
+      console.error("❌ Error en login:", err);
       if (err?.errors?.[0]?.code === "session_exists") {
-        router.push("/");
+        router.replace("/");
         return;
       }
-
       const message =
         err?.errors?.[0]?.longMessage ??
         err?.errors?.[0]?.message ??
-        "Error al iniciar sesión.";
+        err?.message ??
+        "Error al iniciar sesión. Verifica tus datos.";
       setError(message);
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleVerifyCode(e: FormEvent) {
-    e.preventDefault();
-    if (!isLoaded || !verificationCode) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      let result;
-
-      if (
-        verificationStrategy === "email_code" ||
-        verificationStrategy === "reset_password_email_code"
-      ) {
-        result = await signIn.attemptFirstFactor({
-          strategy: verificationStrategy,
-          code: verificationCode,
-        });
-      } else {
-        result = await signIn.attemptSecondFactor({
-          strategy: "email_code",
-          code: verificationCode,
-        });
-      }
-
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-        router.push("/");
-      } else {
-        setError("Código incorrecto o expirado. Intenta nuevamente.");
-        setLoading(false);
-        setVerificationCode("");
-        if (codeInputRef.current) codeInputRef.current.focus();
-      }
-    } catch (err: any) {
-      if (err?.errors?.[0]?.code === "session_exists") {
-        router.push("/");
-        return;
-      }
-      setError(err?.errors?.[0]?.message || "Error al verificar el código.");
-      setLoading(false);
-    }
-  }
-
-  if (showVerification) {
-    return (
-      <main className="min-h-screen bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIyMjgiIGZpbGwtb3BhY2l0eT0iMC4wNCI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyek0zNiAxNHYySDI0di0yaDEyek0xOCAzNHYySDZ2LTJoMTJ6TTE4IDI0djJINnYtMmgxMnpNMTggMTR2Mkg2di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
-
-        <div className="relative w-full max-w-md z-10">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-light text-white tracking-tight">
-              Verifica tu identidad
-            </h1>
-            <p className="text-sm text-gray-400 mt-1.5">
-              Hemos enviado un código de verificación a tu correo electrónico.
-            </p>
-          </div>
-
-          <div className="bg-[#0D0D0D]/90 backdrop-blur-xl border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl shadow-black/70">
-            <form onSubmit={handleVerifyCode} className="w-full">
-              <div className="mb-4">
-                <label
-                  htmlFor="code"
-                  className="block text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1.5"
-                >
-                  Código de verificación
-                </label>
-                <input
-                  ref={codeInputRef}
-                  id="code"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  required
-                  value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value)}
-                  className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all duration-300 shadow-lg shadow-black/30"
-                  placeholder="Ingresa el código de 6 dígitos"
-                />
-              </div>
-
-              {error && (
-                <div className="mb-3 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                  <p className="text-red-400 text-xs font-medium text-center">
-                    {error}
-                  </p>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-white/10 hover:bg-white/20 disabled:opacity-50 text-white font-medium py-4 rounded-xl transition-all duration-300 shadow-lg shadow-black/30"
-              >
-                {loading ? "Verificando..." : "Verificar código"}
-              </button>
-            </form>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden font-sans antialiased selection:bg-white/10">
-      {/* Fondo decorativo (igual) */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIyMjgiIGZpbGwtb3BhY2l0eT0iMC4wNCI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyek0zNiAxNHYySDI0di0yaDEyek0xOCAzNHYySDZ2LTJoMTJ6TTE4IDI0djJINnYtMmgxMnpNMTggMTR2Mkg2di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
-
       <div className="absolute top-[-10%] right-[-5%] w-[40rem] h-[40rem] bg-white/5 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-[-10%] left-[-5%] w-[30rem] h-[30rem] bg-white/5 rounded-full blur-3xl animate-pulse delay-700"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50rem] h-[50rem] bg-white/5 rounded-full blur-3xl"></div>
-
       <div className="absolute top-[15%] right-[20%] w-1 h-1 bg-white/40 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.2)] animate-ping"></div>
       <div className="absolute bottom-[25%] left-[10%] w-1.5 h-1.5 bg-white/30 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.1)] animate-ping delay-300"></div>
       <div className="absolute top-[40%] right-[5%] w-1 h-1 bg-white/20 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.1)] animate-ping delay-700"></div>
@@ -263,7 +117,6 @@ export default function SignInPage() {
               {dict.signIn.liveSystem}
             </span>
           </div>
-
           <div className="flex items-center justify-center gap-3 mb-2">
             <div className="h-px w-8 bg-gradient-to-r from-transparent to-white/20"></div>
             <span className="text-3xl font-light text-white tracking-tight">
@@ -271,7 +124,6 @@ export default function SignInPage() {
             </span>
             <div className="h-px w-8 bg-gradient-to-l from-transparent to-white/20"></div>
           </div>
-
           <h1 className="text-2xl font-light text-white tracking-tight">
             Performance<span className="font-bold">Monitor</span>
           </h1>
@@ -282,10 +134,8 @@ export default function SignInPage() {
 
         <div className="relative">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-white/10 via-white/5 to-white/10 rounded-2xl blur-sm"></div>
-
           <div className="relative bg-[#0D0D0D]/90 backdrop-blur-xl border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl shadow-black/70">
             <form onSubmit={handleSubmit} className="w-full">
-              {/* Email */}
               <div className="mb-4">
                 <label
                   htmlFor="email"
@@ -311,7 +161,6 @@ export default function SignInPage() {
                 </div>
               </div>
 
-              {/* Password */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-1.5">
                   <label
@@ -327,14 +176,30 @@ export default function SignInPage() {
                     <LockClosedIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-white/70 transition-colors" />
                     <input
                       id="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       autoComplete="current-password"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-transparent border-0 pl-8 text-sm text-white placeholder:text-gray-500 focus:ring-0 focus:outline-none"
+                      className="w-full bg-transparent border-0 pl-8 pr-10 text-sm text-white placeholder:text-gray-500 focus:ring-0 focus:outline-none"
                       placeholder={dict.signIn.password}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors focus:outline-none"
+                      aria-label={
+                        showPassword
+                          ? "Ocultar contraseña"
+                          : "Mostrar contraseña"
+                      }
+                    >
+                      {showPassword ? (
+                        <EyeSlashIcon className="w-5 h-5 cursor-pointer" />
+                      ) : (
+                        <EyeIcon className="w-5 h-5 cursor-pointer" />
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -349,7 +214,6 @@ export default function SignInPage() {
                 </div>
               )}
 
-              {/* Botón */}
               <div className="relative group pt-2">
                 <div className="pointer-events-none absolute -inset-0.5 bg-gradient-to-r from-white/10 to-white/5 rounded-xl blur opacity-70 group-hover:opacity-100 transition duration-300"></div>
                 <button
