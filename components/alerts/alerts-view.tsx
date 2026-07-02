@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SeverityBadge } from "@/components/shared/badges";
 import { OfflineBanner } from "@/components/shared/offline-banner";
@@ -82,12 +82,27 @@ export function AlertsView() {
     safePage * pageSize + pageSize,
   );
 
-  function resetPage<T>(setter: (v: T) => void) {
-    return (v: T) => {
-      setter(v);
-      setPage(0);
-    };
-  }
+  const resetPage = useCallback((setter: (v: string) => void) => (v: string) => {
+    setter(v);
+    setPage(0);
+  }, []);
+
+  const handleStrategyChange = useCallback(resetPage(setStrategy), [resetPage]);
+  const handleSeverityChange = useCallback(resetPage(setSeverity), [resetPage]);
+  const handleFromChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFrom(e.target.value);
+    setPage(0);
+  }, []);
+  const handleToChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setTo(e.target.value);
+    setPage(0);
+  }, []);
+  const handlePageSizeChange = useCallback((v: string) => {
+    setPageSize(Number(v));
+    setPage(0);
+  }, []);
+  const handlePrevPage = useCallback(() => setPage((p) => Math.max(0, p - 1)), []);
+  const handleNextPage = useCallback(() => setPage((p) => Math.min(totalPages - 1, p + 1)), [totalPages]);
 
   // Función auxiliar para interpolación de placeholders
   const interpolate = (
@@ -113,7 +128,7 @@ export function AlertsView() {
             <Select
               items={strategyItems}
               value={strategy}
-              onValueChange={resetPage((v) => setStrategy(v as string))}
+              onValueChange={handleStrategyChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder={dict.alerts.filterStrategy} />
@@ -135,7 +150,7 @@ export function AlertsView() {
             <Select
               items={severityItems}
               value={severity}
-              onValueChange={resetPage((v) => setSeverity(v as string))}
+              onValueChange={handleSeverityChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder={dict.alerts.filterSeverity} />
@@ -156,7 +171,7 @@ export function AlertsView() {
               id="from"
               type="date"
               value={from}
-              onChange={(e) => resetPage(setFrom)(e.target.value)}
+              onChange={handleFromChange}
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -167,7 +182,7 @@ export function AlertsView() {
               id="to"
               type="date"
               value={to}
-              onChange={(e) => resetPage(setTo)(e.target.value)}
+              onChange={handleToChange}
             />
           </div>
         </CardContent>
@@ -229,10 +244,7 @@ export function AlertsView() {
               <span>{dict.alerts.perPage}</span>
               <Select
                 value={String(pageSize)}
-                onValueChange={(v) => {
-                  setPageSize(Number(v));
-                  setPage(0);
-                }}
+                onValueChange={handlePageSizeChange}
               >
                 <SelectTrigger className="w-20">
                   <SelectValue />
@@ -259,7 +271,7 @@ export function AlertsView() {
                   size="icon-sm"
                   aria-label={dict.alerts.prevPage}
                   disabled={safePage === 0}
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  onClick={handlePrevPage}
                 >
                   <ChevronLeft className="size-4" />
                 </Button>
@@ -268,9 +280,7 @@ export function AlertsView() {
                   size="icon-sm"
                   aria-label={dict.alerts.nextPage}
                   disabled={safePage >= totalPages - 1}
-                  onClick={() =>
-                    setPage((p) => Math.min(totalPages - 1, p + 1))
-                  }
+                  onClick={handleNextPage}
                 >
                   <ChevronRight className="size-4" />
                 </Button>

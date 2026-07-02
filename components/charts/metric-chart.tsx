@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import {
   CartesianGrid,
   Line,
@@ -19,7 +20,7 @@ interface MetricChartProps {
   asPercent?: boolean
 }
 
-export default function MetricChart({ data, dataKey, label, asPercent }: MetricChartProps) {
+export default memo(function MetricChart({ data, dataKey, label, asPercent }: MetricChartProps) {
   return (
     <ResponsiveContainer width="100%" height={240}>
       <LineChart data={data} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
@@ -64,4 +65,4 @@ export default function MetricChart({ data, dataKey, label, asPercent }: MetricC
       </LineChart>
     </ResponsiveContainer>
   )
-}
+})

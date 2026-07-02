@@ -1,3 +1,5 @@
+import { memo } from "react"
+
 function cellColor(v: number): string {
   // Positive correlation -> chart-2 (red-ish risk), negative -> chart-1 (green).
   const intensity = Math.min(Math.abs(v), 1)
@@ -7,7 +9,7 @@ function cellColor(v: number): string {
   return `color-mix(in oklab, var(--color-chart-1) ${Math.round(intensity * 70)}%, var(--color-card))`
 }
 
-export function CorrelationHeatmap({
+export const CorrelationHeatmap = memo(function CorrelationHeatmap({
   strategies,
   matrix,
 }: {
@@ -49,4 +51,4 @@ export function CorrelationHeatmap({
       </table>
     </div>
   )
-}
+})

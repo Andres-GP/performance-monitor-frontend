@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import {
   Area,
   AreaChart,
@@ -12,7 +13,7 @@ import {
 import { formatCurrency, formatDateShort } from "@/lib/format"
 import type { PerformanceMetric } from "@/types"
 
-export default function EquityChart({ data }: { data: PerformanceMetric[] }) {
+export default memo(function EquityChart({ data }: { data: PerformanceMetric[] }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <AreaChart data={data} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
@@ -60,4 +61,4 @@ export default function EquityChart({ data }: { data: PerformanceMetric[] }) {
       </AreaChart>
     </ResponsiveContainer>
   )
-}
+})

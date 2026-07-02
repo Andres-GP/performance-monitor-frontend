@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
@@ -30,6 +30,23 @@ export function StrategiesView() {
 
   const strategies = data?.data ?? []
 
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value)
+  }, [])
+
+  const handleStatusChange = useCallback((v: string) => setStatus(v), [])
+
+  const handleHealthChange = useCallback((v: string) => setHealth(v), [])
+
+  const handleDeleteConfirm = useCallback(() => {
+    if (pending) deleteStrategy.mutate(pending.id)
+    setPending(null)
+  }, [pending, deleteStrategy])
+
+  const handleDialogOpenChange = useCallback((open: boolean) => {
+    if (!open) setPending(null)
+  }, [])
+
   const filtered = useMemo(() => {
     return strategies.filter((s) => {
       const matchesSearch =
@@ -58,7 +75,7 @@ export function StrategiesView() {
           <Input
             placeholder={dict.strategies.searchPlaceholder}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={handleSearchChange}
             className="pl-9"
           />
         </div>
@@ -69,7 +86,7 @@ export function StrategiesView() {
             Stopped: dict.strategies.statusStopped,
           }}
           value={status}
-          onValueChange={(v) => setStatus(v as string)}
+          onValueChange={handleStatusChange}
         >
           <SelectTrigger className="w-full sm:w-40">
             <SelectValue placeholder={dict.strategies.statusPlaceholder} />
@@ -88,7 +105,7 @@ export function StrategiesView() {
             unhealthy: dict.strategies.healthUnhealthy,
           }}
           value={health}
-          onValueChange={(v) => setHealth(v as string)}
+          onValueChange={handleHealthChange}
         >
           <SelectTrigger className="w-full sm:w-44">
             <SelectValue placeholder={dict.strategies.healthPlaceholder} />
@@ -114,11 +131,8 @@ export function StrategiesView() {
 
       <DeleteStrategyDialog
         strategy={pending}
-        onOpenChange={(open) => !open && setPending(null)}
-        onConfirm={() => {
-          if (pending) deleteStrategy.mutate(pending.id)
-          setPending(null)
-        }}
+        onOpenChange={handleDialogOpenChange}
+        onConfirm={handleDeleteConfirm}
         isPending={deleteStrategy.isPending}
       />
     </div>

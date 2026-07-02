@@ -76,49 +76,81 @@ export const mockStrategies: Strategy[] = [
   },
 ]
 
-function buildEquityCurve(days: number, start: number): PerformanceMetric[] {
+const equityCurveCache = new Map<string, PerformanceMetric[]>()
+const tradesCache = new Map<string, Trade[]>()
+
+function buildEquityCurve(days: number, start: number, seed: string): PerformanceMetric[] {
+  const cacheKey = `${days}-${start}-${seed}`
+  const cached = equityCurveCache.get(cacheKey)
+  if (cached) return cached
+
   const out: PerformanceMetric[] = []
   let equity = start
   const now = Date.now()
   for (let i = days; i >= 0; i--) {
-    equity += (Math.sin(i / 3) + (Math.random() - 0.4)) * (start * 0.01)
+    const seedVal = hashString(`${seed}-${i}`)
+    const rand = seededRandom(seedVal)
+    equity += (Math.sin(i / 3) + (rand - 0.4)) * (start * 0.01)
     out.push({
       timestamp: new Date(now - i * 86400000).toISOString(),
       equity: Math.round(equity),
-      win_rate: 0.5 + Math.random() * 0.15,
-      profit_factor: 1 + Math.random(),
-      drawdown: Math.random() * 0.15,
-      sharpe: 0.5 + Math.random() * 2,
+      win_rate: 0.5 + rand * 0.15,
+      profit_factor: 1 + seededRandom(hashString(`${seed}-pf-${i}`)),
+      drawdown: seededRandom(hashString(`${seed}-dd-${i}`)) * 0.15,
+      sharpe: 0.5 + seededRandom(hashString(`${seed}-sh-${i}`)) * 2,
     })
   }
+  equityCurveCache.set(cacheKey, out)
   return out
 }
 
-export const mockEquityCurve: PerformanceMetric[] = buildEquityCurve(30, 150000)
+function hashString(str: string): number {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+  }
+  return Math.abs(hash)
+}
+
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed) * 10000
+  return x - Math.floor(x)
+}
+
+export const mockEquityCurve: PerformanceMetric[] = buildEquityCurve(30, 150000, "global-equity")
 
 export function mockMetricsFor(strategyId: string): PerformanceMetric[] {
   const start = mockStrategies.find((s) => s.id === strategyId)?.capital ?? 40000
-  return buildEquityCurve(30, start)
+  return buildEquityCurve(30, start, `metrics-${strategyId}`)
 }
 
 export function mockTradesFor(strategyId: string): Trade[] {
+  const cached = tradesCache.get(strategyId)
+  if (cached) return cached
+
   const out: Trade[] = []
   const now = Date.now()
+  const strategy = mockStrategies.find((s) => s.id === strategyId)
   for (let i = 0; i < 40; i++) {
-    const pnl = Math.round((Math.random() - 0.42) * 800)
+    const seedVal = hashString(`${strategyId}-trade-${i}`)
+    const rand = seededRandom(seedVal)
+    const pnl = Math.round((seededRandom(hashString(`${strategyId}-pnl-${i}`)) - 0.42) * 800)
     out.push({
       id: `${strategyId}-t${i}`,
       strategy_id: strategyId,
-      symbol: mockStrategies.find((s) => s.id === strategyId)?.instrument ?? "ES",
-      side: Math.random() > 0.5 ? "long" : "short",
-      entry_price: 4500 + Math.random() * 100,
-      exit_price: 4500 + Math.random() * 100,
-      quantity: 1 + Math.floor(Math.random() * 3),
+      symbol: strategy?.instrument ?? "ES",
+      side: rand > 0.5 ? "long" : "short",
+      entry_price: 4500 + seededRandom(hashString(`${strategyId}-entry-${i}`)) * 100,
+      exit_price: 4500 + seededRandom(hashString(`${strategyId}-exit-${i}`)) * 100,
+      quantity: 1 + Math.floor(seededRandom(hashString(`${strategyId}-qty-${i}`)) * 3),
       pnl,
       entry_time: new Date(now - i * 3600000 * 5).toISOString(),
       exit_time: new Date(now - i * 3600000 * 5 + 3600000).toISOString(),
     })
   }
+  tradesCache.set(strategyId, out)
   return out
 }
 
@@ -220,7 +252,7 @@ export const mockPortfolioMetrics: PortfolioMetrics = {
       [0.12, 0.27, 0.05, 1],
     ],
   },
-  drawdown_series: buildEquityCurve(30, 100).map((m) => ({
+  drawdown_series: buildEquityCurve(30, 100, "drawdown").map((m) => ({
     timestamp: m.timestamp,
     drawdown: -Math.abs((m.equity - 100) / 100) * 0.2,
   })),
