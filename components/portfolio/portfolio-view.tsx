@@ -26,7 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  useCapitalSummary,
+  //useCapitalSummary,
   usePortfolioMetrics,
   usePortfolioWeights,
 } from "@/lib/queries";
@@ -37,15 +37,14 @@ import { useI18n } from "@/lib/i18n/context";
 export function PortfolioView() {
   const { dict } = useI18n();
 
-  const capital = useCapitalSummary();
+  //const capital = useCapitalSummary();
   const weights = usePortfolioWeights();
   const metrics = usePortfolioMetrics();
 
   const isFallback =
-    capital.data?.isFallback ||
-    weights.data?.isFallback ||
-    metrics.data?.isFallback;
-  const summary = capital.data?.data;
+    //capital.data?.isFallback ||
+    weights.data?.isFallback || metrics.data?.isFallback;
+  //const summary = capital.data?.data;
   const weightList = weights.data?.data ?? [];
   const pm = metrics.data?.data;
 
@@ -68,13 +67,13 @@ export function PortfolioView() {
       {isFallback && <OfflineBanner />}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
+        {/* <StatCard
           label={dict.portfolio.capitalTotal}
           value={formatCurrency(summary?.total)}
           icon={Activity}
           hint={dict.portfolio.capitalHint}
           loading={capital.isLoading}
-        />
+        /> */}
         <StatCard
           label={dict.portfolio.portfolioSharpe}
           value={formatNumber(pm?.sharpe)}
@@ -101,7 +100,7 @@ export function PortfolioView() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle className="text-base">
               {dict.portfolio.capitalByAccount}
@@ -132,7 +131,7 @@ export function PortfolioView() {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card>
           <CardHeader>

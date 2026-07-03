@@ -63,14 +63,13 @@ export async function apiSend<T>(
 // backend is unreachable. Returns { data, isFallback }.
 export async function getWithFallback<T>(
   path: string,
-  fallback: T,
   options?: { signal?: AbortSignal; token?: string },
-): Promise<{ data: T; isFallback: boolean }> {
+): Promise<{ data: T | null; isFallback: boolean }> {
   try {
     const data = await apiGet<T>(path, options);
     return { data, isFallback: false };
   } catch {
-    return { data: fallback, isFallback: true };
+    return { data: null, isFallback: true };
   }
 }
 

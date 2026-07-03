@@ -44,7 +44,7 @@ export const en = {
     footer: "Backend connected via secure proxy",
   },
   offline: {
-    message: "Backend unavailable — showing cached demo data.",
+    message: "Backend unavailable",
   },
   status: {
     Running: "Running",
@@ -108,6 +108,133 @@ export const en = {
     widgetNhnlTitle: "New Highs / New Lows",
     widgetNhnlDesc: "Market breadth through new highs and lows",
     symbolsAria: "Symbols for {title}",
+    correlationsTitle: "Correlations SPY, QQQ, TLT",
+    correlationsDesc:
+      "This graph shows the evolution of prices of SPY (S&P 500), QQQ (Nasdaq 100) and TLT (20-year Treasury bonds). Observe how they move together or in opposite directions. The correlation between SPY and QQQ is usually high, while SPY and TLT usually have negative correlation (safe haven).",
+    correlationsInstruments: {
+      "AMEX:SPY": "ETF of the S&P 500, represents the overall market.",
+      "NASDAQ:QQQ": "ETF of the Nasdaq 100, reflects the technology sector.",
+      "NASDAQ:TLT": "ETF of 20-year Treasury bonds, considered a safe haven.",
+    },
+    vixTitle: "Volatility (VIX)",
+    vixDesc:
+      "The VIX (volatility index) measures the 30-day expected volatility of the S&P 500. High values indicate fear and recent drops; low values indicate complacency. It is a market sentiment indicator.",
+    vixInstruments: {
+      VIX: "S&P 500 volatility index (no exchange). May require subscription. Alternative: CBOE:VIX.",
+    },
+    breadthTitle: "Market Breadth (Advances/Declines)",
+    breadthDesc:
+      "This graph shows the evolution of SPY prices and NYSE advance/decline indices (USI:ADVN.NY and USI:DECL.NQ). These indicators reflect the participation of stocks in the market movement. If they rise, the market is broad; if only SPY rises but advances do not, it is a selective rally.",
+    breadthInstruments: {
+      "AMEX:SPY": "S&P 500 ETF, represents the overall market.",
+      "USI:ADVN.NY": "NYSE Advances – number of advancing stocks on the NYSE.",
+      "USI:DECL.NQ":
+        "NASDAQ Declines – number of declining stocks on the NASDAQ.",
+    },
+
+    // --- NUEVAS CLAVES PARA EXPLICACIONES DETALLADAS (ADX) ---
+    adxHelpTitle: "What does ADX measure?",
+    adxHelpDesc:
+      "The Average Directional Index quantifies the strength of a trend, regardless of direction.",
+    adxHelpSideways: "Sideways market (favors mean reversion strategies).",
+    adxHelpTrending: "Strong trend (favors trend following).",
+    adxHelpTransition: "Transition zone (indecision).",
+    adxHelpNow: "Now:",
+    adxHelpNowTrending: "Strong bullish trend.",
+    adxHelpNowSideways: "Sideways market, no clear direction.",
+    adxHelpNowTransition: "In transition, waiting for definition.",
+
+    // --- VIX ---
+    vixHelpTitle: "What does the VIX percentile measure?",
+    vixHelpDesc:
+      "The VIX (volatility index) reflects 30-day expected volatility. Its percentile shows how extreme current fear is compared to the last year.",
+    vixHelpExtremeFear: "Extreme fear (usually good buying opportunities).",
+    vixHelpComplacency: "Extreme complacency (risk of correction).",
+    vixHelpNormal: "Normal fear levels.",
+    vixHelpNow: "Now:",
+    vixHelpNowExtreme: "Extreme fear, buying opportunity.",
+    vixHelpNowComplacency: "Complacency, caution.",
+    vixHelpNowNormal: "Normal fear level.",
+
+    // --- ATR ---
+    atrHelpTitle: "What does the ATR percentile measure?",
+    atrHelpDesc:
+      "The ATR (average true range) measures daily volatility. Its percentile compares current volatility to the last year.",
+    atrHelpHigh: "High volatility (wider stops, smaller position size).",
+    atrHelpLow: "Low volatility (tighter stops, larger position size).",
+    atrHelpNormal: "Normal volatility.",
+    atrHelpNow: "Now:",
+    atrHelpNowHigh: "High volatility, adjust your stops.",
+    atrHelpNowLow: "Low volatility, you can tighten stops.",
+    atrHelpNowNormal: "Normal volatility.",
+
+    // --- Breadth ---
+    breadthHelpTitle: "What does Breadth measure?",
+    breadthHelpDesc:
+      "It indicates whether the market movement is broad (most stocks participate) or selective.",
+    breadthHelpStrongUpside:
+      "Strong upside breadth: most stocks rising, healthy market.",
+    breadthHelpStrongDownside:
+      "Strong downside breadth: most stocks falling, generalized weakness.",
+    breadthHelpNeutral: "Neutral breadth: balanced.",
+    breadthHelpNow: "Now:",
+    breadthHelpNowUpside: "Strong upside breadth.",
+    breadthHelpNowDownside: "Strong downside breadth.",
+    breadthHelpNowNeutral: "Neutral breadth.",
+
+    // --- Strength ---
+    strengthHelpTitle: "What does Strength measure?",
+    strengthHelpDesc:
+      "Compares the number of new 52-week highs versus new lows. Reflects market conviction.",
+    strengthHelpStrong: "Strong: more highs than lows, real strength.",
+    strengthHelpWeak: "Weak: more lows, weakness.",
+    strengthHelpNeutral: "Neutral: balance.",
+    strengthHelpNow: "Now:",
+    strengthHelpNowStrong: "Market strength.",
+    strengthHelpNowWeak: "Market weakness.",
+    strengthHelpNowNeutral: "Neutral strength.",
+
+    // --- Advance/Decline ---
+    advDecHelpTitle: "Advance / Decline Ratio",
+    advDecHelpDesc:
+      "Number of advancing stocks divided by declining stocks. The most direct breadth metric.",
+    advDecHelpStrong:
+      "Strong bullish bias (more than 2 advance for each decline).",
+    advDecHelpWeak: "Strong bearish bias.",
+    advDecHelpNeutral: "Neutral (≈1).",
+    advDecHelpNow: "Now:",
+    advDecHelpNowStrong: "(strong upside)",
+    advDecHelpNowWeak: "(strong downside)",
+    advDecHelpNowNeutral: "(neutral)",
+
+    // --- New Highs/Lows ---
+    nhNlHelpTitle: "New Highs / New Lows Ratio",
+    nhNlHelpDesc:
+      "Number of stocks reaching new 52-week highs divided by those reaching new lows.",
+    nhNlHelpStrong: "Extreme strength (many new highs).",
+    nhNlHelpWeak: "Extreme weakness.",
+    nhNlHelpNeutral: "Balanced (≈1).",
+    nhNlHelpNow: "Now:",
+    nhNlHelpNowStrong: "(strength)",
+    nhNlHelpNowWeak: "(weakness)",
+    nhNlHelpNowNeutral: "(neutral)",
+
+    // --- Correlations ---
+    corrHelpTitle: "SPY vs QQQ and SPY vs TLT Correlations",
+    corrHelpDesc:
+      "Correlation measures the relationship between daily movements of two assets.",
+    corrHelpSpyQqq:
+      "Usually high and positive (both move together). Values near 1 indicate the market is tech-led.",
+    corrHelpSpyTlt:
+      "Usually negative (bonds act as a safe haven when stocks fall).",
+    corrHelpNow: "Now:",
+    corrHelpNowStrong: "strong positive relation",
+    corrHelpNowStrongNeg: "strong negative relation",
+    corrHelpNowWeak: "weak relation",
+    corrHelpNowNeg: "strong negative correlation, typical",
+    corrHelpNowPos: "unusual positive correlation",
+    corrHelpNote:
+      "* If values are 0 or very low, it may be due to insufficient data (we need at least 30 days of data).",
   },
   strategies: {
     title: "Strategies",
@@ -335,8 +462,7 @@ export const es: Dictionary = {
     footer: "Backend conectado vía proxy seguro",
   },
   offline: {
-    message:
-      "Backend no disponible — mostrando datos en caché de demostración.",
+    message: "Backend no disponible",
   },
   status: {
     Running: "En ejecución",
@@ -401,6 +527,137 @@ export const es: Dictionary = {
     widgetNhnlTitle: "New Highs / New Lows",
     widgetNhnlDesc: "Amplitud del mercado mediante nuevos máximos y mínimos",
     symbolsAria: "Símbolos para {title}",
+    correlationsTitle: "Correlaciones SPY, QQQ, TLT",
+    correlationsDesc:
+      "Este gráfico muestra la evolución de los precios de SPY (S&P 500), QQQ (Nasdaq 100) y TLT (bonos del Tesoro a 20 años). Observa cómo se mueven juntos o en direcciones opuestas. La correlación entre SPY y QQQ suele ser alta, mientras que SPY y TLT suelen tener correlación negativa (refugio).",
+    correlationsInstruments: {
+      "AMEX:SPY": "ETF del S&P 500, representa el mercado general.",
+      "NASDAQ:QQQ": "ETF del Nasdaq 100, refleja el sector tecnológico.",
+      "NASDAQ:TLT":
+        "ETF de bonos del Tesoro a 20 años, considerado refugio seguro.",
+    },
+    vixTitle: "Volatilidad (VIX)",
+    vixDesc:
+      "El VIX (índice de volatilidad) mide la volatilidad esperada a 30 días del S&P 500. Valores altos indican miedo y caídas recientes; valores bajos indican complacencia. Es un indicador de sentimiento del mercado.",
+    vixInstruments: {
+      VIX: "Índice de volatilidad del S&P 500 (sin exchange). Puede requerir suscripción. Alternativa: CBOE:VIX.",
+    },
+    breadthTitle: "Amplitud del Mercado (Avances/Declives)",
+    breadthDesc:
+      "Este gráfico muestra la evolución de los precios de SPY y los índices de avances/declives de NYSE (USI:ADVN.NY y USI:DECL.NQ). Estos indicadores reflejan la participación de las acciones en el movimiento del mercado. Si suben, el mercado es amplio; si solo SPY sube pero los avances no, es un rally selectivo.",
+    breadthInstruments: {
+      "AMEX:SPY": "ETF del S&P 500, representa el mercado general.",
+      "USI:ADVN.NY": "NYSE Advances – número de acciones en avance en NYSE.",
+      "USI:DECL.NQ":
+        "NASDAQ Declines – número de acciones en declive en NASDAQ.",
+    },
+
+    // --- NUEVAS CLAVES PARA EXPLICACIONES DETALLADAS (ADX) ---
+    adxHelpTitle: "¿Qué mide el ADX?",
+    adxHelpDesc:
+      "El Average Directional Index cuantifica la fuerza de una tendencia, sin importar su dirección.",
+    adxHelpSideways:
+      "Mercado lateral (favorece estrategias de mean reversion).",
+    adxHelpTrending: "Tendencia fuerte (favorece el seguimiento de tendencia).",
+    adxHelpTransition: "Zona de transición (indecisión).",
+    adxHelpNow: "Ahora:",
+    adxHelpNowTrending: "Tendencia alcista fuerte.",
+    adxHelpNowSideways: "Mercado lateral, sin dirección clara.",
+    adxHelpNowTransition: "En transición, esperando definición.",
+
+    // --- VIX ---
+    vixHelpTitle: "¿Qué mide el percentil del VIX?",
+    vixHelpDesc:
+      "El VIX (índice de volatilidad) refleja la volatilidad esperada a 30 días. Su percentil muestra cuán extremo es el miedo actual comparado con el último año.",
+    vixHelpExtremeFear:
+      "Miedo extremo (suelen ser buenos momentos para comprar).",
+    vixHelpComplacency: "Complacencia extrema (riesgo de corrección).",
+    vixHelpNormal: "Nivel normal de miedo.",
+    vixHelpNow: "Ahora:",
+    vixHelpNowExtreme: "Miedo extremo, oportunidad de compra.",
+    vixHelpNowComplacency: "Complacencia, precaución.",
+    vixHelpNowNormal: "Nivel normal de miedo.",
+
+    // --- ATR ---
+    atrHelpTitle: "¿Qué mide el percentil del ATR?",
+    atrHelpDesc:
+      "El ATR (rango verdadero promedio) mide la volatilidad diaria. Su percentil compara la volatilidad actual con el último año.",
+    atrHelpHigh:
+      "Alta volatilidad (stops más amplios, menor tamaño de posición).",
+    atrHelpLow: "Baja volatilidad (stops más ajustados, mayor tamaño).",
+    atrHelpNormal: "Volatilidad normal.",
+    atrHelpNow: "Ahora:",
+    atrHelpNowHigh: "Alta volatilidad, ajusta tus stops.",
+    atrHelpNowLow: "Baja volatilidad, puedes ajustar más los stops.",
+    atrHelpNowNormal: "Volatilidad normal.",
+
+    // --- Breadth ---
+    breadthHelpTitle: "¿Qué mide el Breadth?",
+    breadthHelpDesc:
+      "Indica si el movimiento del mercado es amplio (la mayoría de las acciones participan) o selectivo.",
+    breadthHelpStrongUpside:
+      "Amplitud fuerte al alza: mayoría de acciones subiendo, mercado saludable.",
+    breadthHelpStrongDownside:
+      "Amplitud fuerte a la baja: mayoría bajando, debilidad generalizada.",
+    breadthHelpNeutral: "Amplitud neutral: equilibrio.",
+    breadthHelpNow: "Ahora:",
+    breadthHelpNowUpside: "Amplitud fuerte al alza.",
+    breadthHelpNowDownside: "Amplitud fuerte a la baja.",
+    breadthHelpNowNeutral: "Amplitud neutral.",
+
+    // --- Strength ---
+    strengthHelpTitle: "¿Qué mide el Strength?",
+    strengthHelpDesc:
+      "Compara el número de nuevos máximos de 52 semanas frente a nuevos mínimos. Refleja la convicción del mercado.",
+    strengthHelpStrong: "Fuerte: más máximos que mínimos, fortaleza real.",
+    strengthHelpWeak: "Débil: más mínimos, debilidad.",
+    strengthHelpNeutral: "Neutral: equilibrio.",
+    strengthHelpNow: "Ahora:",
+    strengthHelpNowStrong: "Fortaleza de mercado.",
+    strengthHelpNowWeak: "Debilidad de mercado.",
+    strengthHelpNowNeutral: "Fortaleza neutral.",
+
+    // --- Advance/Decline ---
+    advDecHelpTitle: "Ratio Advance / Decline",
+    advDecHelpDesc:
+      "Número de acciones en avance dividido entre las que declinan. La métrica más directa de amplitud.",
+    advDecHelpStrong:
+      "Sesgo alcista fuerte (más de 2 suben por cada 1 que baja).",
+    advDecHelpWeak: "Sesgo bajista fuerte.",
+    advDecHelpNeutral: "Neutral (≈1).",
+    advDecHelpNow: "Ahora:",
+    advDecHelpNowStrong: "(fuerte alza)",
+    advDecHelpNowWeak: "(fuerte baja)",
+    advDecHelpNowNeutral: "(neutral)",
+
+    // --- New Highs/Lows ---
+    nhNlHelpTitle: "Ratio New Highs / New Lows",
+    nhNlHelpDesc:
+      "Número de acciones que alcanzan nuevos máximos de 52 semanas dividido entre las que alcanzan nuevos mínimos.",
+    nhNlHelpStrong: "Fortaleza extrema (muchos nuevos máximos).",
+    nhNlHelpWeak: "Debilidad extrema.",
+    nhNlHelpNeutral: "Equilibrio (≈1).",
+    nhNlHelpNow: "Ahora:",
+    nhNlHelpNowStrong: "(fortaleza)",
+    nhNlHelpNowWeak: "(debilidad)",
+    nhNlHelpNowNeutral: "(neutral)",
+
+    // --- Correlations ---
+    corrHelpTitle: "Correlaciones SPY vs QQQ y SPY vs TLT",
+    corrHelpDesc:
+      "La correlación mide la relación entre los movimientos diarios de dos activos.",
+    corrHelpSpyQqq:
+      "Suele ser alta y positiva (ambos se mueven juntos). Valores cercanos a 1 indican que el mercado está liderado por tecnológicas.",
+    corrHelpSpyTlt:
+      "Suele ser negativa (los bonos actúan como refugio cuando las acciones caen).",
+    corrHelpNow: "Ahora:",
+    corrHelpNowStrong: "relación positiva fuerte",
+    corrHelpNowStrongNeg: "relación negativa fuerte",
+    corrHelpNowWeak: "relación débil",
+    corrHelpNowNeg: "correlación negativa fuerte, típica",
+    corrHelpNowPos: "correlación positiva inusual",
+    corrHelpNote:
+      "* Si los valores son 0 o muy bajos, puede deberse a datos insuficientes (necesitamos al menos 30 días de datos).",
   },
   strategies: {
     title: "Estrategias",

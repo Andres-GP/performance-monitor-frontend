@@ -82,27 +82,42 @@ export function AlertsView() {
     safePage * pageSize + pageSize,
   );
 
-  const resetPage = useCallback((setter: (v: string) => void) => (v: string) => {
-    setter(v);
-    setPage(0);
-  }, []);
+  const resetPage = useCallback(
+    (setter: (v: string) => void) => (v: string) => {
+      setter(v);
+      setPage(0);
+    },
+    [],
+  );
 
   const handleStrategyChange = useCallback(resetPage(setStrategy), [resetPage]);
   const handleSeverityChange = useCallback(resetPage(setSeverity), [resetPage]);
-  const handleFromChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setFrom(e.target.value);
-    setPage(0);
-  }, []);
-  const handleToChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setTo(e.target.value);
-    setPage(0);
-  }, []);
+  const handleFromChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFrom(e.target.value);
+      setPage(0);
+    },
+    [],
+  );
+  const handleToChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setTo(e.target.value);
+      setPage(0);
+    },
+    [],
+  );
   const handlePageSizeChange = useCallback((v: string) => {
     setPageSize(Number(v));
     setPage(0);
   }, []);
-  const handlePrevPage = useCallback(() => setPage((p) => Math.max(0, p - 1)), []);
-  const handleNextPage = useCallback(() => setPage((p) => Math.min(totalPages - 1, p + 1)), [totalPages]);
+  const handlePrevPage = useCallback(
+    () => setPage((p) => Math.max(0, p - 1)),
+    [],
+  );
+  const handleNextPage = useCallback(
+    () => setPage((p) => Math.min(totalPages - 1, p + 1)),
+    [totalPages],
+  );
 
   // Función auxiliar para interpolación de placeholders
   const interpolate = (
@@ -178,12 +193,7 @@ export function AlertsView() {
             <Label htmlFor="to" className="text-xs text-muted-foreground">
               {dict.alerts.filterTo}
             </Label>
-            <Input
-              id="to"
-              type="date"
-              value={to}
-              onChange={handleToChange}
-            />
+            <Input id="to" type="date" value={to} onChange={handleToChange} />
           </div>
         </CardContent>
       </Card>
@@ -200,8 +210,8 @@ export function AlertsView() {
         </div>
       ) : (
         <>
-          <div className="overflow-hidden rounded-lg border border-border">
-            <Table>
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <Table className="min-w-[700px]">
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
                   <TableHead>{dict.alerts.colProblem}</TableHead>
@@ -220,9 +230,16 @@ export function AlertsView() {
               <TableBody>
                 {pageAlerts.map((a) => (
                   <TableRow key={a.id}>
-                    <TableCell className="font-medium">{a.problem}</TableCell>
-                    <TableCell className="hidden max-w-sm text-muted-foreground md:table-cell">
-                      {a.details ?? "—"}
+                    <TableCell className="font-medium">
+                      {a.problem_type}
+                    </TableCell>
+                    <TableCell className="hidden max-w-sm md:table-cell">
+                      <div
+                        className="max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap text-muted-foreground"
+                        title={a.details ?? "—"}
+                      >
+                        {a.details ?? "—"}
+                      </div>
                     </TableCell>
                     <TableCell className="hidden text-muted-foreground sm:table-cell">
                       {a.strategy_name ?? a.strategy_id}
@@ -238,7 +255,6 @@ export function AlertsView() {
               </TableBody>
             </Table>
           </div>
-
           <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>{dict.alerts.perPage}</span>
