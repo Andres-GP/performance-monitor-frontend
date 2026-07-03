@@ -1,20 +1,20 @@
-import { memo } from "react"
+import { memo } from "react";
 
 function cellColor(v: number): string {
   // Positive correlation -> chart-2 (red-ish risk), negative -> chart-1 (green).
-  const intensity = Math.min(Math.abs(v), 1)
+  const intensity = Math.min(Math.abs(v), 1);
   if (v >= 0) {
-    return `color-mix(in oklab, var(--color-chart-2) ${Math.round(intensity * 70)}%, var(--color-card))`
+    return `color-mix(in oklab, var(--color-chart-2) ${Math.round(intensity * 70)}%, var(--color-card))`;
   }
-  return `color-mix(in oklab, var(--color-chart-1) ${Math.round(intensity * 70)}%, var(--color-card))`
+  return `color-mix(in oklab, var(--color-chart-1) ${Math.round(intensity * 70)}%, var(--color-card))`;
 }
 
 export const CorrelationHeatmap = memo(function CorrelationHeatmap({
   strategies,
   matrix,
 }: {
-  strategies: string[]
-  matrix: number[][]
+  strategies: string[];
+  matrix: number[][];
 }) {
   return (
     <div className="overflow-x-auto">
@@ -23,7 +23,10 @@ export const CorrelationHeatmap = memo(function CorrelationHeatmap({
           <tr>
             <th className="p-1" />
             {strategies.map((s) => (
-              <th key={s} className="p-1 text-center font-medium text-muted-foreground">
+              <th
+                key={s}
+                className="p-1 text-center font-medium text-muted-foreground"
+              >
                 {s}
               </th>
             ))}
@@ -50,5 +53,5 @@ export const CorrelationHeatmap = memo(function CorrelationHeatmap({
         </tbody>
       </table>
     </div>
-  )
-})
+  );
+});

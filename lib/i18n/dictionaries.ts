@@ -363,6 +363,51 @@ export const en = {
     accountDemo: "Demo",
     accountReal: "Real",
     accountFunded: "Funded",
+    ruinProbability: "Ruin Probability",
+    ruinProbabilityHint: "Risk of catastrophic loss",
+    concentration: "Concentration",
+    concentrationHint: "Highest exposure by category",
+    transactionCosts: "Transaction Costs",
+    transactionCostsHint: "Monthly costs on capital",
+    helpWeightsTitle: "Target vs Actual Weights",
+    helpWeightsDesc:
+      "Target weights are defined by the trader. Actual weights are calculated from each strategy's PnL. Deviation shows how far the actual allocation has drifted from the target.",
+    helpAllocationTitle: "Weight Allocation",
+    helpAllocationDesc:
+      "Detailed target, actual and deviation per strategy. High deviation suggests rebalancing is needed.",
+    helpCorrelationTitle: "Correlation Matrix",
+    helpCorrelationDesc:
+      "Shows the correlation between daily returns of strategies. Values near 1 indicate high similarity, reducing diversification.",
+    helpDrawdownTitle: "Combined Drawdown",
+    helpDrawdownDesc:
+      "Shows the maximum capital decline from a peak. Current drawdown is the drop from the last peak.",
+    helpRuinTitle: "Ruin Probability",
+    helpRuinDesc:
+      "Estimate of the probability of losing more than 40% of capital, based on Monte Carlo simulations of historical returns.",
+    helpConcentrationTitle: "Concentration",
+    helpConcentrationDesc:
+      "Shows the percentage of exposure to each instrument category. High concentration in a single category increases non-diversified risk.",
+    editWeights: "Edit weights",
+    editWeightsTitle: "Edit target weights",
+    editWeightsDesc:
+      "Assign the percentage of capital you want to allocate to each strategy. The sum must be 100%.",
+    helpSharpeTitle: "Portfolio Sharpe",
+    helpSharpeDesc:
+      "The Sharpe ratio measures the risk-adjusted return of the portfolio. Values above 1 are considered good.",
+    helpDrawdown:
+      "The combined drawdown shows the maximum capital decline from a peak. Current drawdown is the drop from the last peak.",
+    helpTransactionCostsTitle: "Transaction Costs",
+    helpTransactionCostsDesc:
+      "Transaction costs include commissions, slippage and other expenses. They are expressed as a percentage of monthly capital.",
+    helpRuinTitle: "Ruin Probability",
+    helpRuinDesc:
+      "Ruin probability estimates the risk of losing more than 40% of capital, based on Monte Carlo simulations of historical returns.",
+    helpConcentration:
+      "Concentration shows the percentage exposure to each instrument category. High concentration (>30%) indicates non-diversified risk.",
+    totalSum: "Total sum",
+    cancel: "Cancel",
+    saveWeights: "Save weights",
+    saving: "Saving...",
   },
   regimeWidget: {
     symbolsPlaceholder: "AMEX:SPY, NASDAQ:QQQ",
@@ -787,6 +832,50 @@ export const es: Dictionary = {
     accountDemo: "Demo",
     accountReal: "Real",
     accountFunded: "Fondeada",
+    ruinProbability: "Probabilidad de Ruina",
+    ruinProbabilityHint: "Riesgo de pérdida catastrófica",
+    concentration: "Concentración",
+    concentrationHint: "Mayor exposición por categoría",
+    transactionCosts: "Costos de Transacción",
+    transactionCostsHint: "Costos mensuales sobre capital",
+    helpWeightsTitle: "Pesos Objetivo vs Reales",
+    helpWeightsDesc:
+      "Los pesos objetivo son definidos por el trader. Los pesos reales se calculan a partir del PnL de cada estrategia. La desviación indica cuánto se ha alejado la asignación real de la planeada.",
+    helpAllocationTitle: "Asignación de Pesos",
+    helpAllocationDesc:
+      "Detalle de pesos objetivo, reales y desviación por estrategia. Una desviación alta sugiere la necesidad de rebalancear.",
+    helpCorrelationTitle: "Matriz de Correlación",
+    helpCorrelationDesc:
+      "Muestra la correlación entre los retornos diarios de las estrategias. Valores cercanos a 1 indican alta similitud, lo que reduce la diversificación.",
+    helpDrawdownTitle: "Drawdown Combinado",
+    helpDrawdownDesc:
+      "Muestra la caída máxima del capital del portafolio desde un pico. El drawdown actual es la caída desde el último pico.",
+    helpRuinTitle: "Probabilidad de Ruina",
+    helpRuinDesc:
+      "Estimación de la probabilidad de perder más del 40% del capital, basada en simulaciones Monte Carlo de los retornos históricos.",
+    helpConcentrationTitle: "Concentración",
+    helpConcentrationDesc:
+      "Indica el porcentaje de exposición a cada categoría de instrumento. Una alta concentración en una sola categoría aumenta el riesgo no diversificado.",
+    editWeights: "Editar pesos",
+    editWeightsTitle: "Editar pesos objetivo",
+    editWeightsDesc:
+      "Asigna el porcentaje de capital que deseas destinar a cada estrategia. La suma debe ser 100%.",
+    helpSharpeTitle: "Portfolio Sharpe",
+    helpSharpeDesc:
+      "El ratio de Sharpe mide el retorno ajustado al riesgo del portafolio. Valores superiores a 1 son considerados buenos.",
+    helpDrawdownDesc:
+      "El drawdown combinado muestra la caída máxima del capital desde un pico. El drawdown actual es la caída desde el último pico.",
+    helpTransactionCostsTitle: "Costos de transaccion",
+    helpTransactionCostsDesc:
+      "Los costos de transacción incluyen comisiones, slippage y otros gastos. Se expresan como porcentaje del capital mensual.",
+    helpRuinDesc:
+      "La probabilidad de ruina estima el riesgo de perder más del 40% del capital, basada en simulaciones Monte Carlo de retornos históricos.",
+    helpConcentration:
+      "La concentración muestra la exposición porcentual a cada categoría de instrumento. Una concentración alta (>30%) indica riesgo no diversificado.",
+    totalSum: "Suma total",
+    cancel: "Cancelar",
+    saveWeights: "Guardar pesos",
+    saving: "Guardando...",
   },
   regimeWidget: {
     symbolsPlaceholder: "AMEX:SPY, NASDAQ:QQQ",
