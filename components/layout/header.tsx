@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, LogOut, User, Settings } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -90,7 +90,7 @@ export function Header() {
         </span>
 
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger>
             <Avatar className="size-9 cursor-pointer">
               <AvatarFallback className="bg-primary/15 text-primary">
                 {getInitials()}
