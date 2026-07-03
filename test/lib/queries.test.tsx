@@ -12,6 +12,15 @@ import {
   useTrades,
 } from "@/lib/queries"
 
+// Mock Clerk's useAuth hook
+jest.mock("@clerk/nextjs", () => ({
+  useAuth: () => ({
+    getToken: jest.fn().mockResolvedValue("mock-token"),
+    isLoaded: true,
+    isSignedIn: true,
+  }),
+}))
+
 jest.mock("sonner", () => ({
   toast: { success: jest.fn(), error: jest.fn() },
 }))
@@ -54,7 +63,7 @@ describe("query hooks", () => {
     const { result } = renderHook(() => useStrategies(), { wrapper: createWrapper() })
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
     expect(result.current.data).toEqual(payload)
-    expect(mockGetWithFallback).toHaveBeenCalledWith("/strategies", expect.anything())
+    expect(mockGetWithFallback).toHaveBeenCalledWith("/strategies", expect.anything(), expect.objectContaining({ token: "mock-token" }))
   })
 
   it("useStrategy derives a single strategy from the list", async () => {
@@ -73,27 +82,27 @@ describe("query hooks", () => {
     mockGetWithFallback.mockResolvedValueOnce({ data: [], isFallback: false } as never)
     const { result } = renderHook(() => useTrades("str-9"), { wrapper: createWrapper() })
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    expect(mockGetWithFallback).toHaveBeenCalledWith("/strategies/str-9/trades", expect.anything())
+    expect(mockGetWithFallback).toHaveBeenCalledWith("/strategies/str-9/trades", expect.anything(), expect.objectContaining({ token: "mock-token" }))
   })
 
   it("useAlerts honors the limit argument in the request path", async () => {
     mockGetWithFallback.mockResolvedValueOnce({ data: [], isFallback: false } as never)
     const { result } = renderHook(() => useAlerts(25), { wrapper: createWrapper() })
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    expect(mockGetWithFallback).toHaveBeenCalledWith("/alerts?limit=25", expect.anything())
+    expect(mockGetWithFallback).toHaveBeenCalledWith("/alerts?limit=25", expect.anything(), expect.objectContaining({ token: "mock-token" }))
   })
 
   it("useMarketRegime fetches the regime endpoint", async () => {
     mockGetWithFallback.mockResolvedValueOnce({ data: { adx: 1 }, isFallback: false } as never)
     const { result } = renderHook(() => useMarketRegime(), { wrapper: createWrapper() })
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    expect(mockGetWithFallback).toHaveBeenCalledWith("/market/regime", expect.anything())
+    expect(mockGetWithFallback).toHaveBeenCalledWith("/market/regime", expect.anything(), expect.objectContaining({ token: "mock-token" }))
   })
 
   it("useDeleteStrategy calls the DELETE endpoint", async () => {
     mockApiSend.mockResolvedValueOnce({} as never)
     const { result } = renderHook(() => useDeleteStrategy(), { wrapper: createWrapper() })
     result.current.mutate("str-3")
-    await waitFor(() => expect(mockApiSend).toHaveBeenCalledWith("/strategies/str-3", "DELETE"))
+    await waitFor(() => expect(mockApiSend).toHaveBeenCalledWith("/strategies/str-3", "DELETE", undefined, expect.objectContaining({ token: "mock-token" })))
   })
 })

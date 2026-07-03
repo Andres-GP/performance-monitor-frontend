@@ -20,7 +20,7 @@ export default function DashboardPage() {
         </p>
       </div>
       <DashboardStats />
-      <EquityCard />
+      {/* <EquityCard /> */}
       <div>
         <h3 className="mb-3 text-sm font-medium text-muted-foreground">
           {dict.dashboard.currentRegime}

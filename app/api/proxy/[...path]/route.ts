@@ -1,17 +1,20 @@
 // app/api/proxy/[...path]/route.ts
 import { type NextRequest, NextResponse } from "next/server";
-import { backendUrl, getBearerToken } from "@/lib/server/backend";
+import { backendUrl } from "@/lib/server/backend";
 
 export const dynamic = "force-dynamic";
 
 async function forward(req: NextRequest, path: string[]) {
   const targetPath = path.join("/");
   const search = req.nextUrl.search;
-  const token = await getBearerToken();
 
-  // Si no hay token, devolver 401 (la lógica de autenticación ya está en el middleware, pero por si acaso)
+  // Get the Authorization header from the incoming request (Clerk JWT from client)
+  const authHeader = req.headers.get("authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+  // If no token, return 401
   if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized - No token provided" }, { status: 401 });
   }
 
   const headers = new Headers();
