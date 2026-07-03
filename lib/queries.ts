@@ -271,9 +271,13 @@ export function useSetWeight() {
     },
     onSuccess: () => {
       toast.success("Target weight updated");
+      // Invalidamos ambas consultas para refrescar los datos
       qc.invalidateQueries({ queryKey: qk.weights });
+      qc.invalidateQueries({ queryKey: qk.portfolioMetrics });
     },
-    onError: () => toast.error("Could not update weight"),
+    onError: (error: Error) => {
+      toast.error(`Could not update weight: ${error.message}`);
+    },
   });
 }
 
