@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -12,27 +12,27 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { OfflineBanner } from "@/components/shared/offline-banner"
-import { useTrades } from "@/lib/queries"
-import { formatCurrency, formatDate, formatNumber } from "@/lib/format"
-import { useI18n } from "@/lib/i18n/context"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/table";
+import { OfflineBanner } from "@/components/shared/offline-banner";
+import { useTrades } from "@/lib/queries";
+import { formatCurrency, formatDate, formatNumber } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/context";
+import { cn } from "@/lib/utils";
 
-const PAGE_SIZE = 12
+const PAGE_SIZE = 12;
 
 export function TradesTable({ strategyId }: { strategyId: string }) {
-  const { dict, t } = useI18n()
-  const { data, isLoading } = useTrades(strategyId)
-  const [page, setPage] = useState(0)
+  const { dict, t } = useI18n();
+  const { data, isLoading } = useTrades(strategyId);
+  const [page, setPage] = useState(0);
 
-  const trades = data?.data ?? []
-  const totalPages = Math.max(1, Math.ceil(trades.length / PAGE_SIZE))
+  const trades = data?.data ?? [];
+  const totalPages = Math.max(1, Math.ceil(trades.length / PAGE_SIZE));
 
   const pageTrades = useMemo(
     () => trades.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE),
     [trades, page],
-  )
+  );
 
   if (isLoading) {
     return (
@@ -41,7 +41,7 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
           <Skeleton key={i} className="h-12 w-full" />
         ))}
       </div>
-    )
+    );
   }
 
   if (trades.length === 0) {
@@ -51,9 +51,10 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
           {dict.trades.empty}
         </CardContent>
       </Card>
-    )
+    );
   }
 
+  console.log("pageTrades", pageTrades);
   return (
     <div className="flex flex-col gap-3">
       {data?.isFallback && <OfflineBanner />}
@@ -64,17 +65,25 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
             <TableRow className="hover:bg-transparent">
               <TableHead>{dict.trades.colSymbol}</TableHead>
               <TableHead>{dict.trades.colSide}</TableHead>
-              <TableHead className="text-right">{dict.trades.colEntry}</TableHead>
-              <TableHead className="text-right">{dict.trades.colExit}</TableHead>
+              <TableHead className="text-right">
+                {dict.trades.colEntry}
+              </TableHead>
+              <TableHead className="text-right">
+                {dict.trades.colExit}
+              </TableHead>
               <TableHead className="text-right">{dict.trades.colQty}</TableHead>
               <TableHead className="text-right">{dict.trades.colPnl}</TableHead>
-              <TableHead className="hidden text-right md:table-cell">{dict.trades.colDate}</TableHead>
+              <TableHead className="hidden text-right md:table-cell">
+                {dict.trades.colDate}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pageTrades.map((trade) => (
               <TableRow key={trade.id}>
-                <TableCell className="font-medium">{trade.symbol ?? dict.common.none}</TableCell>
+                <TableCell className="font-medium">
+                  {trade.instrument ?? dict.common.none}
+                </TableCell>
                 <TableCell>
                   <span
                     className={cn(
@@ -84,7 +93,7 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
                         : "bg-chart-2/10 text-chart-2",
                     )}
                   >
-                    {trade.side === "long" ? dict.trades.long : dict.trades.short}
+                    {trade.direction}
                   </span>
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
@@ -93,7 +102,9 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
                 <TableCell className="text-right tabular-nums">
                   {formatNumber(trade.exit_price)}
                 </TableCell>
-                <TableCell className="text-right tabular-nums">{trade.quantity ?? dict.common.none}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {trade.quantity ?? dict.common.none}
+                </TableCell>
                 <TableCell
                   className={cn(
                     "text-right font-medium tabular-nums",
@@ -113,7 +124,11 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
 
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <span>
-          {trades.length} operaciones · página {page + 1} de {totalPages}
+          {t(dict.strategyDetail.operations, {
+            trades: trades.length,
+            page: page + 1,
+            totalPages: totalPages,
+          })}
         </span>
         <div className="flex items-center gap-2">
           <Button
@@ -137,5 +152,5 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

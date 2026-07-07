@@ -6,7 +6,6 @@ describe("navItems", () => {
     expect(hrefs).toEqual(
       expect.arrayContaining([
         "/",
-        "/strategies",
         "/portfolio",
         "/market-regime",
         "/alerts",

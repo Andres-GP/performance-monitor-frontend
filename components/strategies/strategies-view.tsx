@@ -1,45 +1,66 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
-import { Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { useCallback, useMemo, useState } from "react";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Skeleton } from "@/components/ui/skeleton"
-import { OfflineBanner } from "@/components/shared/offline-banner"
-import { useI18n } from "@/lib/i18n/context"
-import { useDeleteStrategy, useStrategies } from "@/lib/queries"
-import type { Strategy } from "@/types"
-import { StrategiesTable } from "./strategies-table"
-import { DeleteStrategyDialog } from "./delete-strategy-dialog"
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { OfflineBanner } from "@/components/shared/offline-banner";
+import { useI18n } from "@/lib/i18n/context";
+import { useDeleteStrategy, useStrategies } from "@/lib/queries";
+import type { Strategy } from "@/types";
+import { StrategiesTable } from "./strategies-table";
+import { DeleteStrategyDialog } from "./delete-strategy-dialog";
 
 export function StrategiesView() {
-  const { dict, t } = useI18n()
-  const { data, isLoading } = useStrategies()
-  const deleteStrategy = useDeleteStrategy()
+  const { dict, t } = useI18n();
+  const { data, isLoading } = useStrategies();
 
-  const [search, setSearch] = useState("")
-  const [status, setStatus] = useState("all")
-  const [health, setHealth] = useState("all")
-  const [pending, setPending] = useState<Strategy | null>(null)
+  const deleteStrategy = useDeleteStrategy();
 
-  const strategies = data?.data ?? []
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
+  const [health, setHealth] = useState("all");
+  const [pending, setPending] = useState<Strategy | null>(null);
+
+  const strategies = data?.data ?? [];
+
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearch(e.target.value);
+    },
+    [],
+  );
+
+  const handleStatusChange = useCallback((v: string) => setStatus(v), []);
+
+  const handleHealthChange = useCallback((v: string) => setHealth(v), []);
+
+  const handleDeleteConfirm = useCallback(() => {
+    if (pending) deleteStrategy.mutate(pending.strategy_id);
+    setPending(null);
+  }, [pending, deleteStrategy]);
+
+  const handleDialogOpenChange = useCallback((open: boolean) => {
+    if (!open) setPending(null);
+  }, []);
 
   const filtered = useMemo(() => {
     return strategies.filter((s) => {
       const matchesSearch =
         s.name.toLowerCase().includes(search.toLowerCase()) ||
-        s.instrument.toLowerCase().includes(search.toLowerCase())
-      const matchesStatus = status === "all" || s.status === status
-      const matchesHealth = health === "all" || s.health_status === health
-      return matchesSearch && matchesStatus && matchesHealth
-    })
-  }, [strategies, search, status, health])
+        s.instrument.toLowerCase().includes(search.toLowerCase());
+      const matchesStatus = status === "all" || s.state === status;
+      const matchesHealth = health === "all" || s.health_status === health;
+      return matchesSearch && matchesStatus && matchesHealth;
+    });
+  }, [strategies, search, status, health]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -58,7 +79,7 @@ export function StrategiesView() {
           <Input
             placeholder={dict.strategies.searchPlaceholder}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={handleSearchChange}
             className="pl-9"
           />
         </div>
@@ -69,15 +90,19 @@ export function StrategiesView() {
             Stopped: dict.strategies.statusStopped,
           }}
           value={status}
-          onValueChange={(v) => setStatus(v as string)}
+          onValueChange={handleStatusChange}
         >
           <SelectTrigger className="w-full sm:w-40">
             <SelectValue placeholder={dict.strategies.statusPlaceholder} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{dict.strategies.statusAll}</SelectItem>
-            <SelectItem value="Running">{dict.strategies.statusRunning}</SelectItem>
-            <SelectItem value="Stopped">{dict.strategies.statusStopped}</SelectItem>
+            <SelectItem value="Running">
+              {dict.strategies.statusRunning}
+            </SelectItem>
+            <SelectItem value="Stopped">
+              {dict.strategies.statusStopped}
+            </SelectItem>
           </SelectContent>
         </Select>
         <Select
@@ -88,16 +113,22 @@ export function StrategiesView() {
             unhealthy: dict.strategies.healthUnhealthy,
           }}
           value={health}
-          onValueChange={(v) => setHealth(v as string)}
+          onValueChange={handleHealthChange}
         >
           <SelectTrigger className="w-full sm:w-44">
             <SelectValue placeholder={dict.strategies.healthPlaceholder} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{dict.strategies.healthAll}</SelectItem>
-            <SelectItem value="healthy">{dict.strategies.healthHealthy}</SelectItem>
-            <SelectItem value="edge_decay">{dict.strategies.healthEdgeDecay}</SelectItem>
-            <SelectItem value="unhealthy">{dict.strategies.healthUnhealthy}</SelectItem>
+            <SelectItem value="healthy">
+              {dict.strategies.healthHealthy}
+            </SelectItem>
+            <SelectItem value="edge_decay">
+              {dict.strategies.healthEdgeDecay}
+            </SelectItem>
+            <SelectItem value="unhealthy">
+              {dict.strategies.healthUnhealthy}
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -114,13 +145,10 @@ export function StrategiesView() {
 
       <DeleteStrategyDialog
         strategy={pending}
-        onOpenChange={(open) => !open && setPending(null)}
-        onConfirm={() => {
-          if (pending) deleteStrategy.mutate(pending.id)
-          setPending(null)
-        }}
+        onOpenChange={handleDialogOpenChange}
+        onConfirm={handleDeleteConfirm}
         isPending={deleteStrategy.isPending}
       />
     </div>
-  )
+  );
 }

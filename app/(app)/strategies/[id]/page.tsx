@@ -1,10 +1,10 @@
-import { StrategyDetail } from "@/components/strategies/strategy-detail"
+import { StrategyDetail } from "@/components/strategies/strategy-detail";
 
 export default async function StrategyDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = await params
-  return <StrategyDetail id={id} />
+  const { id } = await params;
+  return <StrategyDetail id={id} />;
 }

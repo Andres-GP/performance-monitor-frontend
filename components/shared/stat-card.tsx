@@ -1,27 +1,39 @@
-import type { LucideIcon } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import type { LucideIcon } from "lucide-react";
+import { memo } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 interface StatCardProps {
-  label: string
-  value: string
-  icon: LucideIcon
-  hint?: string
-  trend?: "up" | "down" | "neutral"
-  loading?: boolean
+  label: string;
+  value: string | number | undefined;
+  icon: LucideIcon;
+  hint?: string;
+  trend?: "up" | "down" | "neutral";
+  loading?: boolean;
+  className?: string;
 }
 
-export function StatCard({ label, value, icon: Icon, hint, trend = "neutral", loading }: StatCardProps) {
+export const StatCard = memo(function StatCard({
+  label,
+  value,
+  icon: Icon,
+  hint,
+  trend = "neutral",
+  loading,
+  className,
+}: StatCardProps) {
   return (
-    <Card>
+    <Card className={className}>
       <CardContent className="flex items-start justify-between gap-3 p-5">
         <div className="flex min-w-0 flex-col gap-1">
           <span className="text-sm text-muted-foreground">{label}</span>
           {loading ? (
             <Skeleton className="h-7 w-24" />
           ) : (
-            <span className="truncate text-2xl font-semibold tracking-tight">{value}</span>
+            <span className="truncate text-2xl font-semibold tracking-tight">
+              {value}
+            </span>
           )}
           {hint ? (
             <span
@@ -41,5 +53,5 @@ export function StatCard({ label, value, icon: Icon, hint, trend = "neutral", lo
         </span>
       </CardContent>
     </Card>
-  )
-}
+  );
+});
