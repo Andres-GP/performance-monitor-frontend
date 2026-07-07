@@ -164,10 +164,20 @@ export function StrategiesTable({
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        aria-label={t(dict.strategies.deleteAria, {
-                          name: s.name,
-                        })}
+                        aria-label={
+                          s.state === "Stopped"
+                            ? t(dict.strategies.deleteAria, { name: s.name })
+                            : t(dict.strategies.deleteDisabledAria, {
+                                name: s.name,
+                              })
+                        }
+                        title={
+                          s.state !== "Stopped"
+                            ? dict.strategyDetail.onlyStoppedCanBeDeleted
+                            : undefined
+                        }
                         onClick={() => onDelete(s)}
+                        disabled={s.state !== "Stopped"}
                         className="cursor-pointer"
                       >
                         <Trash2 className="size-4 text-muted-foreground transition-colors hover:text-destructive" />

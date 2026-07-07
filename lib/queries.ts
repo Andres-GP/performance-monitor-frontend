@@ -87,10 +87,10 @@ export function useStrategies() {
 
 export function useStrategy(id: string) {
   const all = useStrategies();
-  const strategy = all.data?.data.find((s) => s.strategy_id === id);
+  const strategy = all.data?.find((s) => s.strategy_id === id);
   return {
     strategy,
-    isFallback: all.data?.isFallback ?? false,
+    isFallback: all.isFallback ?? false,
     isLoading: all.isLoading,
   };
 }

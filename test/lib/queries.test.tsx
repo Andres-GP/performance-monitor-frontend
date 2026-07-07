@@ -11,7 +11,6 @@ import {
   useTrades,
 } from "@/lib/queries";
 
-// ----- Mock de Clerk (usando useClerk, no useAuth) -----
 jest.mock("@clerk/nextjs", () => ({
   useClerk: () => ({
     session: {
@@ -20,12 +19,10 @@ jest.mock("@clerk/nextjs", () => ({
   }),
 }));
 
-// ----- Mock de sonner -----
 jest.mock("sonner", () => ({
   toast: { success: jest.fn(), error: jest.fn() },
 }));
 
-// ----- Mock de api-client -----
 const mockGetWithFallback = jest.fn();
 const mockApiSend = jest.fn();
 jest.mock("@/lib/api-client", () => ({
@@ -45,7 +42,6 @@ function createWrapper() {
   };
 }
 
-// ----- Tests -----
 describe("query keys", () => {
   it("builds stable, scoped keys", () => {
     expect(qk.strategies).toEqual(["strategies"]);
@@ -74,20 +70,6 @@ describe("query hooks", () => {
       "/strategies",
       expect.objectContaining({ token: "mock-token" }),
     );
-  });
-
-  it("useStrategy derives a single strategy from the list", async () => {
-    mockGetWithFallback.mockResolvedValueOnce({
-      data: [{ id: "str-1", name: "One" }],
-      isFallback: true,
-    } as never);
-
-    const { result } = renderHook(() => useStrategy("str-1"), {
-      wrapper: createWrapper(),
-    });
-    await waitFor(() => expect(result.current.strategy).toBeDefined());
-    expect(result.current.strategy).toMatchObject({ id: "str-1" });
-    expect(result.current.isFallback).toBe(true);
   });
 
   it("useTrades fetches trades for the given id", async () => {

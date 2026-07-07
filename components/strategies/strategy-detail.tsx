@@ -15,6 +15,7 @@ import {
   DollarSign,
   BarChart3,
   Sliders,
+  GitCompare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -90,7 +91,7 @@ function BacktestUpload({ strategyId }: { strategyId: string }) {
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <Upload className="size-4" />
-          {dict.strategyDetail.uploadBacktest || "Subir Backtest"}
+          {dict.strategyDetail.uploadBacktest || dict.backtest.title}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -102,7 +103,7 @@ function BacktestUpload({ strategyId }: { strategyId: string }) {
                 className="text-xs font-medium text-muted-foreground"
               >
                 <Calendar className="inline size-3 mr-1" />
-                Inicio del período
+                {dict.backtest.startOfPeriod}
               </Label>
               <Input
                 id="period_start"
@@ -119,7 +120,7 @@ function BacktestUpload({ strategyId }: { strategyId: string }) {
                 className="text-xs font-medium text-muted-foreground"
               >
                 <Calendar className="inline size-3 mr-1" />
-                Fin del período
+                {dict.backtest.endOfPeriod}
               </Label>
               <Input
                 id="period_end"
@@ -139,7 +140,7 @@ function BacktestUpload({ strategyId }: { strategyId: string }) {
                 className="text-xs font-medium text-muted-foreground"
               >
                 <DollarSign className="inline size-3 mr-1" />
-                PNL esperado
+                {dict.backtest.expectedPnl}
               </Label>
               <Input
                 id="expected_pnl"
@@ -160,7 +161,7 @@ function BacktestUpload({ strategyId }: { strategyId: string }) {
                 className="text-xs font-medium text-muted-foreground"
               >
                 <BarChart3 className="inline size-3 mr-1" />
-                Sharpe esperado
+                {dict.backtest.expectedSharpe}
               </Label>
               <Input
                 id="expected_sharpe"
@@ -183,7 +184,7 @@ function BacktestUpload({ strategyId }: { strategyId: string }) {
                 className="text-xs font-medium text-muted-foreground"
               >
                 <TrendingDown className="inline size-3 mr-1" />
-                Drawdown esperado (%)
+                {dict.backtest.expectedDrowdown}
               </Label>
               <Input
                 id="expected_drawdown"
@@ -208,7 +209,7 @@ function BacktestUpload({ strategyId }: { strategyId: string }) {
               className="text-xs font-medium text-muted-foreground"
             >
               <Sliders className="inline size-3 mr-1" />
-              Parámetros (JSON opcional)
+              {dict.backtest.parametersOptionalJSON}
             </Label>
             <textarea
               id="parameters"
@@ -218,7 +219,7 @@ function BacktestUpload({ strategyId }: { strategyId: string }) {
               className="flex min-h-[80px] w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono"
             />
             <p className="text-[10px] text-muted-foreground">
-              Ingresa un objeto JSON válido con los parámetros de la estrategia
+              {dict.backtest.JSONParametersValidDesc}
             </p>
           </div>
 
@@ -227,7 +228,9 @@ function BacktestUpload({ strategyId }: { strategyId: string }) {
             disabled={uploadBacktest.isPending}
             className="w-full sm:w-auto"
           >
-            {uploadBacktest.isPending ? "Subiendo..." : "Subir Backtest"}
+            {uploadBacktest.isPending
+              ? dict.backtest.submitting
+              : dict.backtest.submit}
           </Button>
         </form>
       </CardContent>
@@ -239,7 +242,7 @@ export function StrategyDetail({ id }: { id: string }) {
   const router = useRouter();
   const { dict, t } = useI18n();
   const { strategy, isFallback, isLoading } = useStrategy(id);
-  const metrics = useMetrics(id); // ✅ usa el mismo id (strategy_id)
+  const metrics = useMetrics(id);
   const deleteStrategy = useDeleteStrategy();
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -273,12 +276,16 @@ export function StrategyDetail({ id }: { id: string }) {
   }
 
   const metricsData = strategy.metrics || {};
-  const winRate = metricsData.win_rate ?? 0;
-  const profitFactor = metricsData.profit_factor ?? 0;
-  const drawdown = metricsData.drawdown ?? 0;
-  const sharpe = metricsData.sharpe ?? 0;
+  const winRateReal = metricsData.win_rate ?? 0;
+  const profitFactorReal = metricsData.profit_factor ?? 0;
+  const drawdownReal = metricsData.drawdown ?? 0;
+  const sharpeReal = metricsData.sharpe ?? 0;
 
   const series = metrics.data?.data ?? [];
+
+  const backtestData = strategy.backtest;
+  const hasBacktest = backtestData !== null;
+
   const canDelete = strategy.state === "Stopped";
 
   return (
@@ -321,38 +328,35 @@ export function StrategyDetail({ id }: { id: string }) {
           })}
         </p>
       </div>
-
       {isFallback && <OfflineBanner />}
-
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label={dict.strategyDetail.winRate}
-          value={formatPercent(winRate)}
+          value={formatPercent(winRateReal)}
           icon={Percent}
         />
         <StatCard
           label={dict.strategyDetail.profitFactor}
-          value={formatNumber(profitFactor)}
+          value={formatNumber(profitFactorReal)}
           icon={TrendingUp}
         />
         <StatCard
           label={dict.strategyDetail.drawdown}
-          value={formatPercent(drawdown)}
+          value={formatPercent(drawdownReal)}
           icon={TrendingDown}
           hint={
-            drawdown >= 0.15
+            drawdownReal >= 0.15
               ? dict.strategyDetail.aboveThreshold
               : dict.strategyDetail.withinRange
           }
-          trend={drawdown >= 0.15 ? "down" : "neutral"}
+          trend={drawdownReal >= 0.15 ? "down" : "neutral"}
         />
         <StatCard
           label={dict.strategyDetail.sharpe}
-          value={formatNumber(sharpe)}
+          value={formatNumber(sharpeReal)}
           icon={Gauge}
         />
       </div>
-
       <Tabs defaultValue="metrics">
         <TabsList>
           <TabsTrigger value="metrics">
@@ -366,6 +370,9 @@ export function StrategyDetail({ id }: { id: string }) {
           </TabsTrigger>
           <TabsTrigger value="backtest">
             {dict.strategyDetail.tabBacktest}
+          </TabsTrigger>
+          <TabsTrigger value="comparison">
+            {dict.strategyDetail.comparison}
           </TabsTrigger>
         </TabsList>
 
@@ -472,10 +479,206 @@ export function StrategyDetail({ id }: { id: string }) {
 
         <TabsContent value="backtest" className="mt-4 space-y-4">
           <BacktestUpload strategyId={id} />
-          <BacktestPanel strategyId={id} />
+          {hasBacktest && <BacktestPanel strategyId={id} />}
+          {!hasBacktest && (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                <BarChart3 className="size-12 mb-4 opacity-50" />
+                <p className="text-sm">{dict.backtest.noData}</p>
+                <p className="text-xs mt-1">{dict.backtest.useForm}</p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="comparison" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <GitCompare className="size-4" />
+                {dict.backtest.backtestVsReal}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {!hasBacktest ? (
+                <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                  <BarChart3 className="size-12 mb-4 opacity-50" />
+                  <p className="text-sm">{dict.backtest.noData}</p>
+                  <p className="text-xs mt-1">{dict.backtest.useForm}</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-2 font-medium text-muted-foreground">
+                          {dict.backtest.metric}
+                        </th>
+                        <th className="text-right py-2 font-medium text-muted-foreground">
+                          {dict.backtest.expectedBacktestParentheses}
+                        </th>
+                        <th className="text-right py-2 font-medium text-muted-foreground">
+                          {dict.backtest.realLiveParantheses}
+                        </th>
+                        <th className="text-right py-2 font-medium text-muted-foreground">
+                          {dict.backtest.difference}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-border/50">
+                        <td className="py-2">{dict.backtest.winRate}</td>
+                        <td className="text-right tabular-nums">
+                          {formatPercent(backtestData.expected_win_rate ?? 0)}
+                        </td>
+                        <td className="text-right tabular-nums">
+                          {formatPercent(winRateReal)}
+                        </td>
+                        <td
+                          className={`text-right tabular-nums ${
+                            backtestData.expected_win_rate
+                              ? Math.abs(
+                                  winRateReal -
+                                    (backtestData.expected_win_rate ?? 0),
+                                ) > 0.1
+                                ? "text-destructive"
+                                : "text-green-500"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {backtestData.expected_win_rate
+                            ? formatPercent(
+                                winRateReal -
+                                  (backtestData.expected_win_rate ?? 0),
+                              )
+                            : "N/A"}
+                        </td>
+                      </tr>
+                      <tr className="border-b border-border/50">
+                        <td className="py-2">Profit Factor</td>
+                        <td className="text-right tabular-nums">
+                          {formatNumber(
+                            backtestData.expected_profit_factor ?? 0,
+                          )}
+                        </td>
+                        <td className="text-right tabular-nums">
+                          {formatNumber(profitFactorReal)}
+                        </td>
+                        <td
+                          className={`text-right tabular-nums ${
+                            backtestData.expected_profit_factor
+                              ? Math.abs(
+                                  profitFactorReal -
+                                    (backtestData.expected_profit_factor ?? 0),
+                                ) > 0.5
+                                ? "text-destructive"
+                                : "text-green-500"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {backtestData.expected_profit_factor
+                            ? formatNumber(
+                                profitFactorReal -
+                                  (backtestData.expected_profit_factor ?? 0),
+                              )
+                            : "N/A"}
+                        </td>
+                      </tr>
+                      <tr className="border-b border-border/50">
+                        <td className="py-2">Drawdown (%)</td>
+                        <td className="text-right tabular-nums">
+                          {formatPercent(
+                            (backtestData.expected_drawdown ?? 0) / 100,
+                          )}
+                        </td>
+                        <td className="text-right tabular-nums">
+                          {formatPercent(drawdownReal)}
+                        </td>
+                        <td
+                          className={`text-right tabular-nums ${
+                            backtestData.expected_drawdown
+                              ? Math.abs(
+                                  drawdownReal -
+                                    (backtestData.expected_drawdown ?? 0) / 100,
+                                ) > 0.05
+                                ? "text-destructive"
+                                : "text-green-500"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {backtestData.expected_drawdown
+                            ? formatPercent(
+                                drawdownReal -
+                                  (backtestData.expected_drawdown ?? 0) / 100,
+                              )
+                            : "N/A"}
+                        </td>
+                      </tr>
+                      <tr className="border-b border-border/50">
+                        <td className="py-2">Sharpe</td>
+                        <td className="text-right tabular-nums">
+                          {formatNumber(backtestData.expected_sharpe ?? 0)}
+                        </td>
+                        <td className="text-right tabular-nums">
+                          {formatNumber(sharpeReal)}
+                        </td>
+                        <td
+                          className={`text-right tabular-nums ${
+                            backtestData.expected_sharpe
+                              ? Math.abs(
+                                  sharpeReal -
+                                    (backtestData.expected_sharpe ?? 0),
+                                ) > 0.3
+                                ? "text-destructive"
+                                : "text-green-500"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {backtestData.expected_sharpe
+                            ? formatNumber(
+                                sharpeReal -
+                                  (backtestData.expected_sharpe ?? 0),
+                              )
+                            : "N/A"}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2">{dict.backtest.expectedPnl}</td>
+                        <td className="text-right tabular-nums">
+                          {formatCurrency(backtestData.expected_pnl ?? 0)}
+                        </td>
+                        <td className="text-right tabular-nums text-muted-foreground">
+                          —
+                        </td>
+                        <td className="text-right tabular-nums text-muted-foreground">
+                          —
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div className="mt-4 text-xs text-muted-foreground border-t border-border pt-4">
+                    <p>
+                      {dict.backtest.periodOfBacktest}{" "}
+                      <span className="font-mono">
+                        {backtestData.period_start} → {backtestData.period_end}
+                      </span>
+                    </p>
+                    {backtestData.parameters &&
+                      Object.keys(backtestData.parameters).length > 0 && (
+                        <p className="mt-1">
+                          {dict.backtest.parameters}{" "}
+                          <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono">
+                            {JSON.stringify(backtestData.parameters)}
+                          </code>
+                        </p>
+                      )}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
-
       <DeleteStrategyDialog
         strategy={confirmDelete ? strategy : null}
         onOpenChange={(open) => !open && setConfirmDelete(false)}
