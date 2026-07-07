@@ -22,7 +22,6 @@ export function StrategiesView() {
   const { dict, t } = useI18n();
   const { data, isLoading } = useStrategies();
 
-  console.log("DATAAAA", data);
   const deleteStrategy = useDeleteStrategy();
 
   const [search, setSearch] = useState("");
@@ -44,7 +43,7 @@ export function StrategiesView() {
   const handleHealthChange = useCallback((v: string) => setHealth(v), []);
 
   const handleDeleteConfirm = useCallback(() => {
-    if (pending) deleteStrategy.mutate(pending.id);
+    if (pending) deleteStrategy.mutate(pending.strategy_id);
     setPending(null);
   }, [pending, deleteStrategy]);
 
@@ -57,7 +56,7 @@ export function StrategiesView() {
       const matchesSearch =
         s.name.toLowerCase().includes(search.toLowerCase()) ||
         s.instrument.toLowerCase().includes(search.toLowerCase());
-      const matchesStatus = status === "all" || s.status === status;
+      const matchesStatus = status === "all" || s.state === status;
       const matchesHealth = health === "all" || s.health_status === health;
       return matchesSearch && matchesStatus && matchesHealth;
     });

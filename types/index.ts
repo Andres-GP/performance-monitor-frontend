@@ -1,23 +1,52 @@
-export type StrategyStatus = "Running" | "Stopped";
-export type Platform = "NT8" | "MT5";
 export type HealthStatus = "healthy" | "unhealthy" | "edge_decay";
 export type Severity = "high" | "medium" | "low";
 export type AccountType = "demo" | "real" | "funded";
+export type Platform = "NT8" | "MT5" | "Unknown";
+export type StrategyStatus = "Running" | "Stopped" | "Unknown";
+
+export interface PerformanceMetric {
+  win_rate?: number;
+  profit_factor?: number;
+  drawdown?: number;
+  sharpe?: number;
+  total_trades?: number;
+  avg_win?: number;
+  avg_loss?: number;
+}
+
+export interface BacktestData {
+  period_start?: string;
+  period_end?: string;
+  expected_pnl?: number;
+  expected_sharpe?: number;
+  expected_drawdown?: number;
+  parameters?: Record<string, any>;
+}
+
+export interface EdgeMetrics {
+  [key: string]: any;
+}
 
 export interface Strategy {
-  id: string;
+  strategy_id: string; // ← antes 'id'
   name: string;
   instrument: string;
+  instrument_type?: string | null;
+  timeframe?: string | null;
+  data_type?: string | null;
   platform: Platform;
-  status: StrategyStatus;
+  sizing?: number | null;
+  start_date: string; // ISO 8601
+  state: StrategyStatus;
   health_status: HealthStatus;
-  win_rate: number;
-  profit_factor: number;
-  drawdown: number;
-  trades_count: number;
-  sharpe?: number;
-  capital?: number;
+  last_heartbeat?: string | null;
+  created_at: string;
   updated_at: string;
+  alerts_30d: number;
+  trades_count: number;
+  metrics: PerformanceMetric | null;
+  backtest: BacktestData | null;
+  edge_health: EdgeMetrics | null;
 }
 
 export interface Trade {

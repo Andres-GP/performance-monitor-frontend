@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -9,8 +9,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import type { Strategy } from "@/types"
+} from "@/components/ui/dialog";
+import type { Strategy } from "@/types";
+import { useI18n } from "@/lib/i18n/context";
 
 export function DeleteStrategyDialog({
   strategy,
@@ -18,33 +19,37 @@ export function DeleteStrategyDialog({
   onConfirm,
   isPending,
 }: {
-  strategy: Strategy | null
-  onOpenChange: (open: boolean) => void
-  onConfirm: () => void
-  isPending: boolean
+  strategy: Strategy | null;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  isPending: boolean;
 }) {
+  const { dict, t } = useI18n();
+
   return (
     <Dialog open={!!strategy} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Eliminar estrategia</DialogTitle>
+          <DialogTitle>{dict.strategyDelete.title}</DialogTitle>
           <DialogDescription>
-            ¿Seguro que deseas eliminar{" "}
-            <span className="font-medium text-foreground">{strategy?.name}</span>? Esta
-            acción no se puede deshacer y dejará de monitorearse.
+            {t(dict.strategyDelete.description, { name: strategy?.name || "" })}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose render={<Button variant="outline" />}>Cancelar</DialogClose>
+          <DialogClose asChild>
+            <Button variant="outline">Cancelar</Button>
+          </DialogClose>
           <Button
             variant="destructive"
             onClick={onConfirm}
             disabled={isPending}
           >
-            {isPending ? "Eliminando..." : "Eliminar"}
+            {isPending
+              ? dict.strategyDelete.deleting
+              : dict.strategyDelete.confirm}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

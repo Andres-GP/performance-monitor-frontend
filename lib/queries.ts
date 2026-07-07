@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { apiSend, getWithFallback } from "@/lib/api-client";
 import type {
   Alert,
-  //CapitalSummary,
   MarketRegime,
   PerformanceMetric,
   PortfolioMetrics,
@@ -88,7 +87,7 @@ export function useStrategies() {
 
 export function useStrategy(id: string) {
   const all = useStrategies();
-  const strategy = all.data?.data.find((s) => s.id === id);
+  const strategy = all.data?.data.find((s) => s.strategy_id === id);
   return {
     strategy,
     isFallback: all.data?.isFallback ?? false,
@@ -145,36 +144,6 @@ export function useAlerts(limit = 100) {
     staleTime: STALE,
   });
 }
-
-// export function useEquityCurve() {
-//   const getToken = useApiToken();
-//   return useQuery({
-//     queryKey: qk.equityCurve,
-//     queryFn: async ({ signal }) => {
-//       const token = await getToken();
-//       return getWithFallback<PerformanceMetric[]>("/performance/equity", {
-//         signal,
-//         token,
-//       });
-//     },
-//     staleTime: STALE,
-//   });
-// }
-
-// export function useCapitalSummary() {
-//   const getToken = useApiToken();
-//   return useQuery({
-//     queryKey: qk.capital,
-//     queryFn: async ({ signal }) => {
-//       const token = await getToken();
-//       return getWithFallback<CapitalSummary>("/capital/summary", {
-//         signal,
-//         token,
-//       });
-//     },
-//     staleTime: STALE,
-//   });
-// }
 
 export function useMarketRegime() {
   const getToken = useApiToken();

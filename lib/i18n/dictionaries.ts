@@ -260,6 +260,12 @@ export const en = {
     empty: "No strategies match the filters.",
     deleteAria: "Delete {name}",
     viewAria: "View {name}",
+    strategyId: "Strategy Id",
+    creationDate: "Creation Date",
+    alertsInLast30Days: "Last 30 days Alerts",
+    timeFrame: "Timeframe",
+    dataType: "Data Type",
+    sizing: "Sizing",
   },
   strategyDetail: {
     back: "Strategies",
@@ -267,8 +273,7 @@ export const en = {
     backToStrategies: "Back to strategies",
     delete: "Delete",
     onlyStoppedCanBeDeleted: "Only stopped strategies can be deleted",
-    subtitle:
-      "{instrument} · {platform} · {trades} trades · {capital} in capital",
+    subtitle: "{instrument} · {platform} · {trades} trades",
     winRate: "Win Rate",
     profitFactor: "Profit Factor",
     drawdown: "Drawdown",
@@ -280,6 +285,17 @@ export const en = {
     tabHealth: "Edge Health",
     tabBacktest: "Backtest",
     equityCurve: "Equity Curve",
+    equityCurveNoData: "There is no equity curve data to display.",
+    operations: "{trades} operations · page {page} of {totalPages}",
+    edgeStatus: "Edge Status",
+    edgeHealthHealthyDesc:
+      "The strategy maintains its statistical advantage within the expected parameters.",
+    edgeHealthDecayDesc:
+      "Edge deterioration detected: recent performance diverges from historical performance. Consider reviewing parameters.",
+    edgeUnhealthyDesc:
+      "The statistical advantage has significantly degraded. It is recommended to halt and re-evaluate the strategy.",
+    noMetrics: "No metric data is available for this strategy.",
+    noOpsYet: "The data will be generated when the strategy begins to operate.",
   },
   strategyDelete: {
     title: "Delete strategy",
@@ -728,6 +744,12 @@ export const es: Dictionary = {
     empty: "No hay estrategias que coincidan con los filtros.",
     deleteAria: "Eliminar {name}",
     viewAria: "Ver {name}",
+    alertsInLast30Days: "Alertas en los ultimos 30 dias",
+    strategyId: "Id de estrategia",
+    creationDate: "Fecha de Creacion",
+    timeFrame: "Timeframe",
+    dataType: "Tipo de datos",
+    sizing: "Sizing",
   },
   strategyDetail: {
     back: "Estrategias",
@@ -735,8 +757,7 @@ export const es: Dictionary = {
     backToStrategies: "Volver a estrategias",
     delete: "Eliminar",
     onlyStoppedCanBeDeleted: "Solo se pueden eliminar estrategias detenidas",
-    subtitle:
-      "{instrument} · {platform} · {trades} trades · {capital} en capital",
+    subtitle: "{instrument} · {platform} · {trades} trades",
     winRate: "Win Rate",
     profitFactor: "Profit Factor",
     drawdown: "Drawdown",
@@ -748,6 +769,17 @@ export const es: Dictionary = {
     tabHealth: "Edge Health",
     tabBacktest: "Backtest",
     equityCurve: "Curva de Equity",
+    equityCurveNoData: "No hay datos de equity curve para mostrar",
+    operations: "{trades} operaciones · página {page} de {totalPages}",
+    edgeStatus: "Estado del Edge",
+    edgeHealthHealthyDesc:
+      "La estrategia mantiene su ventaja estadística dentro de los parámetros esperados.",
+    edgeHealthDecayDesc:
+      "Se detecta deterioro del edge: el rendimiento reciente diverge del histórico. Considera revisar parámetros.",
+    edgeUnhealthyDesc:
+      "La ventaja estadística se ha degradado significativamente. Se recomienda detener y reevaluar la estrategia.",
+    noMetrics: "No hay datos de métricas disponibles para esta estrategia.",
+    noOpsYet: "Los datos se generarán cuando la estrategia comience a operar.",
   },
   strategyDelete: {
     title: "Eliminar estrategia",
