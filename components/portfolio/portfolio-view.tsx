@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Activity, Edit, Receipt, TrendingDown, Library } from "lucide-react";
 import { WeightsBar } from "@/components/charts/lazy";
 import { CorrelationHeatmap } from "@/components/charts/correlation-heatmap";
@@ -55,7 +55,6 @@ export function PortfolioView() {
   const weightList = weights.data?.data ?? [];
   const pm = metrics.data?.data;
 
-  // --- Estado para diálogos de ayuda ---
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
   const [helpContent, setHelpContent] = useState<{
     title: string;
@@ -72,23 +71,10 @@ export function PortfolioView() {
     setHelpDialogOpen(true);
   };
 
-  // --- Estado para el modal de edición de pesos ---
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editableWeights, setEditableWeights] = useState<
     { strategy_id: string; strategy_name: string; target_weight: number }[]
   >([]);
-
-  useEffect(() => {
-    if (editDialogOpen) {
-      setEditableWeights(
-        weightList.map((w) => ({
-          strategy_id: w.strategy_id,
-          strategy_name: w.strategy_name ?? w.strategy_id,
-          target_weight: w.target_weight ?? 0,
-        })),
-      );
-    }
-  }, [editDialogOpen, weightList]);
 
   const handleWeightChange = (index: number, value: string) => {
     const numValue = parseFloat(value);
@@ -120,12 +106,9 @@ export function PortfolioView() {
     try {
       await Promise.all(promises);
       setEditDialogOpen(false);
-    } catch (error) {
-      // Error ya manejado por useSetWeight
-    }
+    } catch (error) {}
   };
 
-  // --- Procesar datos ---
   const allocationDeviations = pm?.allocation_deviations ?? {};
   const concentrationMetrics = pm?.concentration_metrics ?? {};
 
@@ -190,7 +173,6 @@ export function PortfolioView() {
       {isFallback && <OfflineBanner />}
 
       <div className="flex flex-wrap gap-4">
-        {/* Sharpe */}
         <div
           className="flex-1 min-w-[180px] lg:flex-[1_1_calc(33.333%-1rem)] h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30"
           onClick={() => openHelp("helpSharpeTitle", "helpSharpeDesc")}
@@ -272,8 +254,6 @@ export function PortfolioView() {
         </div>
       </div>
 
-      {/* Weights Chart */}
-
       <Card className="relative">
         <CardHeader>
           <CardTitle className="text-base">
@@ -298,7 +278,6 @@ export function PortfolioView() {
         </CardContent>
       </Card>
 
-      {/* Allocation Table */}
       <Card className="relative">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
@@ -318,7 +297,21 @@ export function PortfolioView() {
             >
               <Library className="h-3.5 w-3.5" />
             </Button>
-            <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+            <Dialog
+              open={editDialogOpen}
+              onOpenChange={(open) => {
+                if (open) {
+                  setEditableWeights(
+                    weightList.map((w) => ({
+                      strategy_id: w.strategy_id,
+                      strategy_name: w.strategy_name ?? w.strategy_id,
+                      target_weight: w.target_weight ?? 0,
+                    })),
+                  );
+                }
+                setEditDialogOpen(open);
+              }}
+            >
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
@@ -467,7 +460,6 @@ export function PortfolioView() {
         </CardContent>
       </Card>
 
-      {/* Correlation & Drawdown */}
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="relative">
           <CardHeader>
@@ -535,7 +527,6 @@ export function PortfolioView() {
         </Card>
       </div>
 
-      {/* Diálogo de ayuda global */}
       <Dialog open={helpDialogOpen} onOpenChange={setHelpDialogOpen}>
         <DialogContent>
           <DialogHeader>

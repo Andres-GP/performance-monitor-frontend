@@ -43,18 +43,16 @@ export function AlertsView() {
   const alerts = data?.data ?? [];
   const strategyList = strategies.data?.data ?? [];
 
-  // Opciones traducidas para el select de estrategia
   const strategyItems = useMemo(() => {
     const items: Record<string, string> = {
       all: dict.alerts.all,
     };
     strategyList.forEach((s) => {
-      items[s.id] = s.name; // El nombre de la estrategia ya viene del backend, no se traduce
+      items[s.id] = s.name;
     });
     return items;
   }, [strategyList, dict.alerts.all]);
 
-  // Opciones traducidas para severidad
   const severityItems = {
     all: dict.alerts.all,
     high: dict.alerts.high,
@@ -82,16 +80,16 @@ export function AlertsView() {
     safePage * pageSize + pageSize,
   );
 
-  const resetPage = useCallback(
-    (setter: (v: string) => void) => (v: string) => {
-      setter(v);
-      setPage(0);
-    },
-    [],
-  );
+  const handleStrategyChange = useCallback((value: string) => {
+    setStrategy(value);
+    setPage(0);
+  }, []);
 
-  const handleStrategyChange = useCallback(resetPage(setStrategy), [resetPage]);
-  const handleSeverityChange = useCallback(resetPage(setSeverity), [resetPage]);
+  const handleSeverityChange = useCallback((value: string) => {
+    setSeverity(value);
+    setPage(0);
+  }, []);
+
   const handleFromChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setFrom(e.target.value);
@@ -99,6 +97,7 @@ export function AlertsView() {
     },
     [],
   );
+
   const handleToChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setTo(e.target.value);
@@ -106,20 +105,20 @@ export function AlertsView() {
     },
     [],
   );
-  const handlePageSizeChange = useCallback((v: string) => {
-    setPageSize(Number(v));
+
+  const handlePageSizeChange = useCallback((value: string) => {
+    setPageSize(Number(value));
     setPage(0);
   }, []);
-  const handlePrevPage = useCallback(
-    () => setPage((p) => Math.max(0, p - 1)),
-    [],
-  );
-  const handleNextPage = useCallback(
-    () => setPage((p) => Math.min(totalPages - 1, p + 1)),
-    [totalPages],
-  );
 
-  // Función auxiliar para interpolación de placeholders
+  const handlePrevPage = useCallback(() => {
+    setPage((p) => Math.max(0, p - 1));
+  }, []);
+
+  const handleNextPage = useCallback(() => {
+    setPage((p) => Math.min(totalPages - 1, p + 1));
+  }, [totalPages]);
+
   const interpolate = (
     template: string,
     values: Record<string, string | number>,
