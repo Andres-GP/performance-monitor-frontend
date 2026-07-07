@@ -1,83 +1,97 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { backendUrl, getBearerToken } from "@/lib/server/backend"
+// app/api/proxy/[...path]/route.ts
+import { type NextRequest, NextResponse } from "next/server";
+import { backendUrl } from "@/lib/server/backend";
 
-// Catch-all server-side proxy. Every browser request to /api/proxy/* is
-// forwarded here to the FastAPI backend with the Authorization header injected
-// on the server. The backend URL and token are never exposed to the client.
-
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
 
 async function forward(req: NextRequest, path: string[]) {
-  const targetPath = path.join("/")
-  const search = req.nextUrl.search
-  const token = await getBearerToken()
+  const targetPath = path.join("/");
+  const search = req.nextUrl.search;
 
-  const headers = new Headers()
-  headers.set("accept", "application/json")
-  if (token) headers.set("authorization", `Bearer ${token}`)
+  // Get the Authorization header from the incoming request (Clerk JWT from client)
+  const authHeader = req.headers.get("authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+  // If no token, return 401
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized - No token provided" }, { status: 401 });
+  }
+
+  const headers = new Headers();
+  headers.set("accept", "application/json");
+  headers.set("authorization", `Bearer ${token}`);
+
+  // Propagar otros headers importantes (content-type, etc.)
+  const contentType = req.headers.get("content-type");
+  if (contentType) {
+    headers.set("content-type", contentType);
+  }
 
   // Abort slow requests so the client can fall back fast (Render cold starts
   // can otherwise hang for ~30s).
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 6000)
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 6000);
 
   const init: RequestInit = {
     method: req.method,
     headers,
     cache: "no-store",
     signal: controller.signal,
-  }
+    // body se añade solo si no es GET/HEAD
+  };
 
+  // Manejar el body para métodos que no son GET/HEAD
   if (!["GET", "HEAD"].includes(req.method)) {
-    const contentType = req.headers.get("content-type")
-    if (contentType) headers.set("content-type", contentType)
-    const body = await req.text()
-    if (body) init.body = body
+    const body = await req.text();
+    if (body) init.body = body;
   }
 
   try {
-    const res = await fetch(backendUrl(`/${targetPath}`, search), init)
-    const text = await res.text()
-    const contentType = res.headers.get("content-type") ?? "application/json"
+    const url = backendUrl(`/${targetPath}`, search);
+    const res = await fetch(url, init);
+    const text = await res.text();
+    const contentTypeRes =
+      res.headers.get("content-type") ?? "application/json";
 
     return new NextResponse(text, {
       status: res.status,
-      headers: { "content-type": contentType },
-    })
+      headers: { "content-type": contentTypeRes },
+    });
   } catch (error) {
-    console.log("[v0] proxy error:", error instanceof Error ? error.message : error)
+    console.error("[Proxy] Error forwarding request:", error);
+    const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: "Backend unreachable", detail: String(error) },
+      { error: "Backend unreachable", detail: message },
       { status: 502 },
-    )
+    );
   } finally {
-    clearTimeout(timeout)
+    clearTimeout(timeout);
   }
 }
 
-type Ctx = { params: Promise<{ path: string[] }> }
+type Ctx = { params: Promise<{ path: string[] }> };
 
 export async function GET(req: NextRequest, { params }: Ctx) {
-  const { path } = await params
-  return forward(req, path)
+  const { path } = await params;
+  return forward(req, path);
 }
 
 export async function POST(req: NextRequest, { params }: Ctx) {
-  const { path } = await params
-  return forward(req, path)
+  const { path } = await params;
+  return forward(req, path);
 }
 
 export async function PUT(req: NextRequest, { params }: Ctx) {
-  const { path } = await params
-  return forward(req, path)
+  const { path } = await params;
+  return forward(req, path);
 }
 
 export async function PATCH(req: NextRequest, { params }: Ctx) {
-  const { path } = await params
-  return forward(req, path)
+  const { path } = await params;
+  return forward(req, path);
 }
 
 export async function DELETE(req: NextRequest, { params }: Ctx) {
-  const { path } = await params
-  return forward(req, path)
+  const { path } = await params;
+  return forward(req, path);
 }

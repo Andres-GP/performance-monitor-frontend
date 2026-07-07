@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import {
   Bar,
   BarChart,
@@ -12,7 +13,7 @@ import {
 } from "recharts"
 import type { PortfolioWeight } from "@/types"
 
-export default function WeightsBar({ data }: { data: PortfolioWeight[] }) {
+export default memo(function WeightsBar({ data }: { data: PortfolioWeight[] }) {
   const chartData = data.map((w) => ({
     name: w.strategy_name ?? w.strategy_id,
     target: Math.round((w.target_weight ?? 0) * 100),
@@ -57,4 +58,4 @@ export default function WeightsBar({ data }: { data: PortfolioWeight[] }) {
       </BarChart>
     </ResponsiveContainer>
   )
-}
+})

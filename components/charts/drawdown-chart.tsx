@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import {
   Area,
   AreaChart,
@@ -11,7 +12,7 @@ import {
 } from "recharts"
 import { formatDateShort } from "@/lib/format"
 
-export default function DrawdownChart({
+export default memo(function DrawdownChart({
   data,
 }: {
   data: { timestamp: string; drawdown: number }[]
@@ -63,4 +64,4 @@ export default function DrawdownChart({
       </AreaChart>
     </ResponsiveContainer>
   )
-}
+})

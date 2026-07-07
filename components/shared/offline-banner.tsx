@@ -1,9 +1,10 @@
 "use client"
 
+import { memo } from "react"
 import { WifiOff } from "lucide-react"
 import { useI18n } from "@/lib/i18n/context"
 
-export function OfflineBanner({ show = true }: { show?: boolean }) {
+export const OfflineBanner = memo(function OfflineBanner({ show = true }: { show?: boolean }) {
   const { dict } = useI18n()
   if (!show) return null
   return (
@@ -12,4 +13,4 @@ export function OfflineBanner({ show = true }: { show?: boolean }) {
       <span>{dict.offline.message}</span>
     </div>
   )
-}
+})

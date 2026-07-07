@@ -1,6 +1,8 @@
-import type { ReactNode } from "react"
-import { Header } from "@/components/layout/header"
-import { SidebarNav } from "@/components/layout/sidebar-nav"
+"use client";
+
+import type { ReactNode } from "react";
+import { Header } from "@/components/layout/header";
+import { SidebarNav } from "@/components/layout/sidebar-nav";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
@@ -15,5 +17,5 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
     </div>
-  )
+  );
 }

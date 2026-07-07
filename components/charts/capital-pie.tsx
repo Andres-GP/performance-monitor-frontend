@@ -1,12 +1,13 @@
 "use client"
 
+import { memo } from "react"
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 import { formatCurrency } from "@/lib/format"
 import type { CapitalAccount } from "@/types"
 
 const COLORS = ["var(--color-chart-1)", "var(--color-chart-3)", "var(--color-chart-5)", "var(--color-chart-4)"]
 
-export default function CapitalPie({ data }: { data: CapitalAccount[] }) {
+export default memo(function CapitalPie({ data }: { data: CapitalAccount[] }) {
   return (
     <ResponsiveContainer width="100%" height={260}>
       <PieChart>
@@ -36,4 +37,4 @@ export default function CapitalPie({ data }: { data: CapitalAccount[] }) {
       </PieChart>
     </ResponsiveContainer>
   )
-}
+})

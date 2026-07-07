@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Bell, Mail, Moon, Server } from "lucide-react";
 import {
   Card,
@@ -10,40 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { apiGet } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
-
-function Toggle({
-  checked,
-  onChange,
-  label,
-}: {
-  checked: boolean;
-  onChange: (v: boolean) => void;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      onClick={() => onChange(!checked)}
-      className={cn(
-        "cursor-pointer inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-        checked ? "bg-primary" : "bg-muted",
-      )}
-    >
-      <span
-        className={cn(
-          "inline-block size-5 transform rounded-full bg-background transition-transform",
-          checked ? "translate-x-5" : "translate-x-0.5",
-        )}
-      />
-    </button>
-  );
-}
+import { useHealth } from "@/lib/queries";
 
 function SettingRow({
   icon: Icon,
@@ -74,43 +41,25 @@ function SettingRow({
 
 export function SettingsView() {
   const { dict } = useI18n();
-  const [emailAlerts, setEmailAlerts] = useState(true);
-  const [pushAlerts, setPushAlerts] = useState(false);
-  const [dailyDigest, setDailyDigest] = useState(true);
+  const health = useHealth();
 
-  const health = useQuery({
-    queryKey: ["health"],
-    queryFn: async () => {
-      try {
-        await apiGet<{ status: string }>("/health");
-        return "online" as const;
-      } catch {
-        return "offline" as const;
-      }
-    },
-    refetchInterval: 30_000,
-  });
-
-  // Determinar el estado del backend para mostrarlo
-  const backendStatus = health.isLoading
+  const backendStatus = health.isPending
     ? dict.settings.checking
-    : health.data === "online"
+    : health.status === "success"
       ? dict.settings.online
       : dict.settings.offline;
 
-  const statusClass =
-    health.data === "online"
-      ? "bg-chart-1/10 text-chart-1"
-      : health.data === "offline"
-        ? "bg-destructive/10 text-destructive"
-        : "bg-muted text-muted-foreground";
+  const statusClass = health.isPending
+    ? "bg-chart-1/10 text-chart-1"
+    : health.status === "success"
+      ? "bg-muted text-muted-foreground"
+      : "bg-destructive/10 text-destructive";
 
-  const dotClass =
-    health.data === "online"
-      ? "bg-chart-1"
-      : health.data === "offline"
-        ? "bg-destructive"
-        : "bg-muted-foreground";
+  const dotClass = health.isPending
+    ? "bg-muted-foreground"
+    : health.status === "success"
+      ? "bg-emerald-400"
+      : "bg-destructive";
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">

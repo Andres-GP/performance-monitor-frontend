@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SeverityBadge } from "@/components/shared/badges";
 import { OfflineBanner } from "@/components/shared/offline-banner";
@@ -43,18 +43,16 @@ export function AlertsView() {
   const alerts = data?.data ?? [];
   const strategyList = strategies.data?.data ?? [];
 
-  // Opciones traducidas para el select de estrategia
   const strategyItems = useMemo(() => {
     const items: Record<string, string> = {
       all: dict.alerts.all,
     };
     strategyList.forEach((s) => {
-      items[s.id] = s.name; // El nombre de la estrategia ya viene del backend, no se traduce
+      items[s.id] = s.name;
     });
     return items;
   }, [strategyList, dict.alerts.all]);
 
-  // Opciones traducidas para severidad
   const severityItems = {
     all: dict.alerts.all,
     high: dict.alerts.high,
@@ -82,14 +80,45 @@ export function AlertsView() {
     safePage * pageSize + pageSize,
   );
 
-  function resetPage<T>(setter: (v: T) => void) {
-    return (v: T) => {
-      setter(v);
-      setPage(0);
-    };
-  }
+  const handleStrategyChange = useCallback((value: string) => {
+    setStrategy(value);
+    setPage(0);
+  }, []);
 
-  // Función auxiliar para interpolación de placeholders
+  const handleSeverityChange = useCallback((value: string) => {
+    setSeverity(value);
+    setPage(0);
+  }, []);
+
+  const handleFromChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFrom(e.target.value);
+      setPage(0);
+    },
+    [],
+  );
+
+  const handleToChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setTo(e.target.value);
+      setPage(0);
+    },
+    [],
+  );
+
+  const handlePageSizeChange = useCallback((value: string) => {
+    setPageSize(Number(value));
+    setPage(0);
+  }, []);
+
+  const handlePrevPage = useCallback(() => {
+    setPage((p) => Math.max(0, p - 1));
+  }, []);
+
+  const handleNextPage = useCallback(() => {
+    setPage((p) => Math.min(totalPages - 1, p + 1));
+  }, [totalPages]);
+
   const interpolate = (
     template: string,
     values: Record<string, string | number>,
@@ -113,7 +142,7 @@ export function AlertsView() {
             <Select
               items={strategyItems}
               value={strategy}
-              onValueChange={resetPage((v) => setStrategy(v as string))}
+              onValueChange={handleStrategyChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder={dict.alerts.filterStrategy} />
@@ -135,7 +164,7 @@ export function AlertsView() {
             <Select
               items={severityItems}
               value={severity}
-              onValueChange={resetPage((v) => setSeverity(v as string))}
+              onValueChange={handleSeverityChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder={dict.alerts.filterSeverity} />
@@ -156,19 +185,14 @@ export function AlertsView() {
               id="from"
               type="date"
               value={from}
-              onChange={(e) => resetPage(setFrom)(e.target.value)}
+              onChange={handleFromChange}
             />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="to" className="text-xs text-muted-foreground">
               {dict.alerts.filterTo}
             </Label>
-            <Input
-              id="to"
-              type="date"
-              value={to}
-              onChange={(e) => resetPage(setTo)(e.target.value)}
-            />
+            <Input id="to" type="date" value={to} onChange={handleToChange} />
           </div>
         </CardContent>
       </Card>
@@ -185,8 +209,8 @@ export function AlertsView() {
         </div>
       ) : (
         <>
-          <div className="overflow-hidden rounded-lg border border-border">
-            <Table>
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <Table className="min-w-[700px]">
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
                   <TableHead>{dict.alerts.colProblem}</TableHead>
@@ -205,9 +229,16 @@ export function AlertsView() {
               <TableBody>
                 {pageAlerts.map((a) => (
                   <TableRow key={a.id}>
-                    <TableCell className="font-medium">{a.problem}</TableCell>
-                    <TableCell className="hidden max-w-sm text-muted-foreground md:table-cell">
-                      {a.details ?? "—"}
+                    <TableCell className="font-medium">
+                      {a.problem_type}
+                    </TableCell>
+                    <TableCell className="hidden max-w-sm md:table-cell">
+                      <div
+                        className="max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap text-muted-foreground"
+                        title={a.details ?? "—"}
+                      >
+                        {a.details ?? "—"}
+                      </div>
                     </TableCell>
                     <TableCell className="hidden text-muted-foreground sm:table-cell">
                       {a.strategy_name ?? a.strategy_id}
@@ -223,16 +254,12 @@ export function AlertsView() {
               </TableBody>
             </Table>
           </div>
-
           <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>{dict.alerts.perPage}</span>
               <Select
                 value={String(pageSize)}
-                onValueChange={(v) => {
-                  setPageSize(Number(v));
-                  setPage(0);
-                }}
+                onValueChange={handlePageSizeChange}
               >
                 <SelectTrigger className="w-20">
                   <SelectValue />
@@ -259,7 +286,7 @@ export function AlertsView() {
                   size="icon-sm"
                   aria-label={dict.alerts.prevPage}
                   disabled={safePage === 0}
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  onClick={handlePrevPage}
                 >
                   <ChevronLeft className="size-4" />
                 </Button>
@@ -268,9 +295,7 @@ export function AlertsView() {
                   size="icon-sm"
                   aria-label={dict.alerts.nextPage}
                   disabled={safePage >= totalPages - 1}
-                  onClick={() =>
-                    setPage((p) => Math.min(totalPages - 1, p + 1))
-                  }
+                  onClick={handleNextPage}
                 >
                   <ChevronRight className="size-4" />
                 </Button>
