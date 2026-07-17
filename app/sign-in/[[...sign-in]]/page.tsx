@@ -2,7 +2,7 @@
 
 import { useUser, useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useState, useEffect, useRef } from "react";
 import {
   EnvelopeIcon,
   LockClosedIcon,
@@ -17,9 +17,11 @@ export default function SignInPage() {
   const { isLoaded: isUserLoaded, isSignedIn } = useUser();
   const { setActive, client } = useClerk();
   const router = useRouter();
+  const redirected = useRef(false);
 
   useEffect(() => {
-    if (isUserLoaded && isSignedIn) {
+    if (isUserLoaded && isSignedIn && !redirected.current) {
+      redirected.current = true;
       router.replace("/");
     }
   }, [isUserLoaded, isSignedIn, router]);

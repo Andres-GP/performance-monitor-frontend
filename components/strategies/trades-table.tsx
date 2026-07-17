@@ -54,7 +54,6 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
     );
   }
 
-  console.log("pageTrades", pageTrades);
   return (
     <div className="flex flex-col gap-3">
       {data?.isFallback && <OfflineBanner />}
