@@ -87,10 +87,11 @@ export function useStrategies() {
 
 export function useStrategy(id: string) {
   const all = useStrategies();
-  const strategy = all.data?.find((s) => s.strategy_id === id);
+  const strategies = all.data?.data ?? [];
+  const strategy = strategies.find((s) => s.strategy_id === id);
   return {
     strategy,
-    isFallback: all.isFallback ?? false,
+    isFallback: all.data?.isFallback ?? false,
     isLoading: all.isLoading,
   };
 }
@@ -196,13 +197,15 @@ export function useDeleteStrategy() {
   return useMutation({
     mutationFn: async (id: string) => {
       const token = await getToken();
+      if (!token) throw new Error("No autenticado");
       return apiSend(`/strategies/${id}`, "DELETE", undefined, { token });
     },
     onSuccess: () => {
       toast.success("Strategy deleted");
       qc.invalidateQueries({ queryKey: qk.strategies });
     },
-    onError: () => toast.error("Could not delete strategy"),
+    onError: (error) =>
+      toast.error(error.message || "Could not delete strategy"),
   });
 }
 
@@ -210,8 +213,16 @@ export function useUploadBacktest(strategyId: string) {
   const qc = useQueryClient();
   const getToken = useApiToken();
   return useMutation({
-    mutationFn: async (body: { expected_pnl: number; notes?: string }) => {
+    mutationFn: async (body: {
+      expected_pnl: number;
+      expected_sharpe: number;
+      expected_drawdown: number;
+      period_start: string;
+      period_end: string;
+      parameters?: Record<string, any>;
+    }) => {
       const token = await getToken();
+      if (!token) throw new Error("No autenticado");
       return apiSend(
         "/backtest/upload",
         "POST",
@@ -223,7 +234,8 @@ export function useUploadBacktest(strategyId: string) {
       toast.success("Backtest subido correctamente");
       qc.invalidateQueries({ queryKey: qk.metrics(strategyId) });
     },
-    onError: () => toast.error("No se pudo subir el backtest"),
+    onError: (error) =>
+      toast.error(error.message || "No se pudo subir el backtest"),
   });
 }
 
@@ -236,17 +248,15 @@ export function useSetWeight() {
       target_weight: number;
     }) => {
       const token = await getToken();
+      if (!token) throw new Error("No autenticado");
       return apiSend("/portfolio/weights", "POST", body, { token });
     },
     onSuccess: () => {
       toast.success("Target weight updated");
-      // Invalidamos ambas consultas para refrescar los datos
       qc.invalidateQueries({ queryKey: qk.weights });
       qc.invalidateQueries({ queryKey: qk.portfolioMetrics });
     },
-    onError: (error: Error) => {
-      toast.error(`Could not update weight: ${error.message}`);
-    },
+    onError: (error) => toast.error(error.message || "Could not update weight"),
   });
 }
 
