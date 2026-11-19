@@ -27,6 +27,7 @@ export const en = {
     strategies: "Strategies",
     portfolio: "Portfolio",
     marketRegime: "Market Regime",
+    weeklyReview: "Weekly EDA",
     alerts: "Alerts",
     settings: "Settings",
     main: "Main navigation",
@@ -235,6 +236,18 @@ export const en = {
     corrHelpNowPos: "unusual positive correlation",
     corrHelpNote:
       "* If values are 0 or very low, it may be due to insufficient data (we need at least 30 days of data).",
+  },
+  weeklyReview: {
+    title: "Weekly strategy EDA", subtitle: "Latest portfolio review and strategy diagnostics",
+    loading: "Loading latest review…", unavailable: "No weekly report is available yet.",
+    error: "Could not load the weekly review.", week: "Week", generated: "Generated",
+    overall: "Review status", worstEhi: "Lowest available EHI", strategies: "Strategy review",
+    strategy: "Strategy", state: "Review", backtest: "Backtest", regime: "Regime",
+    ehi: "EHI", expectancy: "Expectancy percentile", profitFactor: "Profit factor percentile",
+    winRate: "Win rate percentile", regimeScore: "Regime component", status: "Data status",
+    market: "Market context", noData: "Not available", unconfirmed: "Regime hypothesis unconfirmed; neutral component applied.",
+    provisional: "Provisional score; review the source data before making decisions.",
+    alert: "Review required", limited: "Limited by data", ready: "Ready for human review",
   },
   strategies: {
     title: "Strategies",
@@ -531,6 +544,7 @@ export const es: Dictionary = {
     strategies: "Estrategias",
     portfolio: "Portafolio",
     marketRegime: "Régimen de Mercado",
+    weeklyReview: "EDA semanal",
     alerts: "Alertas",
     settings: "Ajustes",
     main: "Navegación principal",
@@ -744,6 +758,18 @@ export const es: Dictionary = {
     corrHelpNowPos: "correlación positiva inusual",
     corrHelpNote:
       "* Si los valores son 0 o muy bajos, puede deberse a datos insuficientes (necesitamos al menos 30 días de datos).",
+  },
+  weeklyReview: {
+    title: "EDA semanal de estrategias", subtitle: "Último análisis del portfolio y diagnóstico de estrategias",
+    loading: "Cargando el último informe…", unavailable: "Aún no hay informes semanales.",
+    error: "No se pudo cargar el informe semanal.", week: "Semana", generated: "Generado",
+    overall: "Estado de revisión", worstEhi: "EHI disponible más bajo", strategies: "Revisión de estrategias",
+    strategy: "Estrategia", state: "Revisión", backtest: "Backtest", regime: "Régimen",
+    ehi: "EHI", expectancy: "Percentil de expectancy", profitFactor: "Percentil de profit factor",
+    winRate: "Percentil de win rate", regimeScore: "Componente de régimen", status: "Estado de datos",
+    market: "Contexto de mercado", noData: "No disponible", unconfirmed: "Hipótesis de régimen sin confirmar; se aplica componente neutral.",
+    provisional: "Score provisional; revisa los datos de origen antes de decidir.",
+    alert: "Requiere revisión", limited: "Datos limitados", ready: "Lista para revisión humana",
   },
   strategies: {
     title: "Estrategias",

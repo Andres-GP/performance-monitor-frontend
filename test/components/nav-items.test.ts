@@ -8,6 +8,7 @@ describe("navItems", () => {
         "/",
         "/portfolio",
         "/market-regime",
+        "/weekly-review",
         "/alerts",
         "/settings",
       ]),

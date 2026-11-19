@@ -1,6 +1,7 @@
 import {
   Activity,
   Bell,
+  ClipboardList,
   Gauge,
   LineChart,
   Settings,
@@ -20,6 +21,7 @@ export const navItems: NavItem[] = [
   { labelKey: "strategies", href: "/", icon: LineChart },
   { labelKey: "portfolio", href: "/portfolio", icon: Wallet },
   { labelKey: "marketRegime", href: "/market-regime", icon: Gauge },
+  { labelKey: "weeklyReview", href: "/weekly-review", icon: ClipboardList },
   { labelKey: "alerts", href: "/alerts", icon: Bell },
   { labelKey: "settings", href: "/settings", icon: Settings },
 ];
