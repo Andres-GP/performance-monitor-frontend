@@ -30,7 +30,7 @@ export const qk = {
 
 const STALE = 60_000;
 
-function useApiToken() {
+export function useApiToken() {
   const { session } = useClerk();
 
   return async (): Promise<string | undefined> => {

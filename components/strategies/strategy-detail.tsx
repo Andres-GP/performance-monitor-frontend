@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MonitoringStrategyPanel } from "./monitoring-strategy-panel";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -290,6 +291,7 @@ export function StrategyDetail({ id }: { id: string }) {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+      <MonitoringStrategyPanel strategyId={id} />
       <div className="flex flex-col gap-3">
         <Button
           variant="ghost"

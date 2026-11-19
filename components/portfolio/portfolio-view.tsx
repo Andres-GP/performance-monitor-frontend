@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MonitoringPortfolioDashboard } from "./monitoring-dashboard";
 import { Activity, Edit, Receipt, TrendingDown, Library } from "lucide-react";
 import { WeightsBar } from "@/components/charts/lazy";
 import { CorrelationHeatmap } from "@/components/charts/correlation-heatmap";
@@ -163,6 +164,7 @@ export function PortfolioView() {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+      <MonitoringPortfolioDashboard />
       <div>
         <h2 className="text-xl font-semibold">{dict.portfolio.title}</h2>
         <p className="text-sm text-muted-foreground">
