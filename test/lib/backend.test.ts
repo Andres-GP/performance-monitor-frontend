@@ -1,18 +1,11 @@
 /**
  * @jest-environment node
  */
-const cookieGet = jest.fn()
-
-jest.mock("next/headers", () => ({
-  cookies: async () => ({ get: cookieGet }),
-}))
-
 describe("lib/server/backend", () => {
   const ORIGINAL_ENV = process.env
 
   beforeEach(() => {
     jest.resetModules()
-    cookieGet.mockReset()
     process.env = { ...ORIGINAL_ENV }
   })
 
@@ -27,30 +20,40 @@ describe("lib/server/backend", () => {
     expect(backendUrl("alerts", "?limit=5")).toBe("https://api.example.com/alerts?limit=5")
   })
 
-  it("falls back to the default backend URL when env is unset", async () => {
+  it("does not silently select production when backend env is unset", async () => {
     delete process.env.BACKEND_API_URL
+    delete process.env.RENDER_GIT_BRANCH
+    delete process.env.GITHUB_REF_NAME
+    delete process.env.RENDER_SERVICE_ID_PROD
+    delete process.env.RENDER_SERVICE_ID_STAGING
     const { BACKEND_API_URL } = await import("@/lib/server/backend")
-    expect(BACKEND_API_URL).toContain("performance-monitor-backend")
+    expect(BACKEND_API_URL).toBeNull()
   })
 
-  it("prefers the token cookie over the env token", async () => {
-    process.env.BACKEND_API_TOKEN = "env-token"
-    cookieGet.mockReturnValue({ value: "cookie-token" })
-    const { getBearerToken } = await import("@/lib/server/backend")
-    expect(await getBearerToken()).toBe("cookie-token")
+  it("selects the staging Render service for staging branches", async () => {
+    delete process.env.BACKEND_API_URL
+    process.env.RENDER_GIT_BRANCH = "develop"
+    process.env.RENDER_SERVICE_ID_STAGING = "staging-service"
+    const { BACKEND_API_URL } = await import("@/lib/server/backend")
+    expect(BACKEND_API_URL).toBe("https://staging-service.onrender.com")
   })
 
-  it("uses the env token when no cookie is present", async () => {
-    process.env.BACKEND_API_TOKEN = "env-token"
-    cookieGet.mockReturnValue(undefined)
-    const { getBearerToken } = await import("@/lib/server/backend")
-    expect(await getBearerToken()).toBe("env-token")
+  it("selects the production Render service only for main", async () => {
+    delete process.env.BACKEND_API_URL
+    process.env.RENDER_GIT_BRANCH = "main"
+    process.env.RENDER_SERVICE_ID_PROD = "production-service"
+    const { BACKEND_API_URL } = await import("@/lib/server/backend")
+    expect(BACKEND_API_URL).toBe("https://production-service.onrender.com")
   })
 
-  it("returns null when neither cookie nor env token exist", async () => {
-    delete process.env.BACKEND_API_TOKEN
-    cookieGet.mockReturnValue(undefined)
-    const { getBearerToken } = await import("@/lib/server/backend")
-    expect(await getBearerToken()).toBeNull()
+  it("requires backend configuration when building a proxy URL", async () => {
+    delete process.env.BACKEND_API_URL
+    delete process.env.RENDER_GIT_BRANCH
+    delete process.env.GITHUB_REF_NAME
+    delete process.env.RENDER_SERVICE_ID_PROD
+    delete process.env.RENDER_SERVICE_ID_STAGING
+    const { backendUrl } = await import("@/lib/server/backend")
+    expect(() => backendUrl("/health")).toThrow(/Backend API is not configured/)
   })
+
 })
