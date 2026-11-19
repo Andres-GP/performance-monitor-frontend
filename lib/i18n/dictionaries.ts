@@ -493,6 +493,8 @@ export const en = {
     count: "{count} alerts · page {page} of {total}",
     prevPage: "Previous page",
     nextPage: "Next page",
+    acknowledge: "Acknowledge",
+    acknowledged: "Acknowledged",
   },
   settings: {
     title: "Settings",
@@ -1021,6 +1023,8 @@ export const es: Dictionary = {
     count: "{count} alertas · página {page} de {total}",
     prevPage: "Página anterior",
     nextPage: "Página siguiente",
+    acknowledge: "Reconocer",
+    acknowledged: "Reconocida",
   },
   settings: {
     title: "Ajustes",

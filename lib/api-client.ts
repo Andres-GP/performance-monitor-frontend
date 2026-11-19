@@ -68,7 +68,12 @@ export async function getWithFallback<T>(
   try {
     const data = await apiGet<T>(path, options);
     return { data, isFallback: false };
-  } catch {
+  } catch (error) {
+    // Authentication and contract errors must remain visible to the caller.
+    // Only transport failures and backend outages may use the empty state.
+    if (error instanceof ApiError && error.status < 500 && error.status !== 408) {
+      throw error;
+    }
     return { data: null, isFallback: true };
   }
 }

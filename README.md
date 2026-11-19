@@ -8,6 +8,18 @@ A modern **performance monitoring dashboard** built with **Next.js 16** and **Ty
 
 ---
 
+## Local configuration and data contract
+
+The private dashboard is served by the Next.js App Router under `app/(app)`. Clerk middleware protects these pages. Browser requests to FastAPI go through `/api/proxy/*`; the client obtains a Clerk session token and sends it as a Bearer token. Keep `CLERK_SECRET_KEY`, backend credentials, and all Supabase keys server-side. Never prefix them with `NEXT_PUBLIC_`.
+
+Copy `.env.example` to `.env.local` and set the Clerk keys and URLs. Backend selection is server-side: set `BACKEND_API_URL` to an explicit FastAPI base URL, or configure `RENDER_SERVICE_ID_PROD` and `RENDER_SERVICE_ID_STAGING` for branch-based selection (`main` uses production; `staging` and `develop` use staging). Do not set `BACKEND_API_TOKEN` in a deployed frontend; authenticated calls use the user's Clerk session token. No frontend code connects directly to Supabase.
+
+Available private views are Overview (`/`), Strategies (`/strategies` and `/strategies/[id]`), Portfolio (`/portfolio`), Alerts (`/alerts`), Market Regime (`/market-regime`), Weekly EDA (`/weekly-review`), and Settings (`/settings`). The frontend uses the backend's existing `/strategies`, `/strategies/{id}`, `/strategies/{id}/trades`, `/strategies/{id}/equity`, `/performance/metrics/{id}`, `/alerts`, `/alerts/{id}/ack`, `/portfolios`, `/portfolios/{id}`, `/portfolios/{id}/correlation`, `/market/regime`, `/portfolio/metrics`, `/portfolio/weights`, `/capital/summary`, `/weekly/reports/latest`, and `/health` routes where supported.
+
+Monitoring portfolio, equity, correlation, trade, and alert endpoints use paged `{ items, limit, offset, total }` responses. The legacy strategy/metrics endpoints retain their existing array/object formats. Weekly EDA consumes the latest `reports/weekly/<week>/summary.json` served by the backend. The backend checkout does not include a sample summary, so report fields should remain optional and absent values must display as unavailable. The EHI is provisional analysis only and must not be treated as an execution instruction.
+
+Run locally with `npm install` and `npm run dev`. Verification commands are `npm test -- --runInBand`, `npm run lint`, and `npm run build`. A working Clerk environment and reachable FastAPI instance are required to verify live authenticated data.
+
 ## 🚀 Live Demo
 
 👉 [View Live Dashboard](https://performance-monitor-frontend.vercel.app/)

@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAlerts, useStrategies } from "@/lib/queries";
+import { useAcknowledgeAlert, useAlerts, useStrategies } from "@/lib/queries";
 import { formatDate } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/context";
 
@@ -32,6 +32,7 @@ export function AlertsView() {
   const { dict } = useI18n();
   const { data, isLoading } = useAlerts(200);
   const strategies = useStrategies();
+  const acknowledge = useAcknowledgeAlert();
 
   const [strategy, setStrategy] = useState("all");
   const [severity, setSeverity] = useState("all");
@@ -40,7 +41,7 @@ export function AlertsView() {
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(0);
 
-  const alerts = data?.data ?? [];
+  const alerts = data?.data?.items ?? [];
   const strategyList = strategies.data?.data ?? [];
 
   const strategyItems = useMemo(() => {
@@ -48,7 +49,7 @@ export function AlertsView() {
       all: dict.alerts.all,
     };
     strategyList.forEach((s) => {
-      items[s.id] = s.name;
+      items[s.strategy_id] = s.name;
     });
     return items;
   }, [strategyList, dict.alerts.all]);
@@ -64,7 +65,7 @@ export function AlertsView() {
     const fromTime = from ? new Date(from).getTime() : null;
     const toTime = to ? new Date(to).getTime() + 86_400_000 : null;
     return alerts.filter((a) => {
-      const t = new Date(a.timestamp).getTime();
+      const t = new Date(a.last_seen ?? a.first_seen ?? a.timestamp ?? "").getTime();
       const matchStrategy = strategy === "all" || a.strategy_id === strategy;
       const matchSeverity = severity === "all" || a.severity === severity;
       const matchFrom = fromTime == null || t >= fromTime;
@@ -80,12 +81,14 @@ export function AlertsView() {
     safePage * pageSize + pageSize,
   );
 
-  const handleStrategyChange = useCallback((value: string) => {
+  const handleStrategyChange = useCallback((value: string | null) => {
+    if (value === null) return;
     setStrategy(value);
     setPage(0);
   }, []);
 
-  const handleSeverityChange = useCallback((value: string) => {
+  const handleSeverityChange = useCallback((value: string | null) => {
+    if (value === null) return;
     setSeverity(value);
     setPage(0);
   }, []);
@@ -106,7 +109,8 @@ export function AlertsView() {
     [],
   );
 
-  const handlePageSizeChange = useCallback((value: string) => {
+  const handlePageSizeChange = useCallback((value: string | null) => {
+    if (value === null) return;
     setPageSize(Number(value));
     setPage(0);
   }, []);
@@ -150,7 +154,7 @@ export function AlertsView() {
               <SelectContent>
                 <SelectItem value="all">{dict.alerts.all}</SelectItem>
                 {strategyList.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
+                  <SelectItem key={s.strategy_id} value={s.strategy_id}>
                     {s.name}
                   </SelectItem>
                 ))}
@@ -221,6 +225,7 @@ export function AlertsView() {
                     {dict.alerts.colStrategy}
                   </TableHead>
                   <TableHead>{dict.alerts.colSeverity}</TableHead>
+                  <TableHead>{dict.alerts.acknowledge}</TableHead>
                   <TableHead className="text-right">
                     {dict.alerts.colDate}
                   </TableHead>
@@ -230,7 +235,7 @@ export function AlertsView() {
                 {pageAlerts.map((a) => (
                   <TableRow key={a.id}>
                     <TableCell className="font-medium">
-                      {a.problem_type}
+                      {a.problem_type ?? a.rule_key ?? a.problem ?? "—"}
                     </TableCell>
                     <TableCell className="hidden max-w-sm md:table-cell">
                       <div
@@ -241,13 +246,20 @@ export function AlertsView() {
                       </div>
                     </TableCell>
                     <TableCell className="hidden text-muted-foreground sm:table-cell">
-                      {a.strategy_name ?? a.strategy_id}
+                      {a.strategy_name ?? a.strategy_id ?? a.portfolio_id ?? "—"}
                     </TableCell>
                     <TableCell>
                       <SeverityBadge severity={a.severity} />
                     </TableCell>
                     <TableCell className="text-right text-muted-foreground">
-                      {formatDate(a.timestamp)}
+                      {formatDate(a.last_seen ?? a.first_seen ?? a.timestamp)}
+                    </TableCell>
+                    <TableCell>
+                      {a.status === "open" ? (
+                        <Button size="sm" variant="outline" disabled={acknowledge.isPending} onClick={() => acknowledge.mutate(a.id)}>
+                          {dict.alerts.acknowledge}
+                        </Button>
+                      ) : a.status === "ack" ? dict.alerts.acknowledged : "—"}
                     </TableCell>
                   </TableRow>
                 ))}

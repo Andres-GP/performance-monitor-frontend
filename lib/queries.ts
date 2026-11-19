@@ -10,6 +10,7 @@ import type {
   PerformanceMetric,
   PortfolioMetrics,
   PortfolioWeight,
+  MonitoringPage,
   Strategy,
   Trade,
 } from "@/types";
@@ -34,39 +35,10 @@ export function useApiToken() {
   const { session } = useClerk();
 
   return async (): Promise<string | undefined> => {
-    await new Promise<void>((resolve, reject) => {
-      if (session !== null && session !== undefined) {
-        resolve();
-        return;
-      }
-
-      let intentos = 0;
-      const interval = setInterval(() => {
-        intentos++;
-
-        if (session !== null && session !== undefined) {
-          clearInterval(interval);
-          clearTimeout(timeoutId);
-          resolve();
-        }
-      }, 200);
-      const timeoutId = setTimeout(() => {
-        clearInterval(interval);
-        reject(new Error("Timeout esperando session"));
-      }, 10000);
-    });
-    try {
-      const token = await session.getToken();
-      if (token) {
-        console.log("✅ Token correctly obtained");
-      } else {
-        console.warn("⚠️ Token is undefined or null");
-      }
-      return token ?? undefined;
-    } catch (error) {
-      console.error("❌ Error obtaining token:", error);
-      return undefined;
-    }
+    if (!session) throw new Error("Your session has expired. Sign in again.");
+    const token = await session.getToken();
+    if (!token) throw new Error("Your session has expired. Sign in again.");
+    return token;
   };
 }
 
@@ -137,12 +109,26 @@ export function useAlerts(limit = 100) {
     queryKey: qk.alerts(limit),
     queryFn: async ({ signal }) => {
       const token = await getToken();
-      return getWithFallback<Alert[]>(`/alerts?limit=${limit}`, {
+      return getWithFallback<MonitoringPage<Alert>>(`/alerts?limit=${limit}`, {
         signal,
         token,
       });
     },
     staleTime: STALE,
+  });
+}
+
+export function useAcknowledgeAlert() {
+  const qc = useQueryClient();
+  const getToken = useApiToken();
+  return useMutation({
+    mutationFn: async (alertId: number | string) => {
+      const token = await getToken();
+      if (!/^\d+$/.test(String(alertId))) throw new Error("Invalid alert ID");
+      return apiSend(`/alerts/${alertId}/ack`, "POST", undefined, { token });
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["alerts"] }),
+    onError: (error) => toast.error(error.message || "Could not acknowledge alert"),
   });
 }
 
@@ -266,7 +252,7 @@ export function useHealth() {
     queryKey: qk.health,
     queryFn: async ({ signal }) => {
       const token = await getToken();
-      return getWithFallback<Strategy[]>("/health", {
+      return getWithFallback<{ status: string; ingestion?: { status: string; last_received_at?: string | null; age_seconds?: number | null } }>("/health", {
         signal,
         token,
       });

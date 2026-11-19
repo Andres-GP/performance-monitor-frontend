@@ -86,37 +86,46 @@
 
 .dark {
   color-scheme: dark;
-  --background: oklch(0.135 0 0);
-  --foreground: oklch(0.97 0 0);
-  --card: oklch(0.185 0 0);
-  --card-foreground: oklch(0.97 0 0);
+  --background: #142720;
+  --foreground: #f1f5f1;
+  --card: #1f3d36;
+  --card-foreground: #f1f5f1;
   --popover: oklch(0.185 0 0);
   --popover-foreground: oklch(0.97 0 0);
-  --primary: oklch(0.74 0.15 162);
-  --primary-foreground: oklch(0.16 0.02 162);
-  --secondary: oklch(0.25 0 0);
-  --secondary-foreground: oklch(0.97 0 0);
-  --muted: oklch(0.23 0 0);
-  --muted-foreground: oklch(0.68 0 0);
-  --accent: oklch(0.27 0.03 162);
-  --accent-foreground: oklch(0.97 0 0);
+  --primary: #c8f5a8;
+  --primary-foreground: #173229;
+  --secondary: #2b4d44;
+  --secondary-foreground: #f1f5f1;
+  --muted: #2b4d44;
+  --muted-foreground: #adc5b7;
+  --accent: #35584d;
+  --accent-foreground: #f1f5f1;
   --destructive: oklch(0.62 0.21 25);
-  --border: oklch(1 0 0 / 9%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.74 0.15 162);
-  --chart-1: oklch(0.74 0.15 162);
-  --chart-2: oklch(0.62 0.21 25);
-  --chart-3: oklch(0.7 0.13 200);
-  --chart-4: oklch(0.78 0.15 80);
-  --chart-5: oklch(0.65 0.16 264);
-  --sidebar: oklch(0.16 0 0);
-  --sidebar-foreground: oklch(0.97 0 0);
-  --sidebar-primary: oklch(0.74 0.15 162);
-  --sidebar-primary-foreground: oklch(0.16 0.02 162);
-  --sidebar-accent: oklch(0.24 0 0);
-  --sidebar-accent-foreground: oklch(0.97 0 0);
-  --sidebar-border: oklch(1 0 0 / 9%);
-  --sidebar-ring: oklch(0.74 0.15 162);
+  --border: #426055;
+  --input: #426055;
+  --ring: #c8f5a8;
+  --chart-1: #c8f5a8;
+  --chart-2: #e89b76;
+  --chart-3: #8fc4bd;
+  --chart-4: #d7c781;
+  --chart-5: #a9a3d7;
+  --sidebar: #12231e;
+  --sidebar-foreground: #f1f5f1;
+  --sidebar-primary: #c8f5a8;
+  --sidebar-primary-foreground: #173229;
+  --sidebar-accent: #2b4d44;
+  --sidebar-accent-foreground: #f1f5f1;
+  --sidebar-border: #355046;
+  --sidebar-ring: #c8f5a8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

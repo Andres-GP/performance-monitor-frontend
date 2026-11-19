@@ -14,7 +14,7 @@ async function forward(req: NextRequest, path: string[]) {
 
   // If no token, return 401
   if (!token) {
-    return NextResponse.json({ error: "Unauthorized - No token provided" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const headers = new Headers();
@@ -58,10 +58,9 @@ async function forward(req: NextRequest, path: string[]) {
       headers: { "content-type": contentTypeRes },
     });
   } catch (error) {
-    console.error("[Proxy] Error forwarding request:", error);
-    const message = error instanceof Error ? error.message : String(error);
+    console.error("[Proxy] Backend request failed", error instanceof Error ? error.name : "unknown error");
     return NextResponse.json(
-      { error: "Backend unreachable", detail: message },
+      { error: "Backend unreachable" },
       { status: 502 },
     );
   } finally {

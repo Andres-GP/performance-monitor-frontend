@@ -1,5 +1,5 @@
 export type HealthStatus = "healthy" | "unhealthy" | "edge_decay";
-export type Severity = "high" | "medium" | "low";
+export type Severity = "critical" | "high" | "medium" | "low" | "info";
 export type AccountType = "demo" | "real" | "funded";
 export type Platform = "NT8" | "MT5" | "Unknown";
 export type StrategyStatus = "Running" | "Stopped" | "Unknown";
@@ -63,14 +63,27 @@ export interface Trade {
 }
 
 export interface Alert {
-  id: string;
-  strategy_id: string;
+  id: number | string;
+  strategy_id?: string | null;
+  portfolio_id?: string | null;
   strategy_name?: string;
-  problem: string;
+  problem?: string;
+  problem_type?: string;
+  rule_key?: string;
   details?: string;
   severity: Severity;
+  status?: "open" | "ack" | "resolved";
+  first_seen?: string;
+  last_seen?: string;
+  timestamp?: string;
   read?: boolean;
-  timestamp: string;
+}
+
+export interface MonitoringPage<T> {
+  items: T[];
+  limit: number;
+  offset: number;
+  total: number | null;
 }
 
 export interface CapitalAccount {
