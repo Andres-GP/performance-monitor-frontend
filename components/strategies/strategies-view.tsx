@@ -13,10 +13,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { OfflineBanner } from "@/components/shared/offline-banner";
 import { useI18n } from "@/lib/i18n/context";
-import { useDeleteStrategy, useStrategies } from "@/lib/queries";
+import { useStrategies } from "@/lib/queries";
 import type { Strategy } from "@/types";
 import { StrategiesTable } from "./strategies-table";
-import { DeleteStrategyDialog } from "./delete-strategy-dialog";
 
 const EMPTY_STRATEGIES: Strategy[] = [];
 
@@ -24,12 +23,9 @@ export function StrategiesView() {
   const { dict, t } = useI18n();
   const { data, isLoading } = useStrategies();
 
-  const deleteStrategy = useDeleteStrategy();
-
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [health, setHealth] = useState("all");
-  const [pending, setPending] = useState<Strategy | null>(null);
 
   const strategies = data?.data ?? EMPTY_STRATEGIES;
 
@@ -43,15 +39,6 @@ export function StrategiesView() {
   const handleStatusChange = useCallback((v: string | null) => { if (v !== null) setStatus(v); }, []);
 
   const handleHealthChange = useCallback((v: string | null) => { if (v !== null) setHealth(v); }, []);
-
-  const handleDeleteConfirm = useCallback(() => {
-    if (pending) deleteStrategy.mutate(pending.strategy_id);
-    setPending(null);
-  }, [pending, deleteStrategy]);
-
-  const handleDialogOpenChange = useCallback((open: boolean) => {
-    if (!open) setPending(null);
-  }, []);
 
   const filtered = useMemo(() => {
     return strategies.filter((s) => {
@@ -142,15 +129,8 @@ export function StrategiesView() {
           ))}
         </div>
       ) : (
-        <StrategiesTable strategies={filtered} onDelete={setPending} />
+        <StrategiesTable strategies={filtered} />
       )}
-
-      <DeleteStrategyDialog
-        strategy={pending}
-        onOpenChange={handleDialogOpenChange}
-        onConfirm={handleDeleteConfirm}
-        isPending={deleteStrategy.isPending}
-      />
     </div>
   );
 }

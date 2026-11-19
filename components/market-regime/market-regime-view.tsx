@@ -1,559 +1,197 @@
 "use client";
 
-import {
-  Activity,
-  ArrowUpDown,
-  Gauge,
-  Layers,
-  Signal,
-  TrendingUp,
-  Waves,
-  Library,
-} from "lucide-react";
-import { StatCard } from "@/components/shared/stat-card";
+import { Activity, ArrowDownUp, Clock3, Waves } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { OfflineBanner } from "@/components/shared/offline-banner";
-import { RegimeWidget } from "./regime-widget";
-import { useMarketRegime } from "@/lib/queries";
-import { formatDate, formatNumber } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/context";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { useMarketRegime } from "@/lib/queries";
+import type { MarketRegime } from "@/types";
+
+function MetricCard({
+  label,
+  value,
+  unit,
+  description,
+}: {
+  label: string;
+  value: number | null | undefined;
+  unit?: string;
+  description: string;
+}) {
+  const { dict } = useI18n();
+  const available = typeof value === "number" && Number.isFinite(value);
+
+  return (
+    <Card className="min-h-36">
+      <CardContent className="flex h-full flex-col p-5">
+        <p className="text-sm font-medium text-muted-foreground">{label}</p>
+        <p className="mt-4 flex items-baseline gap-2 font-mono text-3xl font-semibold tracking-tight tabular-nums">
+          {available ? formatNumber(value) : dict.common.none}
+          {available && unit ? (
+            <span className="font-sans text-xs font-medium text-muted-foreground">
+              {unit}
+            </span>
+          ) : null}
+        </p>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ContextPill({ label, value }: { label: string; value?: string | null }) {
+  return (
+    <div className="flex min-w-36 flex-1 flex-col gap-2 rounded-xl border border-white/10 bg-[#1f3d36]/70 p-4">
+      <span className="text-xs font-medium uppercase tracking-[0.14em] text-[#adc5b7]">
+        {label}
+      </span>
+      <span className="text-lg font-semibold capitalize text-[#f2f5ef]">
+        {value || "—"}
+      </span>
+    </div>
+  );
+}
 
 export function MarketRegimeView() {
-  const { dict } = useI18n();
-  const { data, isLoading } = useMarketRegime();
-  const r = data?.data;
-  const interpolate = (template: string, value: string | number) =>
-    template.replace("{value}", String(value));
+  const { dict, locale } = useI18n();
+  const query = useMarketRegime();
+  const payload = query.data;
+  const regime: MarketRegime | null | undefined = payload?.data;
+  const dateLocale = locale === "es" ? "es-ES" : "en-US";
 
-  // ---- Explicaciones detalladas de métricas (usando el diccionario) ----
-  const metricExplanations = {
-    adx: {
-      detail: (
-        <div className="text-sm leading-relaxed">
-          <p className="font-medium">{dict.regime.adxHelpTitle}</p>
-          <p>{dict.regime.adxHelpDesc}</p>
-          <ul className="mt-1 list-disc pl-4">
-            <li>
-              <span className="font-semibold">&lt; 20</span> →{" "}
-              {dict.regime.adxHelpSideways}
-            </li>
-            <li>
-              <span className="font-semibold">&gt; 25</span> →{" "}
-              {dict.regime.adxHelpTrending}
-            </li>
-            <li>
-              <span className="font-semibold">20–25</span> →{" "}
-              {dict.regime.adxHelpTransition}
-            </li>
-          </ul>
-          <p className="mt-1">
-            <strong>{dict.regime.adxHelpNow}</strong>{" "}
-            {r?.trend === "trending" && dict.regime.adxHelpNowTrending}
-            {r?.trend === "sideways" && dict.regime.adxHelpNowSideways}
-            {r?.trend === "transition" && dict.regime.adxHelpNowTransition}
-          </p>
-        </div>
-      ),
-    },
-    vix: {
-      detail: (
-        <div className="text-sm leading-relaxed">
-          <p className="font-medium">{dict.regime.vixHelpTitle}</p>
-          <p>{dict.regime.vixHelpDesc}</p>
-          <ul className="mt-1 list-disc pl-4">
-            <li>
-              <span className="font-semibold">&gt; 80%</span> →{" "}
-              {dict.regime.vixHelpExtremeFear}
-            </li>
-            <li>
-              <span className="font-semibold">&lt; 20%</span> →{" "}
-              {dict.regime.vixHelpComplacency}
-            </li>
-            <li>
-              <span className="font-semibold">20% – 80%</span> →{" "}
-              {dict.regime.vixHelpNormal}
-            </li>
-          </ul>
-          <p className="mt-1">
-            <strong>{dict.regime.vixHelpNow}</strong>{" "}
-            {r?.fear === "extreme_fear" && dict.regime.vixHelpNowExtreme}
-            {r?.fear === "extreme_complacency" &&
-              dict.regime.vixHelpNowComplacency}
-            {r?.fear === "normal" && dict.regime.vixHelpNowNormal}
-          </p>
-        </div>
-      ),
-    },
-    atr: {
-      detail: (
-        <div className="text-sm leading-relaxed">
-          <p className="font-medium">{dict.regime.atrHelpTitle}</p>
-          <p>{dict.regime.atrHelpDesc}</p>
-          <ul className="mt-1 list-disc pl-4">
-            <li>
-              <span className="font-semibold">&gt; 70%</span> →{" "}
-              {dict.regime.atrHelpHigh}
-            </li>
-            <li>
-              <span className="font-semibold">&lt; 30%</span> →{" "}
-              {dict.regime.atrHelpLow}
-            </li>
-            <li>
-              <span className="font-semibold">30% – 70%</span> →{" "}
-              {dict.regime.atrHelpNormal}
-            </li>
-          </ul>
-          <p className="mt-1">
-            <strong>{dict.regime.atrHelpNow}</strong>{" "}
-            {r?.volatility === "high" && dict.regime.atrHelpNowHigh}
-            {r?.volatility === "low" && dict.regime.atrHelpNowLow}
-            {r?.volatility === "normal" && dict.regime.atrHelpNowNormal}
-          </p>
-        </div>
-      ),
-    },
-    breadth: {
-      detail: (
-        <div className="text-sm leading-relaxed">
-          <p className="font-medium">{dict.regime.breadthHelpTitle}</p>
-          <p>{dict.regime.breadthHelpDesc}</p>
-          <ul className="mt-1 list-disc pl-4">
-            <li>
-              <span className="text-green-400">
-                {dict.regime.breadthHelpStrongUpside}
-              </span>
-            </li>
-            <li>
-              <span className="text-red-400">
-                {dict.regime.breadthHelpStrongDownside}
-              </span>
-            </li>
-            <li>
-              <span className="text-gray-400">
-                {dict.regime.breadthHelpNeutral}
-              </span>
-            </li>
-          </ul>
-          <p className="mt-1">
-            <strong>{dict.regime.breadthHelpNow}</strong>{" "}
-            {typeof r?.breadth === "number" ? formatNumber(r.breadth) : dict.common.none}
-          </p>
-        </div>
-      ),
-    },
-    strength: {
-      detail: (
-        <div className="text-sm leading-relaxed">
-          <p className="font-medium">{dict.regime.strengthHelpTitle}</p>
-          <p>{dict.regime.strengthHelpDesc}</p>
-          <ul className="mt-1 list-disc pl-4">
-            <li>
-              <span className="text-green-400">
-                {dict.regime.strengthHelpStrong}
-              </span>
-            </li>
-            <li>
-              <span className="text-red-400">
-                {dict.regime.strengthHelpWeak}
-              </span>
-            </li>
-            <li>
-              <span className="text-gray-400">
-                {dict.regime.strengthHelpNeutral}
-              </span>
-            </li>
-          </ul>
-          <p className="mt-1">
-            <strong>{dict.regime.strengthHelpNow}</strong>{" "}
-            {typeof r?.strength === "number" ? formatNumber(r.strength) : dict.common.none}
-          </p>
-        </div>
-      ),
-    },
-    advDec: {
-      detail: (
-        <div className="text-sm leading-relaxed">
-          <p className="font-medium">{dict.regime.advDecHelpTitle}</p>
-          <p>{dict.regime.advDecHelpDesc}</p>
-          <ul className="mt-1 list-disc pl-4">
-            <li>
-              <span className="font-semibold">&gt; 2</span> →{" "}
-              <span className="text-green-400">
-                {dict.regime.advDecHelpStrong}
-              </span>
-            </li>
-            <li>
-              <span className="font-semibold">&lt; 0.5</span> →{" "}
-              <span className="text-red-400">{dict.regime.advDecHelpWeak}</span>
-            </li>
-            <li>
-              <span className="font-semibold">≈ 1</span> →{" "}
-              {dict.regime.advDecHelpNeutral}
-            </li>
-          </ul>
-          <p className="mt-1">
-            <strong>{dict.regime.advDecHelpNow}</strong>{" "}
-            {r?.advance_decline_ratio?.toFixed(2)}
-            {r?.advance_decline_ratio &&
-              r.advance_decline_ratio > 2 &&
-              " " + dict.regime.advDecHelpNowStrong}
-            {r?.advance_decline_ratio &&
-              r.advance_decline_ratio < 0.5 &&
-              " " + dict.regime.advDecHelpNowWeak}
-            {r?.advance_decline_ratio &&
-              r.advance_decline_ratio >= 0.5 &&
-              r.advance_decline_ratio <= 2 &&
-              " " + dict.regime.advDecHelpNowNeutral}
-          </p>
-        </div>
-      ),
-    },
-    nhNl: {
-      detail: (
-        <div className="text-sm leading-relaxed">
-          <p className="font-medium">{dict.regime.nhNlHelpTitle}</p>
-          <p>{dict.regime.nhNlHelpDesc}</p>
-          <ul className="mt-1 list-disc pl-4">
-            <li>
-              <span className="font-semibold">&gt; 3</span> →{" "}
-              <span className="text-green-400">
-                {dict.regime.nhNlHelpStrong}
-              </span>
-            </li>
-            <li>
-              <span className="font-semibold">&lt; 0.33</span> →{" "}
-              <span className="text-red-400">{dict.regime.nhNlHelpWeak}</span>
-            </li>
-            <li>
-              <span className="font-semibold">≈ 1</span> →{" "}
-              {dict.regime.nhNlHelpNeutral}
-            </li>
-          </ul>
-          <p className="mt-1">
-            <strong>{dict.regime.nhNlHelpNow}</strong>{" "}
-            {r?.nh_nl_ratio?.toFixed(2)}
-            {r?.nh_nl_ratio &&
-              r.nh_nl_ratio > 3 &&
-              " " + dict.regime.nhNlHelpNowStrong}
-            {r?.nh_nl_ratio &&
-              r.nh_nl_ratio < 0.33 &&
-              " " + dict.regime.nhNlHelpNowWeak}
-            {r?.nh_nl_ratio &&
-              r.nh_nl_ratio >= 0.33 &&
-              r.nh_nl_ratio <= 3 &&
-              " " + dict.regime.nhNlHelpNowNeutral}
-          </p>
-        </div>
-      ),
-    },
-    corr: {
-      detail: (
-        <div className="text-sm leading-relaxed">
-          <p className="font-medium">{dict.regime.corrHelpTitle}</p>
-          <p>{dict.regime.corrHelpDesc}</p>
-          <ul className="mt-1 list-disc pl-4">
-            <li>
-              <span className="font-semibold">SPY vs QQQ</span>:{" "}
-              {dict.regime.corrHelpSpyQqq}
-            </li>
-            <li>
-              <span className="font-semibold">SPY vs TLT</span>:{" "}
-              {dict.regime.corrHelpSpyTlt}
-            </li>
-          </ul>
-          <p className="mt-1">
-            <strong>{dict.regime.corrHelpNow}</strong> SPY-QQQ ={" "}
-            {r?.correlation_spy_qqq?.toFixed(2)}
-            {r?.correlation_spy_qqq &&
-              r.correlation_spy_qqq > 0.5 &&
-              " (" + dict.regime.corrHelpNowStrong + ")"}
-            {r?.correlation_spy_qqq &&
-              r.correlation_spy_qqq < -0.5 &&
-              " (" + dict.regime.corrHelpNowStrongNeg + ")"}
-            {r?.correlation_spy_qqq &&
-              Math.abs(r.correlation_spy_qqq) <= 0.5 &&
-              " (" + dict.regime.corrHelpNowWeak + ")"}
-            <br />
-            SPY-TLT = {r?.correlation_spy_tlt?.toFixed(2)}
-            {r?.correlation_spy_tlt &&
-              r.correlation_spy_tlt < -0.5 &&
-              " (" + dict.regime.corrHelpNowNeg + ")"}
-            {r?.correlation_spy_tlt &&
-              r.correlation_spy_tlt > 0.5 &&
-              " (" + dict.regime.corrHelpNowPos + ")"}
-            {r?.correlation_spy_tlt &&
-              Math.abs(r.correlation_spy_tlt) <= 0.5 &&
-              " (" + dict.regime.corrHelpNowWeak + ")"}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {dict.regime.corrHelpNote}
-          </p>
-        </div>
-      ),
-    },
-  };
-
-  const widgetExplanations = {
-    correlations: {
-      title: dict.regime.correlationsTitle,
-      description: dict.regime.correlationsDesc,
-      instruments: dict.regime.correlationsInstruments,
-    },
-    vix: {
-      title: dict.regime.vixTitle,
-      description: dict.regime.vixDesc,
-      instruments: dict.regime.vixInstruments,
-    },
-    breadth: {
-      title: dict.regime.breadthTitle,
-      description: dict.regime.breadthDesc,
-      instruments: dict.regime.breadthInstruments,
-    },
-  };
-
-  const metricItems = [
+  const cards = [
     {
-      key: "adx",
       label: dict.regime.adx,
-      value: r?.adx?.toFixed(1),
-      hint: r?.trend
-        ? interpolate(dict.regime.trend, r.trend)
-        : dict.regime.trendStrength,
-      icon: Gauge,
+      value: regime?.adx,
+      unit: dict.regime.indexUnit,
+      description: dict.regime.adxHelpDesc,
     },
     {
-      key: "vix",
       label: dict.regime.vixPercentile,
-      value: `${r?.vix_percentile?.toFixed(1)}%`,
-      hint: r?.fear
-        ? interpolate(dict.regime.fear, r.fear)
-        : dict.regime.impliedVol,
-      icon: Activity,
+      value: regime?.vix_percentile,
+      unit: "%",
+      description: dict.regime.vixHelpDesc,
     },
     {
-      key: "atr",
       label: dict.regime.atrPercentile,
-      value: `${r?.atr_percentile?.toFixed(1)}%`,
-      hint: r?.volatility
-        ? interpolate(dict.regime.volatility, r.volatility)
-        : dict.regime.averageRange,
-      icon: Waves,
+      value: regime?.atr_percentile,
+      unit: "%",
+      description: dict.regime.atrHelpDesc,
     },
     {
-      key: "breadth",
       label: dict.regime.breadth,
-      value: r?.breadth,
-      hint: dict.regime.breadthHint,
-      icon: Layers,
+      value: regime?.breadth,
+      description: dict.regime.breadthHelpDesc,
     },
     {
-      key: "strength",
       label: dict.regime.strength,
-      value: r?.strength,
-      hint: dict.regime.strengthHint,
-      icon: Signal,
+      value: regime?.strength,
+      description: dict.regime.strengthHelpDesc,
     },
     {
-      key: "advDec",
       label: dict.regime.advanceDecline,
-      value: r?.advance_decline_ratio?.toFixed(2),
-      hint: dict.regime.advanceDeclineHint,
-      icon: ArrowUpDown,
+      value: regime?.advance_decline_ratio,
+      unit: dict.regime.ratioUnit,
+      description: dict.regime.advDecHelpDesc,
     },
     {
-      key: "nhNl",
       label: dict.regime.newHighsLows,
-      value: r?.nh_nl_ratio?.toFixed(2),
-      hint: dict.regime.newHighsLowsHint,
-      icon: TrendingUp,
+      value: regime?.nh_nl_ratio,
+      unit: dict.regime.ratioUnit,
+      description: dict.regime.nhNlHelpDesc,
     },
     {
-      key: "corr",
       label: dict.regime.corrSpyQqq,
-      value: r?.correlation_spy_qqq?.toFixed(2),
-      hint: interpolate(
-        dict.regime.corrSpyTlt,
-        r?.correlation_spy_tlt?.toFixed(2) ?? "0.00",
-      ),
-      icon: Activity,
+      value: regime?.correlation_spy_qqq,
+      unit: dict.regime.correlationUnit,
+      description: dict.regime.corrHelpDesc,
+    },
+    {
+      label: dict.regime.corrSpyTlt,
+      value: regime?.correlation_spy_tlt,
+      unit: dict.regime.correlationUnit,
+      description: dict.regime.corrHelpDesc,
     },
   ];
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-      {/* Header */}
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <h2 className="text-xl font-semibold">{dict.regime.title}</h2>
-          <p className="text-sm text-muted-foreground">
+    <section className="mx-auto flex w-full max-w-[1500px] flex-col gap-7" aria-labelledby="market-regime-title">
+      <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(120deg,#2b4d44_0%,#1f3d36_66%,#27473e_100%)] px-6 py-7 shadow-[0_22px_60px_rgba(7,25,20,0.22)] md:px-9 md:py-9">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-20 size-72 rounded-full border border-[#c8f5a8]/10" />
+        <div aria-hidden="true" className="pointer-events-none absolute -right-1 top-0 size-52 rounded-full border border-dashed border-[#c8f5a8]/10" />
+        <div className="relative max-w-3xl">
+          <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#c8f5a8]">
+            <span className="h-px w-6 bg-current" />
+            {dict.regime.marketContext}
+          </p>
+          <h1 id="market-regime-title" className="text-3xl font-semibold tracking-tight text-[#f2f5ef] md:text-4xl">
+            {dict.regime.title}
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#d1ddd5] md:text-base">
             {dict.regime.subtitle}
           </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <ContextPill label={dict.regime.trendLabel} value={regime?.trend} />
+            <ContextPill label={dict.regime.fearLabel} value={regime?.fear} />
+            <ContextPill label={dict.regime.volatilityLabel} value={regime?.volatility} />
+          </div>
+          <p className="mt-5 flex items-center gap-2 text-xs text-[#adc5b7]" aria-live="polite">
+            <Clock3 aria-hidden="true" className="size-3.5" />
+            {regime?.timestamp
+              ? dict.regime.updated.replace(
+                  "{value}",
+                  new Date(regime.timestamp).toLocaleString(dateLocale),
+                )
+              : dict.regime.noTimestamp}
+          </p>
         </div>
-        {r?.timestamp && (
-          <span className="text-xs text-muted-foreground">
-            {interpolate(dict.regime.updated, formatDate(r.timestamp))}
-          </span>
-        )}
-      </div>
+      </header>
 
-      {data?.isFallback && <OfflineBanner />}
+      {payload?.isFallback ? <OfflineBanner /> : null}
 
-      {/* Tarjetas de métricas - clickeables para mostrar explicación */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {metricItems.map((item) => (
-          <Dialog key={item.key}>
-            <DialogTrigger render={<div role="button" tabIndex={0} className="h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30" onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }} />}>
-                <StatCard
-                  label={item.label}
-                  value={item.value}
-                  icon={item.icon}
-                  hint={item.hint}
-                  loading={isLoading}
-                  className="text-left h-full"
-                />
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{item.label}</DialogTitle>
-              </DialogHeader>
-              <DialogDescription className="text-left">
-                {metricExplanations[item.key as keyof typeof metricExplanations]
-                  ?.detail || <p>No hay explicación disponible.</p>}
-              </DialogDescription>
-            </DialogContent>
-          </Dialog>
-        ))}
-      </div>
-
-      {/* Widgets de gráficos con botón de ayuda (Dialog) - icono solo en gráficos */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="relative">
-          <Dialog>
-            <DialogTrigger
-              render={<Button
-                variant="ghost"
-                size="icon"
-                className="cursor-pointer absolute top-10 right-2 z-10 h-6 w-6 p-0 text-muted-foreground/60 hover:text-muted-foreground"
-              >
-                <Library className="h-3.5 w-3.5" />
-              </Button>}
-            />
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  {widgetExplanations.correlations.title}
-                </DialogTitle>
-              </DialogHeader>
-              <DialogDescription className="text-left">
-                <p className="text-sm">
-                  {widgetExplanations.correlations.description}
-                </p>
-                <ul className="mt-2 list-disc pl-4 text-sm">
-                  {Object.entries(
-                    widgetExplanations.correlations.instruments,
-                  ).map(([symbol, desc]) => (
-                    <li key={symbol}>
-                      <span className="font-mono font-semibold">{symbol}</span>:{" "}
-                      {desc}
-                    </li>
-                  ))}
-                </ul>
-              </DialogDescription>
-            </DialogContent>
-          </Dialog>
-          <RegimeWidget
-            title={dict.regime.widgetCorrTitle}
-            description={dict.regime.widgetCorrDesc}
-            defaultSymbols="AMEX:SPY, NASDAQ:QQQ, NASDAQ:TLT"
-          />
+      {query.isLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label={dict.regime.loading}>
+          {Array.from({ length: 9 }, (_, index) => (
+            <Skeleton key={index} className="h-36 rounded-2xl" />
+          ))}
         </div>
-
-        <div className="relative">
-          <Dialog>
-            <DialogTrigger
-              render={<Button
-                variant="ghost"
-                size="icon"
-                className="cursor-pointer absolute top-10 right-2 z-10 h-6 w-6 p-0 text-muted-foreground/60 hover:text-muted-foreground"
-              >
-                <Library className="h-3.5 w-3.5" />
-              </Button>}
-            />
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{widgetExplanations.vix.title}</DialogTitle>
-              </DialogHeader>
-              <DialogDescription className="text-left">
-                <p className="text-sm">{widgetExplanations.vix.description}</p>
-                <ul className="mt-2 list-disc pl-4 text-sm">
-                  {Object.entries(widgetExplanations.vix.instruments).map(
-                    ([symbol, desc]) => (
-                      <li key={symbol}>
-                        <span className="font-mono font-semibold">
-                          {symbol}
-                        </span>
-                        : {desc}
-                      </li>
-                    ),
-                  )}
-                </ul>
-              </DialogDescription>
-            </DialogContent>
-          </Dialog>
-          <RegimeWidget
-            title={dict.regime.widgetVixTitle}
-            description={dict.regime.widgetVixDesc}
-            defaultSymbols="VIX"
-          />
+      ) : query.isError ? (
+        <div role="alert" className="flex flex-wrap items-center gap-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-5 text-sm text-destructive">
+          <span>{dict.regime.loadError}</span>
+          <button type="button" className="font-medium underline underline-offset-4" onClick={() => query.refetch()}>
+            {dict.regime.retry}
+          </button>
         </div>
-      </div>
-      <div className="relative">
-        <Dialog>
-          <DialogTrigger
-            render={<Button
-              variant="ghost"
-              size="icon"
-              className="cursor-pointer absolute top-10 right-2 z-10 h-6 w-6 p-0 text-muted-foreground/60 hover:text-muted-foreground"
-            >
-              <Library className="h-3.5 w-3.5" />
-            </Button>}
-          />
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{widgetExplanations.breadth.title}</DialogTitle>
-            </DialogHeader>
-            <DialogDescription className="text-left">
-              <p className="text-sm">
-                {widgetExplanations.breadth.description}
-              </p>
-              <ul className="mt-2 list-disc pl-4 text-sm">
-                {Object.entries(widgetExplanations.breadth.instruments).map(
-                  ([symbol, desc]) => (
-                    <li key={symbol}>
-                      <span className="font-mono font-semibold">{symbol}</span>:{" "}
-                      {desc}
-                    </li>
-                  ),
-                )}
-              </ul>
-            </DialogDescription>
-          </DialogContent>
-        </Dialog>
-        <RegimeWidget
-          title={dict.regime.widgetNhnlTitle}
-          description={dict.regime.widgetNhnlDesc}
-          defaultSymbols="AMEX:SPY, USI:ADVN.NY, USI:DECL.NQ"
-          height={420}
-        />
-      </div>
-    </div>
+      ) : !regime ? (
+        <Card>
+          <CardContent className="flex min-h-36 items-center gap-3 p-6 text-sm text-muted-foreground">
+            <Waves aria-hidden="true" className="size-5 shrink-0 text-primary" />
+            {dict.regime.empty}
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          <div className="flex items-center gap-2">
+            <Activity aria-hidden="true" className="size-4 text-primary" />
+            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              {dict.regime.marketIndicators}
+            </h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {cards.map((card) => (
+              <MetricCard key={card.label} {...card} />
+            ))}
+          </div>
+          <aside className="flex items-start gap-3 rounded-xl border border-[#c8f5a8]/15 bg-[#2b4d44]/55 p-4 text-sm leading-relaxed text-[#c4d3c9]">
+            <ArrowDownUp aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-[#c8f5a8]" />
+            <p>{dict.regime.brokerDataNote}</p>
+          </aside>
+        </>
+      )}
+    </section>
   );
 }

@@ -1,253 +1,36 @@
 "use client";
 
-import { useState } from "react";
 import { MonitoringStrategyPanel } from "./monitoring-strategy-panel";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Gauge,
   Percent,
-  Trash2,
   TrendingDown,
   TrendingUp,
-  Upload,
-  Calendar,
-  DollarSign,
   BarChart3,
-  Sliders,
   GitCompare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { HealthBadge, StatusBadge } from "@/components/shared/badges";
 import { StatCard } from "@/components/shared/stat-card";
 import { OfflineBanner } from "@/components/shared/offline-banner";
 import { EquityChart, MetricChart } from "@/components/charts/lazy";
-import {
-  useDeleteStrategy,
-  useMetrics,
-  useStrategy,
-  useStrategyEquity,
-  useUploadBacktest,
-} from "@/lib/queries";
+import { useMetrics, useStrategy, useStrategyEquity } from "@/lib/queries";
 import { formatCurrency, formatNumber, formatPercent } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/context";
 import { TradesTable } from "./trades-table";
 import { EdgeHealthPanel } from "./edge-health-panel";
 import { BacktestPanel } from "./backtest-panel";
-import { DeleteStrategyDialog } from "./delete-strategy-dialog";
-import { toast } from "sonner";
-
-function BacktestUpload({ strategyId }: { strategyId: string }) {
-  const { dict } = useI18n();
-  const uploadBacktest = useUploadBacktest(strategyId);
-
-  const [periodStart, setPeriodStart] = useState("");
-  const [periodEnd, setPeriodEnd] = useState("");
-  const [expectedPnl, setExpectedPnl] = useState<number | "">("");
-  const [expectedSharpe, setExpectedSharpe] = useState<number | "">("");
-  const [expectedDrawdown, setExpectedDrawdown] = useState<number | "">("");
-  const [parameters, setParameters] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (
-      !periodStart ||
-      !periodEnd ||
-      expectedPnl === "" ||
-      expectedSharpe === "" ||
-      expectedDrawdown === ""
-    ) {
-      toast.error("Por favor, completa todos los campos obligatorios");
-      return;
-    }
-
-    let parsedParams = {};
-    if (parameters.trim()) {
-      try {
-        parsedParams = JSON.parse(parameters);
-      } catch {
-        toast.error("Los parámetros deben ser un JSON válido");
-        return;
-      }
-    }
-
-    uploadBacktest.mutate({
-      expected_pnl: Number(expectedPnl),
-      expected_sharpe: Number(expectedSharpe),
-      expected_drawdown: Number(expectedDrawdown),
-      period_start: periodStart,
-      period_end: periodEnd,
-      parameters: parsedParams,
-    });
-  };
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base flex items-center gap-2">
-          <Upload className="size-4" />
-          {dict.backtest.title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="period_start"
-                className="text-xs font-medium text-muted-foreground"
-              >
-                <Calendar className="inline size-3 mr-1" />
-                {dict.backtest.startOfPeriod}
-              </Label>
-              <Input
-                id="period_start"
-                type="date"
-                value={periodStart}
-                onChange={(e) => setPeriodStart(e.target.value)}
-                required
-                className="bg-background/50"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="period_end"
-                className="text-xs font-medium text-muted-foreground"
-              >
-                <Calendar className="inline size-3 mr-1" />
-                {dict.backtest.endOfPeriod}
-              </Label>
-              <Input
-                id="period_end"
-                type="date"
-                value={periodEnd}
-                onChange={(e) => setPeriodEnd(e.target.value)}
-                required
-                className="bg-background/50"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="expected_pnl"
-                className="text-xs font-medium text-muted-foreground"
-              >
-                <DollarSign className="inline size-3 mr-1" />
-                {dict.backtest.expectedPnl}
-              </Label>
-              <Input
-                id="expected_pnl"
-                type="number"
-                step="0.01"
-                placeholder="15000"
-                value={expectedPnl}
-                onChange={(e) =>
-                  setExpectedPnl(e.target.value ? Number(e.target.value) : "")
-                }
-                required
-                className="bg-background/50"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="expected_sharpe"
-                className="text-xs font-medium text-muted-foreground"
-              >
-                <BarChart3 className="inline size-3 mr-1" />
-                {dict.backtest.expectedSharpe}
-              </Label>
-              <Input
-                id="expected_sharpe"
-                type="number"
-                step="0.01"
-                placeholder="1.8"
-                value={expectedSharpe}
-                onChange={(e) =>
-                  setExpectedSharpe(
-                    e.target.value ? Number(e.target.value) : "",
-                  )
-                }
-                required
-                className="bg-background/50"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="expected_drawdown"
-                className="text-xs font-medium text-muted-foreground"
-              >
-                <TrendingDown className="inline size-3 mr-1" />
-                {dict.backtest.expectedDrowdown}
-              </Label>
-              <Input
-                id="expected_drawdown"
-                type="number"
-                step="0.1"
-                placeholder="8"
-                value={expectedDrawdown}
-                onChange={(e) =>
-                  setExpectedDrawdown(
-                    e.target.value ? Number(e.target.value) : "",
-                  )
-                }
-                required
-                className="bg-background/50"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label
-              htmlFor="parameters"
-              className="text-xs font-medium text-muted-foreground"
-            >
-              <Sliders className="inline size-3 mr-1" />
-              {dict.backtest.parametersOptionalJSON}
-            </Label>
-            <textarea
-              id="parameters"
-              placeholder='{"fast": 10, "slow": 25}'
-              value={parameters}
-              onChange={(e) => setParameters(e.target.value)}
-              className="flex min-h-[80px] w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono"
-            />
-            <p className="text-[10px] text-muted-foreground">
-              {dict.backtest.JSONParametersValidDesc}
-            </p>
-          </div>
-
-          <Button
-            type="submit"
-            disabled={uploadBacktest.isPending}
-            className="w-full sm:w-auto"
-          >
-            {uploadBacktest.isPending
-              ? dict.backtest.submitting
-              : dict.backtest.submit}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
-  );
-}
 
 export function StrategyDetail({ id }: { id: string }) {
-  const router = useRouter();
   const { dict, t } = useI18n();
   const { strategy, isFallback, isLoading } = useStrategy(id);
   const metrics = useMetrics(id);
   const equity = useStrategyEquity(id);
-  const deleteStrategy = useDeleteStrategy();
-  const [confirmDelete, setConfirmDelete] = useState(false);
 
   if (isLoading) {
     return (
@@ -294,7 +77,6 @@ export function StrategyDetail({ id }: { id: string }) {
   const backtestData = strategy.backtest ?? null;
   const hasBacktest = backtestData !== null;
 
-  const canDelete = strategy.state === "Stopped";
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
@@ -315,19 +97,6 @@ export function StrategyDetail({ id }: { id: string }) {
             <StatusBadge status={strategy.state} />
             <HealthBadge status={strategy.health_status} />
           </div>
-          <Button
-            variant="destructive"
-            size="sm"
-            disabled={!canDelete}
-            onClick={() => setConfirmDelete(true)}
-            title={
-              canDelete
-                ? undefined
-                : dict.strategyDetail.onlyStoppedCanBeDeleted
-            }
-          >
-            <Trash2 className="size-4" /> {dict.strategyDetail.delete}
-          </Button>
         </div>
         <p className="text-sm text-muted-foreground">
           {t(dict.strategyDetail.subtitle, {
@@ -485,14 +254,12 @@ export function StrategyDetail({ id }: { id: string }) {
         </TabsContent>
 
         <TabsContent value="backtest" className="mt-4 space-y-4">
-          <BacktestUpload strategyId={id} />
           {hasBacktest && <BacktestPanel strategyId={id} />}
           {!hasBacktest && (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                 <BarChart3 className="size-12 mb-4 opacity-50" />
                 <p className="text-sm">{dict.backtest.noData}</p>
-                <p className="text-xs mt-1">{dict.backtest.useForm}</p>
               </CardContent>
             </Card>
           )}
@@ -511,7 +278,6 @@ export function StrategyDetail({ id }: { id: string }) {
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                   <BarChart3 className="size-12 mb-4 opacity-50" />
                   <p className="text-sm">{dict.backtest.noData}</p>
-                  <p className="text-xs mt-1">{dict.backtest.useForm}</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -618,17 +384,6 @@ export function StrategyDetail({ id }: { id: string }) {
           </Card>
         </TabsContent>
       </Tabs>
-      <DeleteStrategyDialog
-        strategy={confirmDelete ? strategy : null}
-        onOpenChange={(open) => !open && setConfirmDelete(false)}
-        onConfirm={() => {
-          deleteStrategy.mutate(strategy.strategy_id, {
-            onSuccess: () => router.push("/strategies"),
-          });
-          setConfirmDelete(false);
-        }}
-        isPending={deleteStrategy.isPending}
-      />
     </div>
   );
 }

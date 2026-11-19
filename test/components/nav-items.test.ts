@@ -5,12 +5,11 @@ describe("navItems", () => {
     const hrefs = navItems.map((i) => i.href);
     expect(hrefs).toEqual(
       expect.arrayContaining([
-        "/",
+        "/strategies",
         "/portfolio",
         "/market-regime",
         "/weekly-review",
         "/alerts",
-        "/settings",
       ]),
     );
     expect(new Set(hrefs).size).toBe(hrefs.length);

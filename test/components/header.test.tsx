@@ -21,7 +21,6 @@ jest.mock("@/lib/i18n/context", () => ({
         portfolio: "Portfolio",
         marketRegime: "Market Regime",
         alerts: "Alerts",
-        settings: "Settings",
       },
       header: {
         strategyDetail: "Strategy Detail",
@@ -29,6 +28,11 @@ jest.mock("@/lib/i18n/context", () => ({
         closeSession: "Log out",
         openMenu: "Open menu",
         navigation: "Navigation",
+        apiChecking: "Checking backend",
+        apiConnected: "Backend connected",
+        apiDataStale: "Market feed is stale",
+        apiAwaitingEvents: "Waiting for market events",
+        apiUnavailable: "Backend unavailable",
       },
       common: { appName: "App" },
     },
@@ -41,6 +45,9 @@ jest.mock("@/components/layout/language-selector", () => ({
 jest.mock("@/components/layout/sidebar-nav", () => ({
   SidebarNav: () => <div data-testid="sidebar-nav" />,
 }));
+jest.mock("@/components/layout/backend-status", () => ({
+  BackendStatus: () => <div data-testid="backend-status" />,
+}));
 
 describe("Header", () => {
   beforeEach(() => {
@@ -48,7 +55,7 @@ describe("Header", () => {
   });
 
   it("shows the Strategies title on the root route", () => {
-    mockUsePathname.mockReturnValue("/");
+    mockUsePathname.mockReturnValue("/strategies");
     render(<Header />);
 
     expect(

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight, Trash2 } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -17,13 +17,7 @@ import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
 import type { Strategy } from "@/types";
 
-export function StrategiesTable({
-  strategies,
-  onDelete,
-}: {
-  strategies: Strategy[];
-  onDelete: (s: Strategy) => void;
-}) {
+export function StrategiesTable({ strategies }: { strategies: Strategy[] }) {
   const { dict, t } = useI18n();
 
   if (strategies.length === 0) {
@@ -161,27 +155,6 @@ export function StrategiesTable({
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label={
-                          s.state === "Stopped"
-                            ? t(dict.strategies.deleteAria, { name: s.name })
-                            : t(dict.strategies.deleteDisabledAria, {
-                                name: s.name,
-                              })
-                        }
-                        title={
-                          s.state !== "Stopped"
-                            ? dict.strategyDetail.onlyStoppedCanBeDeleted
-                            : undefined
-                        }
-                        onClick={() => onDelete(s)}
-                        disabled={s.state !== "Stopped"}
-                        className="cursor-pointer"
-                      >
-                        <Trash2 className="size-4 text-muted-foreground transition-colors hover:text-destructive" />
-                      </Button>
                       <Button
                         variant="ghost"
                         size="icon-sm"

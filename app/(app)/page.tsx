@@ -1,19 +1,5 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { LoaderCircle } from "lucide-react";
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace("/strategies");
-  }, [router]);
-
-  return (
-    <div className="flex h-screen w-full items-center justify-center bg-background">
-      <LoaderCircle className="h-12 w-12 animate-spin text-primary" />
-    </div>
-  );
+  redirect("/strategies");
 }

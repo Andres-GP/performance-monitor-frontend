@@ -22,17 +22,12 @@ export function BacktestPanel({ strategyId }: { strategyId: string }) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Datos de Backtest</CardTitle>
+          <CardTitle className="text-base">{dict.backtest.dataTitle}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
             <BarChart3 className="size-12 mb-4 opacity-50" />
-            <p className="text-sm">
-              No hay datos de backtest disponibles para esta estrategia.
-            </p>
-            <p className="text-xs mt-1">
-              Puedes subir un backtest usando el formulario de arriba.
-            </p>
+            <p className="text-sm">{dict.backtest.noData}</p>
           </div>
         </CardContent>
       </Card>

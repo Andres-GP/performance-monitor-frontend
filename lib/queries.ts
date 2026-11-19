@@ -211,54 +211,6 @@ export function usePortfolioMetrics() {
   });
 }
 
-export function useDeleteStrategy() {
-  const qc = useQueryClient();
-  const getToken = useApiToken();
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const token = await getToken();
-      if (!token) throw new Error("No autenticado");
-      return apiSend(`/strategies/${id}`, "DELETE", undefined, { token });
-    },
-    onSuccess: () => {
-      toast.success("Strategy deleted");
-      qc.invalidateQueries({ queryKey: qk.strategies });
-    },
-    onError: (error) =>
-      toast.error(error.message || "Could not delete strategy"),
-  });
-}
-
-export function useUploadBacktest(strategyId: string) {
-  const qc = useQueryClient();
-  const getToken = useApiToken();
-  return useMutation({
-    mutationFn: async (body: {
-      expected_pnl: number;
-      expected_sharpe: number;
-      expected_drawdown: number;
-      period_start: string;
-      period_end: string;
-      parameters?: Record<string, any>;
-    }) => {
-      const token = await getToken();
-      if (!token) throw new Error("No autenticado");
-      return apiSend(
-        "/backtest/upload",
-        "POST",
-        { strategy_id: strategyId, ...body },
-        { token },
-      );
-    },
-    onSuccess: () => {
-      toast.success("Backtest subido correctamente");
-      qc.invalidateQueries({ queryKey: qk.metrics(strategyId) });
-    },
-    onError: (error) =>
-      toast.error(error.message || "No se pudo subir el backtest"),
-  });
-}
-
 export function useSetWeight() {
   const qc = useQueryClient();
   const getToken = useApiToken();
@@ -292,5 +244,6 @@ export function useHealth() {
       });
     },
     staleTime: STALE,
+    refetchInterval: 60_000,
   });
 }

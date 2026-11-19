@@ -123,18 +123,18 @@ export interface EdgeHealth {
 }
 
 export interface MarketRegime {
-  trend?: string;
-  fear?: string;
-  volatility?: string;
-  adx: number;
-  vix_percentile: number;
-  atr_percentile: number;
-  breadth: number;
-  strength: number;
-  advance_decline_ratio: number;
-  nh_nl_ratio: number;
-  correlation_spy_qqq: number;
-  correlation_spy_tlt: number;
+  trend?: string | null;
+  fear?: string | null;
+  volatility?: string | null;
+  adx?: number | null;
+  vix_percentile?: number | null;
+  atr_percentile?: number | null;
+  breadth?: number | null;
+  strength?: number | null;
+  advance_decline_ratio?: number | null;
+  nh_nl_ratio?: number | null;
+  correlation_spy_qqq?: number | null;
+  correlation_spy_tlt?: number | null;
   timestamp?: string;
 }
 

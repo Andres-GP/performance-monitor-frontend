@@ -1,11 +1,15 @@
 // app/api/proxy/[...path]/route.ts
 import { type NextRequest, NextResponse } from "next/server";
 import { backendUrl } from "@/lib/server/backend";
+import { isBackendRouteAllowed } from "@/lib/server/backend-routes";
 
 export const dynamic = "force-dynamic";
 
 async function forward(req: NextRequest, path: string[]) {
-  const targetPath = path.join("/");
+  if (!isBackendRouteAllowed(req.method, path)) {
+    return NextResponse.json({ error: "Backend route not available" }, { status: 404 });
+  }
+  const targetPath = path.map(encodeURIComponent).join("/");
   const search = req.nextUrl.search;
 
   // Get the Authorization header from the incoming request (Clerk JWT from client)
@@ -76,21 +80,6 @@ export async function GET(req: NextRequest, { params }: Ctx) {
 }
 
 export async function POST(req: NextRequest, { params }: Ctx) {
-  const { path } = await params;
-  return forward(req, path);
-}
-
-export async function PUT(req: NextRequest, { params }: Ctx) {
-  const { path } = await params;
-  return forward(req, path);
-}
-
-export async function PATCH(req: NextRequest, { params }: Ctx) {
-  const { path } = await params;
-  return forward(req, path);
-}
-
-export async function DELETE(req: NextRequest, { params }: Ctx) {
   const { path } = await params;
   return forward(req, path);
 }

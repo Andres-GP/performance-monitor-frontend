@@ -4,7 +4,6 @@ import { renderHook, waitFor } from "@testing-library/react";
 import {
   qk,
   useAlerts,
-  useDeleteStrategy,
   useMarketRegime,
   useStrategies,
   useStrategy,
@@ -149,19 +148,4 @@ describe("query hooks", () => {
     );
   });
 
-  it("useDeleteStrategy calls the DELETE endpoint", async () => {
-    mockApiSend.mockResolvedValueOnce({} as never);
-    const { result } = renderHook(() => useDeleteStrategy(), {
-      wrapper: createWrapper(),
-    });
-    result.current.mutate("str-3");
-    await waitFor(() =>
-      expect(mockApiSend).toHaveBeenCalledWith(
-        "/strategies/str-3",
-        "DELETE",
-        undefined,
-        expect.objectContaining({ token: "mock-token" }),
-      ),
-    );
-  });
 });

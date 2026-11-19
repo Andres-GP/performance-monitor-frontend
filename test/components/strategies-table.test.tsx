@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { StrategiesTable } from "@/components/strategies/strategies-table";
 import type { Strategy } from "@/types";
 
@@ -23,12 +22,9 @@ jest.mock("@/lib/i18n/context", () => ({
         timeFrame: "Timeframe",
         dataType: "Data Type",
         sizing: "Sizing",
-        deleteAria: "Delete {name}",
-        deleteDisabledAria: "Delete {name} (disabled)",
         viewAria: "View {name}",
       },
       strategyDetail: {
-        onlyStoppedCanBeDeleted: "Only stopped strategies can be deleted",
       },
     },
     t: (template: string, opts?: { name: string }) => {
@@ -120,44 +116,16 @@ const mockStrategies: Strategy[] = [
 ];
 
 describe("StrategiesTable", () => {
-  const mockOnDelete = jest.fn();
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("calls onDelete when delete button is clicked", async () => {
-    const user = userEvent.setup();
-    render(
-      <StrategiesTable strategies={mockStrategies} onDelete={mockOnDelete} />,
-    );
-
-    const deleteButton = screen.getByRole("button", {
-      name: "Delete My Strategy 2",
-    });
-    expect(deleteButton).not.toBeDisabled();
-
-    await user.click(deleteButton);
-    expect(mockOnDelete).toHaveBeenCalledWith(mockStrategies[1]);
-  });
-
-  it("disables delete button for non-stopped strategies", () => {
-    render(
-      <StrategiesTable strategies={mockStrategies} onDelete={mockOnDelete} />,
-    );
-
-    const deleteButton = screen.getByRole("button", {
-      name: "Delete My Strategy 1 (disabled)",
-    });
-    expect(deleteButton).toBeDisabled();
-    expect(deleteButton).toHaveAttribute(
-      "title",
-      "Only stopped strategies can be deleted",
-    );
+  it("provides navigation to strategy detail without destructive actions", () => {
+    render(<StrategiesTable strategies={mockStrategies} />);
+    expect(
+      screen.getByRole("button", { name: "View My Strategy 1" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /delete/i })).toBeNull();
   });
 
   it("shows empty message when no strategies", () => {
-    render(<StrategiesTable strategies={[]} onDelete={mockOnDelete} />);
+    render(<StrategiesTable strategies={[]} />);
     expect(screen.getByText("No strategies found")).toBeInTheDocument();
   });
 });

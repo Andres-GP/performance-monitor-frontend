@@ -11,32 +11,30 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const { dict } = useI18n();
 
   return (
-    <div className="flex h-full flex-col gap-2">
-      <div className="flex items-center gap-2 px-3 py-4">
-        <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <BrandIcon className="size-5" />
+    <div className="flex h-full flex-col gap-2 px-3 py-5">
+      <div className="flex items-center gap-3 px-2 py-3">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#c8f5a8] text-[#1f3d36] shadow-[0_8px_28px_rgba(200,245,168,0.17)]">
+          <BrandIcon className="size-5" strokeWidth={1.8} />
         </span>
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold leading-tight">
+        <div className="flex min-w-0 flex-col">
+          <span className="text-[15px] font-semibold leading-tight tracking-tight">
             {dict.sidebar.brandTop}
           </span>
-          <span className="text-xs text-muted-foreground leading-tight">
+          <span className="text-[15px] font-medium leading-tight text-[#adc5b7]">
             {dict.sidebar.brandBottom}
           </span>
         </div>
       </div>
 
+      <div className="mx-2 mb-3 mt-1 h-px bg-gradient-to-r from-[#c8f5a8]/25 via-white/10 to-transparent" />
+
       <nav
-        className="flex flex-1 flex-col gap-1 px-2"
+        className="flex flex-1 flex-col gap-1.5 px-1"
         aria-label={dict.nav.main}
       >
         {navItems.map((item) => {
           const active =
-            item.href === "/"
-              ? pathname === "/strategies"
-              : pathname === item.href ||
-                (item.href === "/strategies" && pathname === "/") || // <--- NUEVA CONDICIÓN
-                pathname.startsWith(`${item.href}/`);
+            pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
           return (
             <Link
@@ -45,20 +43,20 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                "group relative flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors",
                 active
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                  ? "bg-[#c8f5a8]/10 text-[#d7f9c2] shadow-[inset_0_0_0_1px_rgba(200,245,168,0.12)] before:absolute before:bottom-2 before:left-0 before:top-2 before:w-[3px] before:rounded-full before:bg-[#c8f5a8]"
+                  : "text-[#adc5b7] hover:bg-white/[0.045] hover:text-[#f2f5ef]",
               )}
             >
-              <Icon className="size-4 shrink-0" />
+              <Icon className="size-[17px] shrink-0 opacity-85 group-hover:opacity-100" />
               <span>{dict.nav[item.labelKey]}</span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="border-t border-sidebar-border px-4 py-3 text-xs text-muted-foreground">
+      <div className="mx-1 mt-4 border-t border-sidebar-border px-2 pt-4 text-[11px] leading-relaxed text-[#91aa9b]">
         {dict.sidebar.footer}
       </div>
     </div>
