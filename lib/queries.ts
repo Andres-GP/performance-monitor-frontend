@@ -123,16 +123,30 @@ export function useStrategyEquity(id: string, page = 0, pageSize = 500) {
   });
 }
 
-export function useAlerts(limit = 100) {
+export interface AlertQueryOptions {
+  offset?: number;
+  status?: "open" | "ack" | "resolved";
+  severity?: Alert["severity"];
+  from?: string;
+  to?: string;
+}
+
+export function useAlerts(limit = 100, options: AlertQueryOptions = {}) {
   const getToken = useApiToken();
   return useQuery({
-    queryKey: qk.alerts(limit),
+    queryKey: [...qk.alerts(limit), options],
     queryFn: async ({ signal }) => {
       const token = await getToken();
-      return getWithFallback<MonitoringPage<Alert>>(`/alerts?limit=${limit}`, {
-        signal,
-        token,
-      });
+      const params = new URLSearchParams({ limit: String(limit) });
+      if (options.offset) params.set("offset", String(options.offset));
+      if (options.status) params.set("status", options.status);
+      if (options.severity) params.set("severity", options.severity);
+      if (options.from) params.set("from", options.from);
+      if (options.to) params.set("to", options.to);
+      return getWithFallback<MonitoringPage<Alert>>(
+        `/alerts?${params.toString()}`,
+        { signal, token },
+      );
     },
     staleTime: STALE,
   });

@@ -118,6 +118,22 @@ describe("query hooks", () => {
     );
   });
 
+  it("passes alert pagination and supported backend filters", async () => {
+    mockGetWithFallback.mockResolvedValueOnce({
+      data: { items: [], limit: 20, offset: 40, total: 0 },
+      isFallback: false,
+    } as never);
+    const { result } = renderHook(
+      () => useAlerts(20, { offset: 40, status: "open", severity: "critical", from: "2026-01-01T00:00:00Z" }),
+      { wrapper: createWrapper() },
+    );
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockGetWithFallback).toHaveBeenCalledWith(
+      "/alerts?limit=20&offset=40&status=open&severity=critical&from=2026-01-01T00%3A00%3A00Z",
+      expect.objectContaining({ token: "mock-token" }),
+    );
+  });
+
   it("useMarketRegime fetches the regime endpoint", async () => {
     mockGetWithFallback.mockResolvedValueOnce({
       data: { adx: 1 },

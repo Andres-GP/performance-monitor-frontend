@@ -18,6 +18,8 @@ Available private views are Overview (`/`), Strategies (`/strategies` and `/stra
 
 Monitoring portfolio, equity, correlation, trade, and alert endpoints use paged `{ items, limit, offset, total }` responses. Strategy detail loads a bounded equity sample page and requests trade pages from FastAPI. Trades use `profit`/`pnl`, `instrument`/`symbol`, and `direction`/`side` as provided by the backend contract. Portfolio percentages are returned in percentage points and are rendered without multiplying by 100. The legacy strategy/metrics endpoints retain their existing array/object formats. Weekly EDA consumes the latest `reports/weekly/<week>/summary.json` served by the backend. The backend checkout does not include a sample summary, so report fields should remain optional and absent values must display as unavailable. The EHI is provisional analysis only and must not be treated as an execution instruction.
 
+Alerts send supported status, severity, time range, limit, and offset filters to FastAPI. The backend does not accept a strategy filter, so that one is applied locally to a bounded 1,000-alert page and the UI says when the API reports additional records.
+
 Run locally with `npm install` and `npm run dev`. Verification commands are `npm test -- --runInBand`, `npm run lint`, and `npm run build`. A working Clerk environment and reachable FastAPI instance are required to verify live authenticated data.
 
 `npx tsc --noEmit` checks the TypeScript project directly, and production builds run this check by default. Next.js 16 warns that the existing root `middleware.ts` convention is deprecated; migrate it to the supported `proxy.ts` convention as a dedicated follow-up after reconciling the duplicate `app/proxy.ts` file.
