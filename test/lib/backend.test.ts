@@ -20,6 +20,12 @@ describe("lib/server/backend", () => {
     expect(backendUrl("alerts", "?limit=5")).toBe("https://api.example.com/alerts?limit=5")
   })
 
+  it("rejects malformed and insecure remote backend URLs", async () => {
+    process.env.BACKEND_API_URL = "https"
+    const { BACKEND_API_URL } = await import("@/lib/server/backend")
+    expect(BACKEND_API_URL).toBeNull()
+  })
+
   it("does not silently select production when backend env is unset", async () => {
     delete process.env.BACKEND_API_URL
     delete process.env.RENDER_GIT_BRANCH
