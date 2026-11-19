@@ -40,7 +40,7 @@ import {
   usePortfolioWeights,
   useSetWeight,
 } from "@/lib/queries";
-import { formatCurrency, formatNumber, formatPercent } from "@/lib/format";
+import { formatCurrency, formatNumber, formatPercentPoints } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
 import { toast } from "sonner";
@@ -142,23 +142,20 @@ export function PortfolioView() {
     }),
   );
 
-  const correlationMatrix = pm?.correlation_matrix ?? {};
-  const hasCorrelation =
-    correlationMatrix &&
-    typeof correlationMatrix === "object" &&
-    !correlationMatrix.note &&
-    Object.keys(correlationMatrix).length > 0;
+  const correlationMatrix = pm?.correlation_matrix;
+  const correlationEntries =
+    correlationMatrix && !("note" in correlationMatrix)
+      ? Object.entries(correlationMatrix)
+      : [];
+  const hasCorrelation = correlationEntries.length > 0;
 
   let heatmapStrategies: string[] = [];
-  let heatmapMatrix: number[][] = [];
+  let heatmapMatrix: (number | null)[][] = [];
 
   if (hasCorrelation) {
-    heatmapStrategies = Object.keys(correlationMatrix);
-    heatmapMatrix = heatmapStrategies.map((s1) =>
-      heatmapStrategies.map((s2) => {
-        const val = correlationMatrix[s1]?.[s2];
-        return typeof val === "number" ? val : 0;
-      }),
+    heatmapStrategies = correlationEntries.map(([strategyId]) => strategyId);
+    heatmapMatrix = correlationEntries.map(([, row]) =>
+      heatmapStrategies.map((strategyId) => row[strategyId] ?? null),
     );
   }
 
@@ -196,7 +193,7 @@ export function PortfolioView() {
         >
           <StatCard
             label={dict.portfolio.combinedDrawdown}
-            value={formatPercent(pm?.max_drawdown)}
+            value={formatPercentPoints(pm?.max_drawdown)}
             icon={TrendingDown}
             hint={dict.portfolio.combinedDrawdownHint}
             trend="down"
@@ -213,7 +210,7 @@ export function PortfolioView() {
         >
           <StatCard
             label={dict.portfolio.transactionCosts}
-            value={formatPercent(pm?.transaction_cost_pct)}
+            value={formatPercentPoints(pm?.transaction_cost_pct)}
             icon={Receipt}
             hint={dict.portfolio.transactionCostsHint}
             loading={metrics.isLoading}
@@ -227,7 +224,7 @@ export function PortfolioView() {
         >
           <StatCard
             label={dict.portfolio.ruinProbability}
-            value={formatPercent(pm?.ruin_probability)}
+            value={formatPercentPoints(pm?.ruin_probability)}
             icon={Activity}
             hint={dict.portfolio.ruinProbabilityHint}
             loading={metrics.isLoading}
@@ -245,8 +242,8 @@ export function PortfolioView() {
             label={dict.portfolio.concentration}
             value={
               maxConcentration.category
-                ? `${maxConcentration.category} ${formatPercent(maxConcentration.value)}`
-                : "N/A"
+                ? `${maxConcentration.category} ${formatPercentPoints(maxConcentration.value)}`
+                : "—"
             }
             icon={Activity}
             hint={dict.portfolio.concentrationHint}
@@ -428,21 +425,21 @@ export function PortfolioView() {
                         {d.strategyId}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {formatPercent(d.target)}
+                        {formatPercentPoints(d.target)}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {formatPercent(d.actual)}
+                        {formatPercentPoints(d.actual)}
                       </TableCell>
                       <TableCell
                         className={cn(
                           "text-right tabular-nums",
-                          Math.abs(d.deviation) > 20
+                          typeof d.deviation === "number" && Math.abs(d.deviation) > 20
                             ? "text-chart-4"
                             : "text-muted-foreground",
                         )}
                       >
-                        {d.deviation >= 0 ? "+" : ""}
-                        {formatPercent(d.deviation)}
+                        {d.deviation != null && d.deviation >= 0 ? "+" : ""}
+                        {formatPercentPoints(d.deviation)}
                       </TableCell>
                     </TableRow>
                   ))
@@ -516,12 +513,12 @@ export function PortfolioView() {
               <p className="text-sm text-muted-foreground">
                 {pm?.current_drawdown !== undefined &&
                 pm?.current_drawdown !== null
-                  ? `Drawdown actual: ${formatPercent(pm.current_drawdown)}`
+                  ? `Drawdown actual: ${formatPercentPoints(pm.current_drawdown)}`
                   : "Sin datos de drawdown actual"}
               </p>
               <p className="text-sm text-muted-foreground">
                 {pm?.max_drawdown !== undefined && pm?.max_drawdown !== null
-                  ? `Drawdown máximo: ${formatPercent(pm.max_drawdown)}`
+                  ? `Drawdown máximo: ${formatPercentPoints(pm.max_drawdown)}`
                   : ""}
               </p>
             </div>

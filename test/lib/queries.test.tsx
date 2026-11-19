@@ -82,7 +82,7 @@ describe("query hooks", () => {
     });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(mockGetWithFallback).toHaveBeenCalledWith(
-      "/strategies/str-9/trades",
+      "/strategies/str-9/trades?limit=100&offset=0",
       expect.objectContaining({ token: "mock-token" }),
     );
   });

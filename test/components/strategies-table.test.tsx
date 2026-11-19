@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { StrategiesTable } from "@/components/strategies/strategies-table";
+import type { Strategy } from "@/types";
 
 // --- Mock de useI18n (con todas las claves que usa el componente) ---
 jest.mock("@/lib/i18n/context", () => ({
@@ -73,7 +74,7 @@ jest.mock("next/link", () => ({
 }));
 
 // --- Datos mockeados con TODAS las propiedades que usa el componente ---
-const mockStrategies = [
+const mockStrategies: Strategy[] = [
   {
     strategy_id: "strategy-1",
     name: "My Strategy 1",
@@ -91,9 +92,9 @@ const mockStrategies = [
     start_date: "2025-01-01T00:00:00Z",
     timeframe: "1h",
     data_type: "OHLC",
-    sizing: "2%",
-    edge_health: true,
-    backtest: false,
+    sizing: 2,
+    edge_health: null,
+    backtest: null,
   },
   {
     strategy_id: "strategy-2",
@@ -112,9 +113,9 @@ const mockStrategies = [
     start_date: "2025-02-15T00:00:00Z",
     timeframe: "15m",
     data_type: "tick",
-    sizing: "1%",
-    edge_health: false,
-    backtest: true,
+    sizing: 1,
+    edge_health: null,
+    backtest: null,
   },
 ];
 

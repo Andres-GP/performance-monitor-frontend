@@ -14,7 +14,7 @@ export const CorrelationHeatmap = memo(function CorrelationHeatmap({
   matrix,
 }: {
   strategies: string[];
-  matrix: number[][];
+  matrix: (number | null)[][];
 }) {
   return (
     <div className="overflow-x-auto">
@@ -42,10 +42,10 @@ export const CorrelationHeatmap = memo(function CorrelationHeatmap({
                 <td
                   key={j}
                   className="h-12 w-16 rounded-md text-center align-middle font-medium tabular-nums"
-                  style={{ background: cellColor(v) }}
-                  title={`${strategies[i]} / ${strategies[j]}: ${v.toFixed(2)}`}
+                  style={{ background: v == null ? "var(--color-muted)" : cellColor(v) }}
+                  title={`${strategies[i]} / ${strategies[j]}: ${v == null ? "—" : v.toFixed(2)}`}
                 >
-                  {v.toFixed(2)}
+                  {v == null ? "—" : v.toFixed(2)}
                 </td>
               ))}
             </tr>

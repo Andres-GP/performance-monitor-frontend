@@ -82,11 +82,11 @@ export function StrategiesTable({
           </TableHeader>
           <TableBody>
             {strategies.map((s) => {
-              const metrics = s.metrics || {};
-              const winRate = metrics.win_rate ?? null;
-              const profitFactor = metrics.profit_factor ?? null;
-              const drawdown = metrics.drawdown ?? null;
-              const hasMetrics = metrics && Object.keys(metrics).length > 0;
+              const metrics = s.metrics;
+              const winRate = metrics?.win_rate;
+              const profitFactor = metrics?.profit_factor;
+              const drawdown = metrics?.drawdown;
+              const hasMetrics = metrics != null && Object.keys(metrics).length > 0;
 
               return (
                 <TableRow key={s.strategy_id} className="group">
@@ -103,24 +103,24 @@ export function StrategiesTable({
                     <HealthBadge status={s.health_status} />
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {hasMetrics && winRate !== null
+                    {hasMetrics && winRate != null
                       ? formatPercent(winRate)
                       : "—"}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {hasMetrics && profitFactor !== null
+                    {hasMetrics && profitFactor != null
                       ? formatNumber(profitFactor)
                       : "—"}
                   </TableCell>
                   <TableCell
                     className={cn(
                       "text-right tabular-nums",
-                      drawdown !== null && drawdown <= -0.15
+                      drawdown != null && drawdown <= -0.15
                         ? "text-destructive"
                         : "text-foreground",
                     )}
                   >
-                    {hasMetrics && drawdown !== null
+                    {hasMetrics && drawdown != null
                       ? formatPercent(drawdown)
                       : "—"}
                   </TableCell>

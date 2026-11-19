@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,16 +25,12 @@ const EMPTY_TRADES: Trade[] = [];
 
 export function TradesTable({ strategyId }: { strategyId: string }) {
   const { dict, t } = useI18n();
-  const { data, isLoading } = useTrades(strategyId);
   const [page, setPage] = useState(0);
+  const { data, isLoading } = useTrades(strategyId, page, PAGE_SIZE);
 
-  const trades = data?.data ?? EMPTY_TRADES;
-  const totalPages = Math.max(1, Math.ceil(trades.length / PAGE_SIZE));
-
-  const pageTrades = useMemo(
-    () => trades.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE),
-    [trades, page],
-  );
+  const trades = data?.data?.items ?? EMPTY_TRADES;
+  const totalPages = Math.max(1, Math.ceil((data?.data?.total ?? trades.length) / PAGE_SIZE));
+  const pageTrades = trades;
 
   if (isLoading) {
     return (
@@ -80,21 +76,24 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {pageTrades.map((trade) => (
+            {pageTrades.map((trade) => {
+              const tradePnl = trade.pnl ?? trade.profit;
+              const direction = trade.direction ?? trade.side;
+              return (
               <TableRow key={trade.id}>
                 <TableCell className="font-medium">
-                  {trade.instrument ?? dict.common.none}
+                  {trade.instrument ?? trade.symbol ?? dict.common.none}
                 </TableCell>
                 <TableCell>
                   <span
                     className={cn(
                       "rounded-md px-2 py-0.5 text-xs font-medium",
-                      trade.side === "long"
+                      direction === "long"
                         ? "bg-chart-1/10 text-chart-1"
                         : "bg-chart-2/10 text-chart-2",
                     )}
                   >
-                    {trade.direction}
+                    {direction ?? dict.common.none}
                   </span>
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
@@ -109,16 +108,20 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
                 <TableCell
                   className={cn(
                     "text-right font-medium tabular-nums",
-                    trade.pnl >= 0 ? "text-chart-1" : "text-destructive",
+                    tradePnl == null
+                      ? "text-muted-foreground"
+                      : tradePnl >= 0
+                        ? "text-chart-1"
+                        : "text-destructive",
                   )}
                 >
-                  {formatCurrency(trade.pnl)}
+                  {formatCurrency(tradePnl)}
                 </TableCell>
                 <TableCell className="hidden text-right text-muted-foreground md:table-cell">
                   {formatDate(trade.entry_time)}
                 </TableCell>
               </TableRow>
-            ))}
+            );})}
           </TableBody>
         </Table>
       </div>
@@ -126,7 +129,7 @@ export function TradesTable({ strategyId }: { strategyId: string }) {
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <span>
           {t(dict.strategyDetail.operations, {
-            trades: trades.length,
+            trades: data?.data?.total ?? trades.length,
             page: page + 1,
             totalPages: totalPages,
           })}

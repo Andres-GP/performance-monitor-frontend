@@ -68,16 +68,19 @@ export function useStrategy(id: string) {
   };
 }
 
-export function useTrades(id: string) {
+export function useTrades(id: string, page = 0, pageSize = 100) {
   const getToken = useApiToken();
   return useQuery({
-    queryKey: qk.trades(id),
+    queryKey: [...qk.trades(id), page, pageSize],
     queryFn: async ({ signal }) => {
       const token = await getToken();
-      return getWithFallback<Trade[]>(`/strategies/${id}/trades`, {
+      return getWithFallback<MonitoringPage<Trade>>(
+        `/strategies/${id}/trades?limit=${pageSize}&offset=${page * pageSize}`,
+        {
         signal,
         token,
-      });
+        },
+      );
     },
     staleTime: STALE,
     enabled: !!id,
