@@ -50,8 +50,8 @@ export default memo(function MetricChart({ data, dataKey, label, asPercent }: Me
             color: "var(--color-popover-foreground)",
           }}
           labelFormatter={(l) => formatDateShort(l as string)}
-          formatter={(value: number) => [
-            asPercent ? `${(value * 100).toFixed(2)}%` : value.toFixed(2),
+          formatter={(value) => [
+            typeof value !== "number" ? "—" : asPercent ? `${(value * 100).toFixed(2)}%` : value.toFixed(2),
             label,
           ]}
         />

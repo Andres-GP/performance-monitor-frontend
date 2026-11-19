@@ -11,6 +11,7 @@ import type {
   PortfolioMetrics,
   PortfolioWeight,
   MonitoringPage,
+  EquitySample,
   Strategy,
   Trade,
 } from "@/types";
@@ -99,6 +100,22 @@ export function useMetrics(id: string) {
           signal,
           token,
         },
+      );
+    },
+    staleTime: STALE,
+    enabled: !!id,
+  });
+}
+
+export function useStrategyEquity(id: string, page = 0, pageSize = 500) {
+  const getToken = useApiToken();
+  return useQuery({
+    queryKey: [...qk.equityCurve, id, page, pageSize],
+    queryFn: async ({ signal }) => {
+      const token = await getToken();
+      return getWithFallback<MonitoringPage<EquitySample>>(
+        `/strategies/${id}/equity?limit=${pageSize}&offset=${page * pageSize}`,
+        { signal, token },
       );
     },
     staleTime: STALE,

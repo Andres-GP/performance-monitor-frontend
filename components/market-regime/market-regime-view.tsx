@@ -14,7 +14,7 @@ import { StatCard } from "@/components/shared/stat-card";
 import { OfflineBanner } from "@/components/shared/offline-banner";
 import { RegimeWidget } from "./regime-widget";
 import { useMarketRegime } from "@/lib/queries";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatNumber } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/context";
 import {
   Dialog,
@@ -144,10 +144,7 @@ export function MarketRegimeView() {
           </ul>
           <p className="mt-1">
             <strong>{dict.regime.breadthHelpNow}</strong>{" "}
-            {r?.breadth === "strong_upside" && dict.regime.breadthHelpNowUpside}
-            {r?.breadth === "strong_downside" &&
-              dict.regime.breadthHelpNowDownside}
-            {r?.breadth === "neutral" && dict.regime.breadthHelpNowNeutral}
+            {typeof r?.breadth === "number" ? formatNumber(r.breadth) : dict.common.none}
           </p>
         </div>
       ),
@@ -176,9 +173,7 @@ export function MarketRegimeView() {
           </ul>
           <p className="mt-1">
             <strong>{dict.regime.strengthHelpNow}</strong>{" "}
-            {r?.strength === "strong" && dict.regime.strengthHelpNowStrong}
-            {r?.strength === "weak" && dict.regime.strengthHelpNowWeak}
-            {r?.strength === "neutral" && dict.regime.strengthHelpNowNeutral}
+            {typeof r?.strength === "number" ? formatNumber(r.strength) : dict.common.none}
           </p>
         </div>
       ),
@@ -415,8 +410,7 @@ export function MarketRegimeView() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {metricItems.map((item) => (
           <Dialog key={item.key}>
-            <DialogTrigger asChild>
-              <div className="h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30">
+            <DialogTrigger render={<div role="button" tabIndex={0} className="h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30" onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }} />}>
                 <StatCard
                   label={item.label}
                   value={item.value}
@@ -425,7 +419,6 @@ export function MarketRegimeView() {
                   loading={isLoading}
                   className="text-left h-full"
                 />
-              </div>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -444,15 +437,15 @@ export function MarketRegimeView() {
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="relative">
           <Dialog>
-            <DialogTrigger asChild>
-              <Button
+            <DialogTrigger
+              render={<Button
                 variant="ghost"
                 size="icon"
                 className="cursor-pointer absolute top-10 right-2 z-10 h-6 w-6 p-0 text-muted-foreground/60 hover:text-muted-foreground"
               >
                 <Library className="h-3.5 w-3.5" />
-              </Button>
-            </DialogTrigger>
+              </Button>}
+            />
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
@@ -485,15 +478,15 @@ export function MarketRegimeView() {
 
         <div className="relative">
           <Dialog>
-            <DialogTrigger asChild>
-              <Button
+            <DialogTrigger
+              render={<Button
                 variant="ghost"
                 size="icon"
                 className="cursor-pointer absolute top-10 right-2 z-10 h-6 w-6 p-0 text-muted-foreground/60 hover:text-muted-foreground"
               >
                 <Library className="h-3.5 w-3.5" />
-              </Button>
-            </DialogTrigger>
+              </Button>}
+            />
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>{widgetExplanations.vix.title}</DialogTitle>
@@ -524,15 +517,15 @@ export function MarketRegimeView() {
       </div>
       <div className="relative">
         <Dialog>
-          <DialogTrigger asChild>
-            <Button
+          <DialogTrigger
+            render={<Button
               variant="ghost"
               size="icon"
               className="cursor-pointer absolute top-10 right-2 z-10 h-6 w-6 p-0 text-muted-foreground/60 hover:text-muted-foreground"
             >
               <Library className="h-3.5 w-3.5" />
-            </Button>
-          </DialogTrigger>
+            </Button>}
+          />
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{widgetExplanations.breadth.title}</DialogTitle>

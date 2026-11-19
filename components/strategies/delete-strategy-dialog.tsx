@@ -36,9 +36,7 @@ export function DeleteStrategyDialog({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Cancelar</Button>
-          </DialogClose>
+          <DialogClose render={<Button variant="outline">Cancelar</Button>} />
           <Button
             variant="destructive"
             onClick={onConfirm}

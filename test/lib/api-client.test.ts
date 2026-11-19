@@ -69,7 +69,7 @@ describe("api-client", () => {
   describe("getWithFallback", () => {
     it("returns live data when the request succeeds", async () => {
       fetchMock.mockResolvedValueOnce(jsonResponse([1, 2, 3]));
-      const res = await getWithFallback("/x", []);
+      const res = await getWithFallback("/x");
       expect(res).toEqual({ data: [1, 2, 3], isFallback: false });
     });
 

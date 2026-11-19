@@ -52,7 +52,7 @@ export default memo(function DrawdownChart({
             color: "var(--color-popover-foreground)",
           }}
           labelFormatter={(l) => formatDateShort(l as string)}
-          formatter={(value: number) => [`${(value * 100).toFixed(2)}%`, "Drawdown"]}
+          formatter={(value) => [typeof value === "number" ? `${(value * 100).toFixed(2)}%` : "—", "Drawdown"]}
         />
         <Area
           type="monotone"

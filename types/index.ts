@@ -97,6 +97,12 @@ export interface MonitoringPage<T> {
   total: number | null;
 }
 
+export interface EquitySample {
+  strategy_id: string;
+  ts: string;
+  equity: number;
+}
+
 export interface CapitalAccount {
   account_type: AccountType;
   capital: number;

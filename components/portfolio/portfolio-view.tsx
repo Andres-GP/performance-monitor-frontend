@@ -311,16 +311,16 @@ export function PortfolioView() {
                 setEditDialogOpen(open);
               }}
             >
-              <DialogTrigger asChild>
-                <Button
+              <DialogTrigger
+                render={<Button
                   variant="outline"
                   size="sm"
                   className="cursor-pointer hover:bg-muted/20"
                 >
                   <Edit className="mr-2 h-4 w-4" />
                   {dict.portfolio.editWeights}
-                </Button>
-              </DialogTrigger>
+                </Button>}
+              />
               <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                   <DialogTitle>{dict.portfolio.editWeightsTitle}</DialogTitle>

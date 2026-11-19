@@ -32,6 +32,7 @@ import {
   useDeleteStrategy,
   useMetrics,
   useStrategy,
+  useStrategyEquity,
   useUploadBacktest,
 } from "@/lib/queries";
 import { formatCurrency, formatNumber, formatPercent } from "@/lib/format";
@@ -92,7 +93,7 @@ function BacktestUpload({ strategyId }: { strategyId: string }) {
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <Upload className="size-4" />
-          {dict.strategyDetail.uploadBacktest || dict.backtest.title}
+          {dict.backtest.title}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -244,6 +245,7 @@ export function StrategyDetail({ id }: { id: string }) {
   const { dict, t } = useI18n();
   const { strategy, isFallback, isLoading } = useStrategy(id);
   const metrics = useMetrics(id);
+  const equity = useStrategyEquity(id);
   const deleteStrategy = useDeleteStrategy();
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -276,15 +278,20 @@ export function StrategyDetail({ id }: { id: string }) {
     );
   }
 
-  const metricsData = strategy.metrics || {};
-  const winRateReal = metricsData.win_rate ?? 0;
-  const profitFactorReal = metricsData.profit_factor ?? 0;
-  const drawdownReal = metricsData.drawdown ?? 0;
-  const sharpeReal = metricsData.sharpe ?? 0;
+  const metricsData = strategy.metrics;
+  const winRateReal = metricsData?.win_rate;
+  const profitFactorReal = metricsData?.profit_factor;
+  const drawdownReal = metricsData?.drawdown;
+  const sharpeReal = metricsData?.sharpe;
 
-  const series = metrics.data?.data ?? [];
+  const metricsSeries = metrics.data?.data ?? [];
+  const equitySamples = equity.data?.data?.items ?? [];
+  const equitySeries = equitySamples.length > 0
+    ? [...equitySamples].reverse().map((sample) => ({ timestamp: sample.ts, equity: sample.equity }))
+    : metricsSeries;
+  const series = metricsSeries;
 
-  const backtestData = strategy.backtest;
+  const backtestData = strategy.backtest ?? null;
   const hasBacktest = backtestData !== null;
 
   const canDelete = strategy.state === "Stopped";
@@ -325,7 +332,7 @@ export function StrategyDetail({ id }: { id: string }) {
         <p className="text-sm text-muted-foreground">
           {t(dict.strategyDetail.subtitle, {
             instrument: strategy.instrument,
-            platform: strategy.platform,
+            platform: strategy.platform ?? dict.common.none,
             trades: strategy.trades_count ?? 0,
           })}
         </p>
@@ -346,12 +353,10 @@ export function StrategyDetail({ id }: { id: string }) {
           label={dict.strategyDetail.drawdown}
           value={formatPercent(drawdownReal)}
           icon={TrendingDown}
-          hint={
-            drawdownReal >= 0.15
-              ? dict.strategyDetail.aboveThreshold
-              : dict.strategyDetail.withinRange
-          }
-          trend={drawdownReal >= 0.15 ? "down" : "neutral"}
+          hint={drawdownReal == null ? undefined : drawdownReal >= 0.15
+            ? dict.strategyDetail.aboveThreshold
+            : dict.strategyDetail.withinRange}
+          trend={drawdownReal == null ? "neutral" : drawdownReal >= 0.15 ? "down" : "neutral"}
         />
         <StatCard
           label={dict.strategyDetail.sharpe}
@@ -386,8 +391,8 @@ export function StrategyDetail({ id }: { id: string }) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {series.length > 0 ? (
-                <EquityChart data={series} />
+              {equitySeries.length > 0 ? (
+                <EquityChart data={equitySeries} />
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                   <TrendingUp className="size-12 mb-4 opacity-50" />
@@ -502,7 +507,7 @@ export function StrategyDetail({ id }: { id: string }) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {!hasBacktest ? (
+              {!backtestData ? (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                   <BarChart3 className="size-12 mb-4 opacity-50" />
                   <p className="text-sm">{dict.backtest.noData}</p>
@@ -529,125 +534,57 @@ export function StrategyDetail({ id }: { id: string }) {
                     </thead>
                     <tbody>
                       <tr className="border-b border-border/50">
-                        <td className="py-2">{dict.backtest.winRate}</td>
-                        <td className="text-right tabular-nums">
-                          {formatPercent(backtestData.expected_win_rate ?? 0)}
-                        </td>
-                        <td className="text-right tabular-nums">
-                          {formatPercent(winRateReal)}
-                        </td>
-                        <td
-                          className={`text-right tabular-nums ${
-                            backtestData.expected_win_rate
-                              ? Math.abs(
-                                  winRateReal -
-                                    (backtestData.expected_win_rate ?? 0),
-                                ) > 0.1
-                                ? "text-destructive"
-                                : "text-green-500"
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          {backtestData.expected_win_rate
-                            ? formatPercent(
-                                winRateReal -
-                                  (backtestData.expected_win_rate ?? 0),
-                              )
-                            : "N/A"}
-                        </td>
-                      </tr>
-                      <tr className="border-b border-border/50">
-                        <td className="py-2">Profit Factor</td>
-                        <td className="text-right tabular-nums">
-                          {formatNumber(
-                            backtestData.expected_profit_factor ?? 0,
-                          )}
-                        </td>
-                        <td className="text-right tabular-nums">
-                          {formatNumber(profitFactorReal)}
-                        </td>
-                        <td
-                          className={`text-right tabular-nums ${
-                            backtestData.expected_profit_factor
-                              ? Math.abs(
-                                  profitFactorReal -
-                                    (backtestData.expected_profit_factor ?? 0),
-                                ) > 0.5
-                                ? "text-destructive"
-                                : "text-green-500"
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          {backtestData.expected_profit_factor
-                            ? formatNumber(
-                                profitFactorReal -
-                                  (backtestData.expected_profit_factor ?? 0),
-                              )
-                            : "N/A"}
-                        </td>
-                      </tr>
-                      <tr className="border-b border-border/50">
                         <td className="py-2">Drawdown (%)</td>
                         <td className="text-right tabular-nums">
-                          {formatPercent(
-                            (backtestData.expected_drawdown ?? 0) / 100,
-                          )}
+                          {formatPercent(backtestData.expected_drawdown == null ? null : backtestData.expected_drawdown / 100)}
                         </td>
                         <td className="text-right tabular-nums">
                           {formatPercent(drawdownReal)}
                         </td>
                         <td
                           className={`text-right tabular-nums ${
-                            backtestData.expected_drawdown
+                            backtestData.expected_drawdown != null && drawdownReal != null
                               ? Math.abs(
-                                  drawdownReal -
-                                    (backtestData.expected_drawdown ?? 0) / 100,
+                                  drawdownReal - backtestData.expected_drawdown / 100,
                                 ) > 0.05
                                 ? "text-destructive"
                                 : "text-green-500"
                               : "text-muted-foreground"
                           }`}
                         >
-                          {backtestData.expected_drawdown
-                            ? formatPercent(
-                                drawdownReal -
-                                  (backtestData.expected_drawdown ?? 0) / 100,
-                              )
-                            : "N/A"}
+                          {backtestData.expected_drawdown != null && drawdownReal != null
+                            ? formatPercent(drawdownReal - backtestData.expected_drawdown / 100)
+                            : dict.common.none}
                         </td>
                       </tr>
                       <tr className="border-b border-border/50">
                         <td className="py-2">Sharpe</td>
                         <td className="text-right tabular-nums">
-                          {formatNumber(backtestData.expected_sharpe ?? 0)}
+                          {formatNumber(backtestData.expected_sharpe)}
                         </td>
                         <td className="text-right tabular-nums">
                           {formatNumber(sharpeReal)}
                         </td>
                         <td
                           className={`text-right tabular-nums ${
-                            backtestData.expected_sharpe
+                            backtestData.expected_sharpe != null && sharpeReal != null
                               ? Math.abs(
-                                  sharpeReal -
-                                    (backtestData.expected_sharpe ?? 0),
+                                  sharpeReal - backtestData.expected_sharpe,
                                 ) > 0.3
                                 ? "text-destructive"
                                 : "text-green-500"
                               : "text-muted-foreground"
                           }`}
                         >
-                          {backtestData.expected_sharpe
-                            ? formatNumber(
-                                sharpeReal -
-                                  (backtestData.expected_sharpe ?? 0),
-                              )
-                            : "N/A"}
+                          {backtestData.expected_sharpe != null && sharpeReal != null
+                            ? formatNumber(sharpeReal - backtestData.expected_sharpe)
+                            : dict.common.none}
                         </td>
                       </tr>
                       <tr>
                         <td className="py-2">{dict.backtest.expectedPnl}</td>
                         <td className="text-right tabular-nums">
-                          {formatCurrency(backtestData.expected_pnl ?? 0)}
+                          {formatCurrency(backtestData.expected_pnl)}
                         </td>
                         <td className="text-right tabular-nums text-muted-foreground">
                           —

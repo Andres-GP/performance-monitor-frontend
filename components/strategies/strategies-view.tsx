@@ -40,9 +40,9 @@ export function StrategiesView() {
     [],
   );
 
-  const handleStatusChange = useCallback((v: string) => setStatus(v), []);
+  const handleStatusChange = useCallback((v: string | null) => { if (v !== null) setStatus(v); }, []);
 
-  const handleHealthChange = useCallback((v: string) => setHealth(v), []);
+  const handleHealthChange = useCallback((v: string | null) => { if (v !== null) setHealth(v); }, []);
 
   const handleDeleteConfirm = useCallback(() => {
     if (pending) deleteStrategy.mutate(pending.strategy_id);

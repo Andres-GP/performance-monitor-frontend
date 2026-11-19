@@ -8,6 +8,7 @@ import {
   useMarketRegime,
   useStrategies,
   useStrategy,
+  useStrategyEquity,
   useTrades,
 } from "@/lib/queries";
 
@@ -83,6 +84,21 @@ describe("query hooks", () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(mockGetWithFallback).toHaveBeenCalledWith(
       "/strategies/str-9/trades?limit=100&offset=0",
+      expect.objectContaining({ token: "mock-token" }),
+    );
+  });
+
+  it("requests a bounded equity page for strategy detail", async () => {
+    mockGetWithFallback.mockResolvedValueOnce({
+      data: { items: [], limit: 500, offset: 0, total: 0 },
+      isFallback: false,
+    } as never);
+    const { result } = renderHook(() => useStrategyEquity("str-4"), {
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockGetWithFallback).toHaveBeenCalledWith(
+      "/strategies/str-4/equity?limit=500&offset=0",
       expect.objectContaining({ token: "mock-token" }),
     );
   });

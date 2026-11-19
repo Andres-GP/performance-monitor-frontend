@@ -348,7 +348,6 @@ export const en = {
     submitting: "Uploading...",
     startOfPeriod: "Period Start",
     endOfPeriod: "Period End",
-    expectedPnl: "Expected PNL",
     expectedSharpe: "Expected Sharpe",
     expectedDrowdown: "Expected Drowdown",
     parametersOptionalJSON: "Parameters (optional JSON)",
@@ -368,7 +367,6 @@ export const en = {
     difference: "Difference",
     pnlExpected: "Expected PNL",
     periodOfBacktest: "Period of backtest:",
-    parameters: "Parameters:",
   },
   edgeHealth: {
     oosDegradation: "OOS Degradation",
@@ -400,8 +398,6 @@ export const en = {
     portfolioSharpeHint: "Risk-adjusted return",
     combinedDrawdown: "Combined Drawdown",
     combinedDrawdownHint: "Maximum portfolio drawdown",
-    transactionCosts: "Transaction Costs",
-    transactionCostsHint: "Accumulated",
     capitalByAccount: "Capital by Account Type",
     capitalByAccountDesc: "Distribution across demo, real and funded accounts",
     weightsTitle: "Target vs Actual Weights",
@@ -462,9 +458,6 @@ export const en = {
     helpTransactionCostsTitle: "Transaction Costs",
     helpTransactionCostsDesc:
       "Transaction costs include commissions, slippage and other expenses. They are expressed as a percentage of monthly capital.",
-    helpRuinTitle: "Ruin Probability",
-    helpRuinDesc:
-      "Ruin probability estimates the risk of losing more than 40% of capital, based on Monte Carlo simulations of historical returns.",
     helpConcentration:
       "Concentration shows the percentage exposure to each instrument category. High concentration (>30%) indicates non-diversified risk.",
     totalSum: "Total sum",
@@ -820,6 +813,7 @@ export const es: Dictionary = {
     colActions: "Acciones",
     empty: "No hay estrategias que coincidan con los filtros.",
     deleteAria: "Eliminar {name}",
+    deleteDisabledAria: "Eliminar deshabilitado {name}",
     viewAria: "Ver {name}",
     alertsInLast30Days: "Alertas en los ultimos 30 dias",
     strategyId: "Id de estrategia",
@@ -892,7 +886,6 @@ export const es: Dictionary = {
     submitting: "Subiendo...",
     startOfPeriod: "Inicio de Periodo",
     endOfPeriod: "Fin de Periodo",
-    expectedPnl: "PNL esperado",
     expectedSharpe: "Sharpe esperado",
     expectedDrowdown: "Drowdown esperado",
     parametersOptionalJSON: "Parámetros (JSON opcional)",
@@ -912,7 +905,6 @@ export const es: Dictionary = {
     difference: "Diferencia",
     pnlExpected: "PNL esperado",
     periodOfBacktest: "Perodio del backtest:",
-    parameters: "Parámetros:",
   },
   edgeHealth: {
     oosDegradation: "Degradación OOS",
@@ -945,8 +937,6 @@ export const es: Dictionary = {
     portfolioSharpeHint: "Retorno ajustado a riesgo",
     combinedDrawdown: "Drawdown Combinado",
     combinedDrawdownHint: "Máxima caída de la cartera",
-    transactionCosts: "Costos de Transacción",
-    transactionCostsHint: "Acumulado",
     capitalByAccount: "Capital por Tipo de Cuenta",
     capitalByAccountDesc: "Distribución entre cuentas demo, real y fondeada",
     weightsTitle: "Pesos Objetivo vs Reales",
@@ -1002,13 +992,11 @@ export const es: Dictionary = {
     helpSharpeTitle: "Portfolio Sharpe",
     helpSharpeDesc:
       "El ratio de Sharpe mide el retorno ajustado al riesgo del portafolio. Valores superiores a 1 son considerados buenos.",
-    helpDrawdownDesc:
+    helpDrawdown:
       "El drawdown combinado muestra la caída máxima del capital desde un pico. El drawdown actual es la caída desde el último pico.",
     helpTransactionCostsTitle: "Costos de transaccion",
     helpTransactionCostsDesc:
       "Los costos de transacción incluyen comisiones, slippage y otros gastos. Se expresan como porcentaje del capital mensual.",
-    helpRuinDesc:
-      "La probabilidad de ruina estima el riesgo de perder más del 40% del capital, basada en simulaciones Monte Carlo de retornos históricos.",
     helpConcentration:
       "La concentración muestra la exposición porcentual a cada categoría de instrumento. Una concentración alta (>30%) indica riesgo no diversificado.",
     totalSum: "Suma total",

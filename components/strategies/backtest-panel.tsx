@@ -78,7 +78,7 @@ export function BacktestPanel({ strategyId }: { strategyId: string }) {
               {dict.backtest.drowdown}
             </p>
             <p className="text-lg font-semibold">
-              {formatPercent(backtest.expected_drawdown / 100)}
+              {formatPercent(backtest.expected_drawdown == null ? null : backtest.expected_drawdown / 100)}
             </p>
           </div>
           <div className="space-y-1">

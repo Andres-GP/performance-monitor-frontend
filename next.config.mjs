@@ -11,9 +11,6 @@ const packageJson = JSON.parse(
 );
 
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
     remotePatterns: [
       {
