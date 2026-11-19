@@ -18,15 +18,17 @@ import { useTrades } from "@/lib/queries";
 import { formatCurrency, formatDate, formatNumber } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
+import type { Trade } from "@/types";
 
 const PAGE_SIZE = 12;
+const EMPTY_TRADES: Trade[] = [];
 
 export function TradesTable({ strategyId }: { strategyId: string }) {
   const { dict, t } = useI18n();
   const { data, isLoading } = useTrades(strategyId);
   const [page, setPage] = useState(0);
 
-  const trades = data?.data ?? [];
+  const trades = data?.data ?? EMPTY_TRADES;
   const totalPages = Math.max(1, Math.ceil(trades.length / PAGE_SIZE));
 
   const pageTrades = useMemo(

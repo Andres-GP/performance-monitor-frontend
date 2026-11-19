@@ -27,6 +27,10 @@ import {
 import { useAcknowledgeAlert, useAlerts, useStrategies } from "@/lib/queries";
 import { formatDate } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/context";
+import type { Alert, Strategy } from "@/types";
+
+const EMPTY_ALERTS: Alert[] = [];
+const EMPTY_STRATEGIES: Strategy[] = [];
 
 export function AlertsView() {
   const { dict } = useI18n();
@@ -41,8 +45,8 @@ export function AlertsView() {
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(0);
 
-  const alerts = data?.data?.items ?? [];
-  const strategyList = strategies.data?.data ?? [];
+  const alerts = data?.data?.items ?? EMPTY_ALERTS;
+  const strategyList = strategies.data?.data ?? EMPTY_STRATEGIES;
 
   const strategyItems = useMemo(() => {
     const items: Record<string, string> = {

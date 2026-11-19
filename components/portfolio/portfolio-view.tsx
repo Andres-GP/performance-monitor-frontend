@@ -196,7 +196,7 @@ export function PortfolioView() {
         >
           <StatCard
             label={dict.portfolio.combinedDrawdown}
-            value={formatPercent(pm?.max_drawdown ?? 0)}
+            value={formatPercent(pm?.max_drawdown)}
             icon={TrendingDown}
             hint={dict.portfolio.combinedDrawdownHint}
             trend="down"
@@ -213,7 +213,7 @@ export function PortfolioView() {
         >
           <StatCard
             label={dict.portfolio.transactionCosts}
-            value={formatPercent(pm?.transaction_cost_pct ?? 0)}
+            value={formatPercent(pm?.transaction_cost_pct)}
             icon={Receipt}
             hint={dict.portfolio.transactionCostsHint}
             loading={metrics.isLoading}
@@ -227,7 +227,7 @@ export function PortfolioView() {
         >
           <StatCard
             label={dict.portfolio.ruinProbability}
-            value={formatPercent(pm?.ruin_probability ?? 0)}
+            value={formatPercent(pm?.ruin_probability)}
             icon={Activity}
             hint={dict.portfolio.ruinProbabilityHint}
             loading={metrics.isLoading}

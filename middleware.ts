@@ -18,7 +18,7 @@ export default clerkMiddleware(async (auth, req) => {
 
   if (!isPublicRoute(req)) {
     await auth.protect({
-      redirectUrl: "/sign-in",
+      unauthenticatedUrl: "/sign-in",
     });
   }
 });

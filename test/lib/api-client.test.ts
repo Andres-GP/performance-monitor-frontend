@@ -72,5 +72,17 @@ describe("api-client", () => {
       const res = await getWithFallback("/x", []);
       expect(res).toEqual({ data: [1, 2, 3], isFallback: false });
     });
+
+    it("does not hide authentication and permission failures as offline data", async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse({ error: "Unauthorized" }, false, 401));
+      await expect(getWithFallback("/alerts")).rejects.toMatchObject({ status: 401 });
+      fetchMock.mockResolvedValueOnce(jsonResponse({ error: "Forbidden" }, false, 403));
+      await expect(getWithFallback("/alerts")).rejects.toMatchObject({ status: 403 });
+    });
+
+    it("uses the empty offline state for server errors", async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse({ error: "Unavailable" }, false, 503));
+      await expect(getWithFallback("/alerts")).resolves.toEqual({ data: null, isFallback: true });
+    });
   });
 });

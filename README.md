@@ -20,6 +20,10 @@ Monitoring portfolio, equity, correlation, trade, and alert endpoints use paged 
 
 Run locally with `npm install` and `npm run dev`. Verification commands are `npm test -- --runInBand`, `npm run lint`, and `npm run build`. A working Clerk environment and reachable FastAPI instance are required to verify live authenticated data.
 
+The current production build configuration sets `typescript.ignoreBuildErrors: true`. A separate `npx tsc --noEmit` still reports existing type errors in legacy portfolio metrics, chart tooltip formatters, market regime components, strategy/backtest shapes, and duplicate/missing translation keys. The successful production build therefore confirms bundling and route generation, not a clean TypeScript check. Next.js 16 also warns that the existing root `middleware.ts` convention is deprecated; migrate it to the supported `proxy.ts` convention as a dedicated follow-up after reconciling the duplicate `app/proxy.ts` file.
+
+The current production build configuration sets `typescript.ignoreBuildErrors: true`. A separate `npx tsc --noEmit` still reports existing type errors in legacy portfolio metrics, chart tooltip formatters, market regime components, strategy/backtest shapes, and duplicate/missing translation keys. The successful production build therefore confirms bundling and route generation, not a clean TypeScript check. Next.js 16 also warns that the existing root `middleware.ts` convention is deprecated; migrate it to the supported `proxy.ts` convention as a dedicated follow-up after reconciling the duplicate `app/proxy.ts` file.
+
 ## 🚀 Live Demo
 
 👉 [View Live Dashboard](https://performance-monitor-frontend.vercel.app/)

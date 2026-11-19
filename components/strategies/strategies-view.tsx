@@ -18,6 +18,8 @@ import type { Strategy } from "@/types";
 import { StrategiesTable } from "./strategies-table";
 import { DeleteStrategyDialog } from "./delete-strategy-dialog";
 
+const EMPTY_STRATEGIES: Strategy[] = [];
+
 export function StrategiesView() {
   const { dict, t } = useI18n();
   const { data, isLoading } = useStrategies();
@@ -29,7 +31,7 @@ export function StrategiesView() {
   const [health, setHealth] = useState("all");
   const [pending, setPending] = useState<Strategy | null>(null);
 
-  const strategies = data?.data ?? [];
+  const strategies = data?.data ?? EMPTY_STRATEGIES;
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

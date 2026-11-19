@@ -50,6 +50,7 @@ export const en = {
   status: {
     Running: "Running",
     Stopped: "Stopped",
+    Unknown: "Unknown",
   },
   health: {
     healthy: "Healthy",
@@ -57,9 +58,11 @@ export const en = {
     unhealthy: "Unhealthy",
   },
   severity: {
+    critical: "Critical",
     high: "High",
     medium: "Medium",
     low: "Low",
+    info: "Info",
   },
   dashboard: {
     title: "Overview",
@@ -240,13 +243,13 @@ export const en = {
   weeklyReview: {
     title: "Weekly strategy EDA", subtitle: "Latest portfolio review and strategy diagnostics",
     loading: "Loading latest review…", unavailable: "No weekly report is available yet.",
-    error: "Could not load the weekly review.", week: "Week", generated: "Generated",
+    error: "Could not load the weekly review.", retry: "Retry", week: "Week", generated: "Generated",
     overall: "Review status", worstEhi: "Lowest available EHI", strategies: "Strategy review",
     strategy: "Strategy", portfolio: "Portfolio", accountMode: "Account mode", modeObservedAt: "Last observed", demo: "Demo", realCapital: "Real capital", modeUnconfirmed: "Not confirmed", state: "Review", backtest: "Backtest", regime: "Regime",
     ehi: "EHI", expectancy: "Expectancy percentile", profitFactor: "Profit factor percentile",
     winRate: "Win rate percentile", regimeScore: "Regime component", status: "Data status",
     market: "Market context", noData: "Not available", unconfirmed: "Regime hypothesis unconfirmed; neutral component applied.",
-    provisional: "Provisional score; review the source data before making decisions.",
+    provisional: "Provisional analysis: combines bootstrap percentiles for expectancy, profit factor and win rate with a market regime component. Unconfirmed regime hypotheses use a neutral score. This is not a recommendation or execution signal.",
     alert: "Review required", limited: "Limited by data", ready: "Ready for human review",
   },
   strategies: {
@@ -523,7 +526,19 @@ export const en = {
   },
 } as const;
 
-export type Dictionary = typeof en;
+type DeepWiden<T> = T extends string
+  ? string
+  : T extends number
+    ? number
+    : T extends boolean
+      ? boolean
+      : T extends readonly (infer U)[]
+        ? readonly DeepWiden<U>[]
+        : T extends object
+          ? { readonly [K in keyof T]: DeepWiden<T[K]> }
+          : T;
+
+export type Dictionary = DeepWiden<typeof en>;
 
 export const es: Dictionary = {
   signIn: {
@@ -575,6 +590,7 @@ export const es: Dictionary = {
   status: {
     Running: "En ejecución",
     Stopped: "Detenida",
+    Unknown: "Desconocido",
   },
   health: {
     healthy: "Saludable",
@@ -582,9 +598,11 @@ export const es: Dictionary = {
     unhealthy: "No saludable",
   },
   severity: {
+    critical: "Crítica",
     high: "Alta",
     medium: "Media",
     low: "Baja",
+    info: "Información",
   },
   dashboard: {
     title: "Resumen General",
@@ -770,13 +788,13 @@ export const es: Dictionary = {
   weeklyReview: {
     title: "EDA semanal de estrategias", subtitle: "Último análisis del portfolio y diagnóstico de estrategias",
     loading: "Cargando el último informe…", unavailable: "Aún no hay informes semanales.",
-    error: "No se pudo cargar el informe semanal.", week: "Semana", generated: "Generado",
+    error: "No se pudo cargar el informe semanal.", retry: "Reintentar", week: "Semana", generated: "Generado",
     overall: "Estado de revisión", worstEhi: "EHI disponible más bajo", strategies: "Revisión de estrategias",
     strategy: "Estrategia", portfolio: "Portfolio", accountMode: "Modo de cuenta", modeObservedAt: "Última observación", demo: "Demo", realCapital: "Capital real", modeUnconfirmed: "Sin confirmar", state: "Revisión", backtest: "Backtest", regime: "Régimen",
     ehi: "EHI", expectancy: "Percentil de expectancy", profitFactor: "Percentil de profit factor",
     winRate: "Percentil de win rate", regimeScore: "Componente de régimen", status: "Estado de datos",
     market: "Contexto de mercado", noData: "No disponible", unconfirmed: "Hipótesis de régimen sin confirmar; se aplica componente neutral.",
-    provisional: "Score provisional; revisa los datos de origen antes de decidir.",
+    provisional: "Análisis provisional: combina percentiles bootstrap de expectancy, profit factor y win rate con un componente de régimen. Las hipótesis de régimen sin confirmar usan una puntuación neutral. No es una recomendación ni una señal de ejecución.",
     alert: "Requiere revisión", limited: "Datos limitados", ready: "Lista para revisión humana",
   },
   strategies: {
