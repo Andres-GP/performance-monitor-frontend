@@ -170,6 +170,19 @@ export function PortfolioView() {
       </div>
 
       {isFallback && <OfflineBanner />}
+      {(weights.isError || metrics.isError) && (
+        <div role="alert" className="flex flex-wrap items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <span>{dict.portfolio.monitoringError}</span>
+          <button type="button" className="font-medium underline underline-offset-4" onClick={() => { void weights.refetch(); void metrics.refetch(); }}>
+            {dict.portfolio.retry}
+          </button>
+        </div>
+      )}
+      {!metrics.isLoading && !metrics.isError && !metrics.data?.isFallback && !pm && (
+        <p role="status" className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-muted-foreground">
+          {dict.portfolio.metricsUnavailable}
+        </p>
+      )}
 
       <div className="flex flex-wrap gap-4">
         <div
@@ -449,7 +462,7 @@ export function PortfolioView() {
                       colSpan={4}
                       className="text-center text-muted-foreground"
                     >
-                      No hay datos de asignación
+                      {dict.portfolio.noWeightData}
                     </TableCell>
                   </TableRow>
                 )}

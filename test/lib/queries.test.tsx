@@ -6,7 +6,7 @@ import {
   healthRefetchInterval,
   useAlerts,
   useHealth,
-  useMarketRegime,
+  usePortfolioMetrics,
   useStrategies,
   useStrategy,
   useStrategyEquity,
@@ -135,18 +135,13 @@ describe("query hooks", () => {
     );
   });
 
-  it("useMarketRegime fetches the regime endpoint", async () => {
-    mockGetWithFallback.mockResolvedValueOnce({
-      data: { adx: 1 },
-      isFallback: false,
-    } as never);
-    const { result } = renderHook(() => useMarketRegime(), {
-      wrapper: createWrapper(),
-    });
+  it("allows missing portfolio metrics to render as unavailable data", async () => {
+    mockGetWithFallback.mockResolvedValueOnce({ data: null, isFallback: false } as never);
+    const { result } = renderHook(() => usePortfolioMetrics(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(mockGetWithFallback).toHaveBeenCalledWith(
-      "/market/regime",
-      expect.objectContaining({ token: "mock-token" }),
+      "/portfolio/metrics",
+      expect.objectContaining({ token: "mock-token", emptyOnNotFound: true }),
     );
   });
 

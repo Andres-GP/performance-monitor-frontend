@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { apiSend, getWithFallback } from "@/lib/api-client";
 import type {
   Alert,
-  MarketRegime,
   PerformanceMetric,
   PortfolioMetrics,
   PortfolioWeight,
@@ -23,7 +22,6 @@ export const qk = {
   metrics: (id: string) => ["performance", "metrics", id] as const,
   alerts: (limit: number) => ["alerts", limit] as const,
   capital: ["capital", "summary"] as const,
-  regime: ["market", "regime"] as const,
   weights: ["portfolio", "weights"] as const,
   portfolioMetrics: ["portfolio", "metrics"] as const,
   equityCurve: ["performance", "equity"] as const,
@@ -166,21 +164,6 @@ export function useAcknowledgeAlert() {
   });
 }
 
-export function useMarketRegime() {
-  const getToken = useApiToken();
-  return useQuery({
-    queryKey: qk.regime,
-    queryFn: async ({ signal }) => {
-      const token = await getToken();
-      return getWithFallback<MarketRegime>("/market/regime", {
-        signal,
-        token,
-      });
-    },
-    staleTime: STALE,
-  });
-}
-
 export function usePortfolioWeights() {
   const getToken = useApiToken();
   return useQuery({
@@ -205,6 +188,7 @@ export function usePortfolioMetrics() {
       return getWithFallback<PortfolioMetrics>("/portfolio/metrics", {
         signal,
         token,
+        emptyOnNotFound: true,
       });
     },
     staleTime: STALE,

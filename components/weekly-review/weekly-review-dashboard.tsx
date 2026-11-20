@@ -2,9 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, CircleHelp } from "lucide-react";
-import { apiGet } from "@/lib/api-client";
+import { getWithFallback } from "@/lib/api-client";
 import { useApiToken } from "@/lib/queries";
 import { useI18n } from "@/lib/i18n/context";
+import { OfflineBanner } from "@/components/shared/offline-banner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -28,8 +29,8 @@ export function WeeklyReviewDashboard() {
   const getToken = useApiToken();
   const { dict } = useI18n();
   const t = dict.weeklyReview;
-  const query = useQuery({ queryKey: ["weekly-review-latest"], queryFn: async () => apiGet<Report>("/weekly/reports/latest", { token: await getToken() }), staleTime: 60_000 });
-  const report = query.data;
+  const query = useQuery({ queryKey: ["weekly-review-latest"], queryFn: async ({ signal }) => getWithFallback<Report>("/weekly/reports/latest", { signal, token: await getToken(), emptyOnNotFound: true }), staleTime: 60_000 });
+  const report = query.data?.data;
   const strategies = report?.strategies ?? [];
   const reviews = new Map((report?.review?.strategies ?? []).map((item) => [item.strategy_id, item]));
   const chartRows = strategies.filter((item) => typeof item.ehi === "number").map((item) => ({ strategy: item.strategy_id, EHI: item.ehi as number }));
@@ -38,6 +39,7 @@ export function WeeklyReviewDashboard() {
     <header><h1 className="text-2xl font-semibold">{t.title}</h1><p className="text-sm text-muted-foreground">{t.subtitle}</p></header>
     {query.isLoading && <p className="text-sm text-muted-foreground">{t.loading}</p>}
     {query.isError && <div role="alert" className="flex flex-wrap items-center gap-3 text-sm text-destructive"><p>{t.error}</p><button type="button" className="underline underline-offset-4" onClick={() => query.refetch()}>{t.retry}</button></div>}
+    {query.data?.isFallback && <div role="alert" className="flex flex-wrap items-center gap-3"><OfflineBanner /><button type="button" className="text-sm font-medium text-primary underline underline-offset-4" onClick={() => query.refetch()}>{t.retry}</button></div>}
     {!query.isLoading && !query.isError && !report && <p className="text-sm text-muted-foreground">{t.unavailable}</p>}
     {report && <><div className="grid gap-3 sm:grid-cols-3">
       <Card><CardHeader className="pb-2"><CardTitle className="text-sm">{t.week}</CardTitle></CardHeader><CardContent className="text-xl font-semibold">{report.week}</CardContent></Card>

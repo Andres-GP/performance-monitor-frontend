@@ -11,7 +11,6 @@ const routes: Record<BackendMethod, RegExp[]> = {
     /^portfolios$/,
     /^portfolios\/[^/]+$/,
     /^portfolios\/[^/]+\/correlation$/,
-    /^market\/regime$/,
     /^portfolio\/metrics$/,
     /^portfolio\/weights$/,
     /^capital\/summary$/,

@@ -16,10 +16,8 @@ jest.mock("@/lib/i18n/context", () => ({
   useI18n: () => ({
     dict: {
       nav: {
-        dashboard: "Dashboard",
         strategies: "Strategies",
         portfolio: "Portfolio",
-        marketRegime: "Market Regime",
         alerts: "Alerts",
       },
       header: {

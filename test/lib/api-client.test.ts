@@ -84,5 +84,13 @@ describe("api-client", () => {
       fetchMock.mockResolvedValueOnce(jsonResponse({ error: "Unavailable" }, false, 503));
       await expect(getWithFallback("/alerts")).resolves.toEqual({ data: null, isFallback: true });
     });
+
+    it("treats an expected missing dataset as empty without hiding other 404s", async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse({ detail: "No portfolio metrics available" }, false, 404));
+      await expect(getWithFallback("/portfolio/metrics", { emptyOnNotFound: true })).resolves.toEqual({ data: null, isFallback: false });
+
+      fetchMock.mockResolvedValueOnce(jsonResponse({ detail: "Not Found" }, false, 404));
+      await expect(getWithFallback("/unknown", { emptyOnNotFound: true })).rejects.toMatchObject({ status: 404 });
+    });
   });
 });

@@ -122,22 +122,6 @@ export interface EdgeHealth {
   notes?: string;
 }
 
-export interface MarketRegime {
-  trend?: string | null;
-  fear?: string | null;
-  volatility?: string | null;
-  adx?: number | null;
-  vix_percentile?: number | null;
-  atr_percentile?: number | null;
-  breadth?: number | null;
-  strength?: number | null;
-  advance_decline_ratio?: number | null;
-  nh_nl_ratio?: number | null;
-  correlation_spy_qqq?: number | null;
-  correlation_spy_tlt?: number | null;
-  timestamp?: string;
-}
-
 export interface PortfolioWeight {
   strategy_id: string;
   strategy_name?: string;

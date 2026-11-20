@@ -7,7 +7,6 @@ describe("navItems", () => {
       expect.arrayContaining([
         "/strategies",
         "/portfolio",
-        "/market-regime",
         "/weekly-review",
         "/alerts",
       ]),
