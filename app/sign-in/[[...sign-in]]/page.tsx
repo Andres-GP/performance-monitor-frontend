@@ -1,16 +1,37 @@
 "use client";
 
-import { useUser, useClerk } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState, useEffect, useRef } from "react";
-import {
-  EnvelopeIcon,
-  LockClosedIcon,
-  ArrowRightIcon,
-  EyeIcon,
-  EyeSlashIcon,
-} from "@heroicons/react/24/outline";
+import { useEffect, useRef, useState } from "react";
+import type { FormEvent } from "react";
+import { ArrowRight, Eye, EyeOff, LineChart, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
+import { LanguageSelector } from "@/components/layout/language-selector";
 import { useI18n } from "@/lib/i18n/context";
+
+type ClerkSignInError = {
+  errors?: Array<{ code?: string; longMessage?: string; message?: string }>;
+  message?: string;
+};
+
+function getSignInError(error: unknown): ClerkSignInError {
+  if (typeof error !== "object" || error === null) return {};
+  const record = error as Record<string, unknown>;
+  const errors = Array.isArray(record.errors)
+    ? record.errors.flatMap((item) => {
+        if (typeof item !== "object" || item === null) return [];
+        const value = item as Record<string, unknown>;
+        return [{
+          code: typeof value.code === "string" ? value.code : undefined,
+          longMessage: typeof value.longMessage === "string" ? value.longMessage : undefined,
+          message: typeof value.message === "string" ? value.message : undefined,
+        }];
+      })
+    : undefined;
+  return {
+    errors,
+    message: typeof record.message === "string" ? record.message : undefined,
+  };
+}
 
 export default function SignInPage() {
   const { dict } = useI18n();
@@ -32,248 +53,206 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  if (!isUserLoaded) {
-    return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <svg
-          className="animate-spin h-8 w-8 text-white"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          />
-        </svg>
-      </div>
-    );
-  }
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      if (!client || !client.signIn) {
-        throw new Error("El cliente de Clerk no está disponible.");
+      if (!client?.signIn) {
+        throw new Error("Clerk is not available. Please try again.");
       }
 
-      const result = await client.signIn.create({
-        identifier: email,
-        password,
-      });
-
+      const result = await client.signIn.create({ identifier: email, password });
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
         router.replace("/");
         return;
       }
 
-      setError(`Estado inesperado: ${result.status}. Contacta soporte.`);
-    } catch (err: any) {
-      console.error("❌ Error en login:", err);
-      if (err?.errors?.[0]?.code === "session_exists") {
+      setError(`${dict.signIn.unexpectedState}: ${result.status}`);
+    } catch (caught: unknown) {
+      const clerkError = getSignInError(caught);
+      const firstError = clerkError.errors?.[0];
+      if (firstError?.code === "session_exists") {
         router.replace("/");
         return;
       }
-      const message =
-        err?.errors?.[0]?.longMessage ??
-        err?.errors?.[0]?.message ??
-        err?.message ??
-        "Error al iniciar sesión. Verifica tus datos.";
-      setError(message);
+      setError(
+        firstError?.longMessage ??
+          firstError?.message ??
+          clerkError.message ??
+          dict.signIn.couldntSignIn,
+      );
     } finally {
       setLoading(false);
     }
   }
 
-  return (
-    <main className="min-h-screen bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden font-sans antialiased selection:bg-white/10">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIyMjgiIGZpbGwtb3BhY2l0eT0iMC4wNCI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyek0zNiAxNHYySDI0di0yaDEyek0xOCAzNHYySDZ2LTJoMTJ6TTE4IDI0djJINnYtMmgxMnpNMTggMTR2Mkg2di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
-      <div className="absolute top-[-10%] right-[-5%] w-[40rem] h-[40rem] bg-white/5 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-[-10%] left-[-5%] w-[30rem] h-[30rem] bg-white/5 rounded-full blur-3xl animate-pulse delay-700"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50rem] h-[50rem] bg-white/5 rounded-full blur-3xl"></div>
-      <div className="absolute top-[15%] right-[20%] w-1 h-1 bg-white/40 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.2)] animate-ping"></div>
-      <div className="absolute bottom-[25%] left-[10%] w-1.5 h-1.5 bg-white/30 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.1)] animate-ping delay-300"></div>
-      <div className="absolute top-[40%] right-[5%] w-1 h-1 bg-white/20 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.1)] animate-ping delay-700"></div>
-
-      <div className="relative w-full max-w-md z-10">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-[#121212] border border-white/5 rounded-full px-3 py-1.5 mb-4 shadow-lg shadow-black/30">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400/80"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-            <span className="text-[10px] font-medium tracking-wider text-gray-400 uppercase">
-              {dict.signIn.liveSystem}
-            </span>
-          </div>
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="h-px w-8 bg-gradient-to-r from-transparent to-white/20"></div>
-            <span className="text-3xl font-light text-white tracking-tight">
-              📊
-            </span>
-            <div className="h-px w-8 bg-gradient-to-l from-transparent to-white/20"></div>
-          </div>
-          <h1 className="text-2xl font-light text-white tracking-tight">
-            Performance<span className="font-bold">Monitor</span>
-          </h1>
-          <p className="text-sm text-gray-400 mt-1.5 font-light tracking-wide">
-            {dict.signIn.description}
-          </p>
+  if (!isUserLoaded) {
+    return (
+      <main className="flex min-h-svh items-center justify-center bg-[#1f3d36]" aria-label={dict.signIn.loading}>
+        <div className="flex flex-col items-center gap-4 rounded-3xl border border-white/10 bg-[#2b4d44] px-10 py-8 shadow-2xl">
+          <span className="flex size-12 items-center justify-center rounded-2xl bg-[#c8f5a8] text-[#1f3d36]">
+            <LineChart aria-hidden="true" className="size-6" />
+          </span>
+          <p className="text-sm text-[#d7e5dc]">{dict.signIn.loading}</p>
+          <span className="h-1 w-40 overflow-hidden rounded-full bg-white/10">
+            <span className="block h-full w-1/2 animate-pulse rounded-full bg-[#c8f5a8] motion-reduce:animate-none" />
+          </span>
         </div>
+      </main>
+    );
+  }
 
-        <div className="relative">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-white/10 via-white/5 to-white/10 rounded-2xl blur-sm"></div>
-          <div className="relative bg-[#0D0D0D]/90 backdrop-blur-xl border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl shadow-black/70">
-            <form onSubmit={handleSubmit} className="w-full">
-              <div className="mb-4">
-                <label
-                  htmlFor="email"
-                  className="block text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1.5"
-                >
-                  {dict.signIn.email}
-                </label>
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 rounded-xl blur-md opacity-0 group-focus-within:opacity-100 transition-opacity duration-500"></div>
-                  <div className="relative bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3.5 group-focus-within:border-white/20 transition-all duration-300 shadow-lg shadow-black/30">
-                    <EnvelopeIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-white/70 transition-colors" />
-                    <input
-                      id="email"
-                      type="email"
-                      autoComplete="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-transparent border-0 pl-8 text-sm text-white placeholder:text-gray-500 focus:ring-0 focus:outline-none"
-                      placeholder={dict.signIn.email}
-                    />
-                  </div>
+  return (
+    <main className="relative isolate flex min-h-svh items-center justify-center overflow-hidden px-4 py-8 sm:px-8 lg:py-12">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute -right-36 -top-44 size-[34rem] rounded-full bg-[#adc5b7]/10 blur-3xl" />
+        <div className="absolute -bottom-48 -left-40 size-[34rem] rounded-full bg-[#c8f5a8]/[0.07] blur-3xl" />
+        <div className="absolute inset-0 opacity-[0.16] [background-image:radial-gradient(rgba(200,245,168,0.26)_0.7px,transparent_0.8px)] [background-size:22px_22px] [mask-image:linear-gradient(135deg,#000,transparent_70%)]" />
+      </div>
+
+      <div className="absolute right-4 top-4 z-10 sm:right-8 sm:top-7">
+        <LanguageSelector />
+      </div>
+
+      <div className="grid w-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/[0.11] bg-[#17342d]/80 shadow-[0_32px_100px_rgba(5,22,17,0.35)] backdrop-blur-xl lg:min-h-[650px] lg:grid-cols-[1.06fr_0.94fr]">
+        <section className="relative flex flex-col justify-between overflow-hidden border-b border-white/10 p-7 sm:p-10 lg:border-b-0 lg:border-r lg:p-14">
+          <div aria-hidden="true" className="absolute -right-16 top-20 size-80 rounded-full border border-[#c8f5a8]/[0.08]" />
+          <div aria-hidden="true" className="absolute -right-4 top-32 size-56 rounded-full border border-[#c8f5a8]/[0.08]" />
+
+          <div className="relative z-[1]">
+            <div className="flex items-center gap-3">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-[#c8f5a8] text-[#1f3d36] shadow-[0_8px_28px_rgba(200,245,168,0.18)]">
+                <LineChart aria-hidden="true" className="size-5" strokeWidth={2} />
+              </span>
+              <span className="leading-tight">
+                <span className="block text-sm font-semibold tracking-tight text-[#f2f5ef]">Alphaca</span>
+                <span className="block text-sm font-medium text-[#adc5b7]">Capital</span>
+              </span>
+              <span className="ml-2 hidden h-px flex-1 bg-gradient-to-r from-white/15 to-transparent sm:block" />
+            </div>
+
+            <div className="mt-12 max-w-xl sm:mt-20 lg:mt-24">
+              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#c8f5a8]/20 bg-[#c8f5a8]/[0.07] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#d5f2c2]">
+                <span className="size-1.5 rounded-full bg-[#c8f5a8]" />
+                {dict.signIn.liveSystem}
+              </p>
+              <h1 className="max-w-lg text-4xl font-medium leading-[1.08] tracking-[-0.045em] text-[#f2f5ef] sm:text-5xl lg:text-[3.5rem]">
+                {dict.signIn.brandHeadline}
+              </h1>
+              <p className="mt-5 max-w-md text-base leading-7 text-[#b4c8bc] sm:text-lg sm:leading-8">
+                {dict.signIn.description}
+              </p>
+            </div>
+          </div>
+
+          <div className="relative z-[1] mt-12 grid gap-3 sm:grid-cols-3 lg:mt-16">
+            {[dict.signIn.focusPortfolio, dict.signIn.focusStrategies, dict.signIn.focusRisk].map((item, index) => (
+              <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.035] px-3 py-3.5">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#c8f5a8]/10 text-[#c8f5a8]">
+                  {index === 0 ? <LineChart aria-hidden="true" className="size-4" /> : index === 1 ? <ArrowRight aria-hidden="true" className="size-4" /> : <ShieldCheck aria-hidden="true" className="size-4" />}
+                </span>
+                <span className="text-xs font-medium text-[#d4e1d8]">{item}</span>
+              </div>
+            ))}
+          </div>
+          <p className="relative z-[1] mt-7 text-[11px] tracking-wide text-[#8da799]">
+            © 2026 Alphaca Capital · {process.env.NEXT_PUBLIC_APP_VERSION || "1.0.0"}
+          </p>
+        </section>
+
+        <section className="flex items-center justify-center p-5 sm:p-10 lg:p-14" aria-labelledby="signin-title">
+          <div className="w-full max-w-md">
+            <div className="mb-8">
+              <span className="mb-5 flex size-11 items-center justify-center rounded-2xl border border-[#c8f5a8]/20 bg-[#c8f5a8]/[0.08] text-[#c8f5a8]">
+                <LockKeyhole aria-hidden="true" className="size-5" />
+              </span>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#adc5b7]">{dict.signIn.secureWorkspace}</p>
+              <h2 id="signin-title" className="mt-2 text-2xl font-semibold tracking-tight text-[#f2f5ef] sm:text-3xl">{dict.signIn.signIn}</h2>
+              <p className="mt-2 text-sm leading-6 text-[#b4c8bc]">{dict.signIn.formDescription}</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-xs font-semibold uppercase tracking-[0.12em] text-[#d4e1d8]">{dict.signIn.email}</label>
+                <div className="flex h-12 items-center gap-3 rounded-xl border border-white/[0.13] bg-[#102820]/65 px-4 transition-colors focus-within:border-[#c8f5a8]/55 focus-within:bg-[#102820]">
+                  <Mail aria-hidden="true" className="size-4 shrink-0 text-[#91aa9b]" />
+                  <input
+                    id="email"
+                    type="email"
+                    autoComplete="username"
+                    inputMode="email"
+                    required
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? "signin-error" : undefined}
+                    className="h-full min-w-0 flex-1 border-0 bg-transparent text-sm text-[#f2f5ef] outline-none placeholder:text-[#80988b] focus:ring-0"
+                  />
                 </div>
               </div>
 
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-1.5">
-                  <label
-                    htmlFor="password"
-                    className="block text-[11px] font-medium text-gray-400 uppercase tracking-wider"
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-xs font-semibold uppercase tracking-[0.12em] text-[#d4e1d8]">{dict.signIn.password}</label>
+                <div className="flex h-12 items-center gap-3 rounded-xl border border-white/[0.13] bg-[#102820]/65 px-4 transition-colors focus-within:border-[#c8f5a8]/55 focus-within:bg-[#102820]">
+                  <LockKeyhole aria-hidden="true" className="size-4 shrink-0 text-[#91aa9b]" />
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    required
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? "signin-error" : undefined}
+                    className="h-full min-w-0 flex-1 border-0 bg-transparent text-sm text-[#f2f5ef] outline-none placeholder:text-[#80988b] focus:ring-0"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((visible) => !visible)}
+                    aria-label={showPassword ? dict.signIn.hidePassword : dict.signIn.showPassword}
+                    className="flex size-8 shrink-0 items-center justify-center rounded-lg text-[#adc5b7] transition-colors hover:bg-white/[0.06] hover:text-white"
                   >
-                    {dict.signIn.password}
-                  </label>
-                </div>
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 rounded-xl blur-md opacity-0 group-focus-within:opacity-100 transition-opacity duration-500"></div>
-                  <div className="relative bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3.5 group-focus-within:border-white/20 transition-all duration-300 shadow-lg shadow-black/30">
-                    <LockClosedIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-white/70 transition-colors" />
-                    <input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      autoComplete="current-password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-transparent border-0 pl-8 pr-10 text-sm text-white placeholder:text-gray-500 focus:ring-0 focus:outline-none"
-                      placeholder={dict.signIn.password}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors focus:outline-none"
-                      aria-label={
-                        showPassword
-                          ? "Ocultar contraseña"
-                          : "Mostrar contraseña"
-                      }
-                    >
-                      {showPassword ? (
-                        <EyeSlashIcon className="w-5 h-5 cursor-pointer" />
-                      ) : (
-                        <EyeIcon className="w-5 h-5 cursor-pointer" />
-                      )}
-                    </button>
-                  </div>
+                    {showPassword ? <EyeOff aria-hidden="true" className="size-4" /> : <Eye aria-hidden="true" className="size-4" />}
+                  </button>
                 </div>
               </div>
 
               <div id="clerk-captcha" />
 
               {error && (
-                <div className="mb-3 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                  <p className="text-red-400 text-xs font-medium text-center">
-                    {error}
-                  </p>
+                <div id="signin-error" role="alert" aria-live="assertive" className="rounded-xl border border-rose-300/20 bg-rose-300/[0.08] px-4 py-3 text-sm leading-5 text-rose-100">
+                  {error}
                 </div>
               )}
 
-              <div className="relative group pt-2">
-                <div className="pointer-events-none absolute -inset-0.5 bg-gradient-to-r from-white/10 to-white/5 rounded-xl blur opacity-70 group-hover:opacity-100 transition duration-300"></div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="cursor-pointer relative w-full bg-white/10 hover:bg-white/20 disabled:opacity-50 text-white font-medium py-4 rounded-xl transition-all duration-300 shadow-lg shadow-black/30 flex items-center justify-center gap-3 group overflow-hidden border border-white/5"
-                >
-                  {loading ? (
-                    <div className="flex items-center gap-2">
-                      <svg
-                        className="animate-spin h-4 w-4 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      <span>{dict.signIn.entering}</span>
-                    </div>
-                  ) : (
-                    <>
-                      <span>{dict.signIn.signIn}</span>
-                      <ArrowRightIcon className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                    </>
-                  )}
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="group flex min-h-12 w-full items-center justify-center gap-3 rounded-xl bg-[#c8f5a8] px-5 py-3 text-sm font-semibold text-[#1f3d36] shadow-[0_10px_28px_rgba(200,245,168,0.12)] transition-colors hover:bg-[#d7fac0] disabled:cursor-wait disabled:opacity-65"
+              >
+                {loading ? (
+                  <>
+                    <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-[#1f3d36]/25 border-t-[#1f3d36] motion-reduce:animate-none" />
+                    {dict.signIn.entering}
+                  </>
+                ) : (
+                  <>
+                    {dict.signIn.signIn}
+                    <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transform-none" />
+                  </>
+                )}
+              </button>
             </form>
-          </div>
-        </div>
 
-        <div className="text-center mt-6">
-          <p className="text-[10px] text-gray-500 font-mono tracking-widest">
-            © 2026 PERFORMANCE MONITOR •{" "}
-            {process.env.NEXT_PUBLIC_APP_VERSION || "1.0.0"}
-          </p>
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <span className="w-1 h-1 rounded-full bg-gray-600/30"></span>
-            <span className="w-1 h-1 rounded-full bg-gray-600/30"></span>
-            <span className="text-[9px] text-green-400/50 tracking-widest uppercase">
-              ● {dict.signIn.onLine}
-            </span>
-            <span className="w-1 h-1 rounded-full bg-gray-600/30"></span>
+            <div className="mt-7 flex items-start gap-3 border-t border-white/[0.09] pt-5">
+              <ShieldCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-[#adc5b7]" />
+              <p className="text-xs leading-5 text-[#9db4a7]">{dict.signIn.securityNote}</p>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
     </main>
   );

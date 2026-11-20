@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { StrategiesTable } from "@/components/strategies/strategies-table";
+import type { Strategy } from "@/types";
 
 // --- Mock de useI18n (con todas las claves que usa el componente) ---
 jest.mock("@/lib/i18n/context", () => ({
@@ -22,12 +22,9 @@ jest.mock("@/lib/i18n/context", () => ({
         timeFrame: "Timeframe",
         dataType: "Data Type",
         sizing: "Sizing",
-        deleteAria: "Delete {name}",
-        deleteDisabledAria: "Delete {name} (disabled)",
         viewAria: "View {name}",
       },
       strategyDetail: {
-        onlyStoppedCanBeDeleted: "Only stopped strategies can be deleted",
       },
     },
     t: (template: string, opts?: { name: string }) => {
@@ -73,7 +70,7 @@ jest.mock("next/link", () => ({
 }));
 
 // --- Datos mockeados con TODAS las propiedades que usa el componente ---
-const mockStrategies = [
+const mockStrategies: Strategy[] = [
   {
     strategy_id: "strategy-1",
     name: "My Strategy 1",
@@ -91,9 +88,9 @@ const mockStrategies = [
     start_date: "2025-01-01T00:00:00Z",
     timeframe: "1h",
     data_type: "OHLC",
-    sizing: "2%",
-    edge_health: true,
-    backtest: false,
+    sizing: 2,
+    edge_health: null,
+    backtest: null,
   },
   {
     strategy_id: "strategy-2",
@@ -112,51 +109,23 @@ const mockStrategies = [
     start_date: "2025-02-15T00:00:00Z",
     timeframe: "15m",
     data_type: "tick",
-    sizing: "1%",
-    edge_health: false,
-    backtest: true,
+    sizing: 1,
+    edge_health: null,
+    backtest: null,
   },
 ];
 
 describe("StrategiesTable", () => {
-  const mockOnDelete = jest.fn();
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("calls onDelete when delete button is clicked", async () => {
-    const user = userEvent.setup();
-    render(
-      <StrategiesTable strategies={mockStrategies} onDelete={mockOnDelete} />,
-    );
-
-    const deleteButton = screen.getByRole("button", {
-      name: "Delete My Strategy 2",
-    });
-    expect(deleteButton).not.toBeDisabled();
-
-    await user.click(deleteButton);
-    expect(mockOnDelete).toHaveBeenCalledWith(mockStrategies[1]);
-  });
-
-  it("disables delete button for non-stopped strategies", () => {
-    render(
-      <StrategiesTable strategies={mockStrategies} onDelete={mockOnDelete} />,
-    );
-
-    const deleteButton = screen.getByRole("button", {
-      name: "Delete My Strategy 1 (disabled)",
-    });
-    expect(deleteButton).toBeDisabled();
-    expect(deleteButton).toHaveAttribute(
-      "title",
-      "Only stopped strategies can be deleted",
-    );
+  it("provides navigation to strategy detail without destructive actions", () => {
+    render(<StrategiesTable strategies={mockStrategies} />);
+    expect(
+      screen.getByRole("button", { name: "View My Strategy 1" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /delete/i })).toBeNull();
   });
 
   it("shows empty message when no strategies", () => {
-    render(<StrategiesTable strategies={[]} onDelete={mockOnDelete} />);
+    render(<StrategiesTable strategies={[]} />);
     expect(screen.getByText("No strategies found")).toBeInTheDocument();
   });
 });

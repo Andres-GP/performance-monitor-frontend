@@ -24,69 +24,93 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAlerts, useStrategies } from "@/lib/queries";
+import { useAcknowledgeAlert, useAlerts, useStrategies } from "@/lib/queries";
 import { formatDate } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/context";
+import type { Alert, Strategy } from "@/types";
+
+const EMPTY_ALERTS: Alert[] = [];
+const EMPTY_STRATEGIES: Strategy[] = [];
 
 export function AlertsView() {
   const { dict } = useI18n();
-  const { data, isLoading } = useAlerts(200);
   const strategies = useStrategies();
+  const acknowledge = useAcknowledgeAlert();
 
   const [strategy, setStrategy] = useState("all");
   const [severity, setSeverity] = useState("all");
+  const [status, setStatus] = useState("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(0);
 
-  const alerts = data?.data ?? [];
-  const strategyList = strategies.data?.data ?? [];
+  const requestLimit = strategy === "all" ? pageSize : 1000;
+  const requestOffset = strategy === "all" ? page * pageSize : 0;
+  const alertsQuery = useAlerts(requestLimit, {
+    offset: requestOffset,
+    status: status === "all" ? undefined : status as "open" | "ack" | "resolved",
+    severity: severity === "all" ? undefined : severity as Alert["severity"],
+    from: from ? `${from}T00:00:00Z` : undefined,
+    to: to ? `${to}T23:59:59.999Z` : undefined,
+  });
+  const { data, isLoading } = alertsQuery;
+
+  const alerts = data?.data?.items ?? EMPTY_ALERTS;
+  const strategyList = strategies.data?.data ?? EMPTY_STRATEGIES;
 
   const strategyItems = useMemo(() => {
     const items: Record<string, string> = {
       all: dict.alerts.all,
     };
     strategyList.forEach((s) => {
-      items[s.id] = s.name;
+      items[s.strategy_id] = s.name;
     });
     return items;
   }, [strategyList, dict.alerts.all]);
 
   const severityItems = {
     all: dict.alerts.all,
+    critical: dict.severity.critical,
     high: dict.alerts.high,
     medium: dict.alerts.medium,
-    low: dict.alerts.low,
+    info: dict.severity.info,
+  };
+
+  const statusItems = {
+    all: dict.alerts.all,
+    open: dict.alerts.open,
+    ack: dict.alerts.acknowledged,
+    resolved: dict.alerts.resolved,
   };
 
   const filtered = useMemo(() => {
-    const fromTime = from ? new Date(from).getTime() : null;
-    const toTime = to ? new Date(to).getTime() + 86_400_000 : null;
-    return alerts.filter((a) => {
-      const t = new Date(a.timestamp).getTime();
-      const matchStrategy = strategy === "all" || a.strategy_id === strategy;
-      const matchSeverity = severity === "all" || a.severity === severity;
-      const matchFrom = fromTime == null || t >= fromTime;
-      const matchTo = toTime == null || t <= toTime;
-      return matchStrategy && matchSeverity && matchFrom && matchTo;
-    });
-  }, [alerts, strategy, severity, from, to]);
+    return alerts.filter((alert) => strategy === "all" || alert.strategy_id === strategy);
+  }, [alerts, strategy]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const totalAlerts = strategy === "all" ? data?.data?.total ?? filtered.length : filtered.length;
+  const strategyFilterLimited = strategy !== "all" && (data?.data?.total ?? 0) > alerts.length;
+  const totalPages = Math.max(1, Math.ceil(totalAlerts / pageSize));
   const safePage = Math.min(page, totalPages - 1);
-  const pageAlerts = filtered.slice(
-    safePage * pageSize,
-    safePage * pageSize + pageSize,
-  );
+  const pageAlerts = strategy === "all"
+    ? filtered
+    : filtered.slice(safePage * pageSize, safePage * pageSize + pageSize);
 
-  const handleStrategyChange = useCallback((value: string) => {
+  const handleStrategyChange = useCallback((value: string | null) => {
+    if (value === null) return;
     setStrategy(value);
     setPage(0);
   }, []);
 
-  const handleSeverityChange = useCallback((value: string) => {
+  const handleSeverityChange = useCallback((value: string | null) => {
+    if (value === null) return;
     setSeverity(value);
+    setPage(0);
+  }, []);
+
+  const handleStatusChange = useCallback((value: string | null) => {
+    if (value === null) return;
+    setStatus(value);
     setPage(0);
   }, []);
 
@@ -106,7 +130,8 @@ export function AlertsView() {
     [],
   );
 
-  const handlePageSizeChange = useCallback((value: string) => {
+  const handlePageSizeChange = useCallback((value: string | null) => {
+    if (value === null) return;
     setPageSize(Number(value));
     setPage(0);
   }, []);
@@ -132,9 +157,10 @@ export function AlertsView() {
       </div>
 
       {data?.isFallback && <OfflineBanner />}
+      {strategyFilterLimited && <p className="rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">{dict.alerts.strategyFilterLimit}</p>}
 
       <Card>
-        <CardContent className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
+        <CardContent className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="flex flex-col gap-1.5">
             <Label className="text-xs text-muted-foreground">
               {dict.alerts.filterStrategy}
@@ -150,7 +176,7 @@ export function AlertsView() {
               <SelectContent>
                 <SelectItem value="all">{dict.alerts.all}</SelectItem>
                 {strategyList.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
+                  <SelectItem key={s.strategy_id} value={s.strategy_id}>
                     {s.name}
                   </SelectItem>
                 ))}
@@ -171,9 +197,22 @@ export function AlertsView() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{dict.alerts.all}</SelectItem>
+                <SelectItem value="critical">{dict.severity.critical}</SelectItem>
                 <SelectItem value="high">{dict.alerts.high}</SelectItem>
                 <SelectItem value="medium">{dict.alerts.medium}</SelectItem>
-                <SelectItem value="low">{dict.alerts.low}</SelectItem>
+                <SelectItem value="info">{dict.severity.info}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs text-muted-foreground">{dict.alerts.filterStatus}</Label>
+            <Select items={statusItems} value={status} onValueChange={handleStatusChange}>
+              <SelectTrigger><SelectValue placeholder={dict.alerts.filterStatus} /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{dict.alerts.all}</SelectItem>
+                <SelectItem value="open">{dict.alerts.open}</SelectItem>
+                <SelectItem value="ack">{dict.alerts.acknowledged}</SelectItem>
+                <SelectItem value="resolved">{dict.alerts.resolved}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -197,13 +236,18 @@ export function AlertsView() {
         </CardContent>
       </Card>
 
-      {isLoading ? (
+      {alertsQuery.isError ? (
+        <div role="alert" className="flex items-center justify-between gap-3 rounded-lg border border-destructive/30 p-4 text-sm text-destructive">
+          <span>{dict.alerts.loadError}</span>
+          <Button variant="outline" size="sm" onClick={() => alertsQuery.refetch()}>{dict.alerts.retry}</Button>
+        </div>
+      ) : isLoading ? (
         <div className="flex flex-col gap-2">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-12 w-full" />
           ))}
         </div>
-      ) : filtered.length === 0 ? (
+      ) : totalAlerts === 0 || filtered.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
           {dict.alerts.empty}
         </div>
@@ -221,6 +265,7 @@ export function AlertsView() {
                     {dict.alerts.colStrategy}
                   </TableHead>
                   <TableHead>{dict.alerts.colSeverity}</TableHead>
+                  <TableHead>{dict.alerts.acknowledge}</TableHead>
                   <TableHead className="text-right">
                     {dict.alerts.colDate}
                   </TableHead>
@@ -230,7 +275,7 @@ export function AlertsView() {
                 {pageAlerts.map((a) => (
                   <TableRow key={a.id}>
                     <TableCell className="font-medium">
-                      {a.problem_type}
+                      {a.problem_type ?? a.rule_key ?? a.problem ?? "—"}
                     </TableCell>
                     <TableCell className="hidden max-w-sm md:table-cell">
                       <div
@@ -241,13 +286,20 @@ export function AlertsView() {
                       </div>
                     </TableCell>
                     <TableCell className="hidden text-muted-foreground sm:table-cell">
-                      {a.strategy_name ?? a.strategy_id}
+                      {a.strategy_name ?? a.strategy_id ?? a.portfolio_id ?? "—"}
                     </TableCell>
                     <TableCell>
                       <SeverityBadge severity={a.severity} />
                     </TableCell>
                     <TableCell className="text-right text-muted-foreground">
-                      {formatDate(a.timestamp)}
+                      {formatDate(a.last_seen ?? a.first_seen ?? a.timestamp)}
+                    </TableCell>
+                    <TableCell>
+                      {a.status === "open" ? (
+                        <Button size="sm" variant="outline" disabled={acknowledge.isPending} onClick={() => acknowledge.mutate(a.id)}>
+                          {dict.alerts.acknowledge}
+                        </Button>
+                      ) : a.status === "ack" ? dict.alerts.acknowledged : "—"}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -275,7 +327,7 @@ export function AlertsView() {
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <span>
                 {interpolate(dict.alerts.count, {
-                  count: filtered.length,
+                  count: totalAlerts,
                   page: safePage + 1,
                   total: totalPages,
                 })}

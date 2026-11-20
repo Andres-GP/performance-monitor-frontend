@@ -21,7 +21,22 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm ci --legacy-peer-deps
+
+      - name: Check required Vercel secrets
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          for name in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "Required GitHub Actions secret $name is missing."
+              exit 1
+            fi
+          done
+          echo "Vercel deployment configuration is present."
 
       - name: Deploy to Vercel
         env:
@@ -29,8 +44,9 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          if [[ "${{ github.ref_name }}" == "main" ]]; then
-            npx vercel deploy --token $VERCEL_TOKEN --yes --prod
+          set -euo pipefail
+          if [[ "$GITHUB_REF_NAME" == "main" ]]; then
+            npx --yes vercel@66.5.0 deploy --token "$VERCEL_TOKEN" --yes --prod
           else
-            npx vercel deploy --token $VERCEL_TOKEN --yes
+            npx --yes vercel@66.5.0 deploy --token "$VERCEL_TOKEN" --yes
           fi

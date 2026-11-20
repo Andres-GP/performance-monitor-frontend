@@ -5,10 +5,12 @@ import type { Alert } from "@/types";
 
 const useAlerts = jest.fn();
 const useStrategies = jest.fn();
+const useAcknowledgeAlert = jest.fn();
 
 jest.mock("@/lib/queries", () => ({
   useAlerts: (limit?: number) => useAlerts(limit),
   useStrategies: () => useStrategies(),
+  useAcknowledgeAlert: () => useAcknowledgeAlert(),
 }));
 
 function buildAlerts(count: number): Alert[] {
@@ -25,6 +27,7 @@ function buildAlerts(count: number): Alert[] {
 
 describe("AlertsView", () => {
   beforeEach(() => {
+    useAcknowledgeAlert.mockReturnValue({ mutate: jest.fn(), isPending: false });
     useStrategies.mockReturnValue({
       data: { data: [{ id: "str-1", name: "Momentum" }] },
     });

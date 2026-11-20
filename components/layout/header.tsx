@@ -14,6 +14,7 @@ import { useI18n } from "@/lib/i18n/context";
 import { LanguageSelector } from "./language-selector";
 import { navItems } from "./nav-items";
 import { SidebarNav } from "./sidebar-nav";
+import { BackendStatus } from "./backend-status";
 import { useClerk, useUser } from "@clerk/nextjs";
 import {
   DropdownMenu,
@@ -59,14 +60,14 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur md:px-6">
+    <header className="sticky top-0 z-30 flex h-[4.5rem] items-center gap-3 border-b border-white/10 bg-[#1f3d36]/90 px-4 backdrop-blur-xl md:px-7">
       <Sheet>
         <SheetTrigger
           render={
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="size-10 rounded-xl border border-white/10 text-[#f2f5ef] hover:bg-white/[0.06] md:hidden"
               aria-label={dict.header.openMenu}
             />
           }
@@ -79,11 +80,19 @@ export function Header() {
         </SheetContent>
       </Sheet>
 
-      <h1 className="text-base font-semibold md:text-lg">{title}</h1>
+      <div className="min-w-0">
+        <p className="hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-[#adc5b7] md:block">
+          Alphaca Capital
+        </p>
+        <h1 className="truncate text-base font-semibold tracking-tight text-[#f2f5ef] md:text-lg">
+          {title}
+        </h1>
+      </div>
 
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-2 sm:gap-3">
+        <BackendStatus />
         <LanguageSelector />
-        <span className="hidden text-sm text-muted-foreground sm:inline">
+        <span className="hidden max-w-36 truncate text-sm text-[#c2d2c8] lg:inline">
           {user?.firstName ||
             user?.emailAddresses?.[0]?.emailAddress ||
             dict.header.user}
@@ -91,8 +100,8 @@ export function Header() {
 
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <Avatar className="size-9 cursor-pointer">
-              <AvatarFallback className="bg-primary/15 text-primary">
+            <Avatar className="size-9 cursor-pointer ring-1 ring-white/15 transition hover:ring-[#c8f5a8]/60">
+              <AvatarFallback className="bg-[#c8f5a8]/15 font-semibold text-[#c8f5a8]">
                 {getInitials()}
               </AvatarFallback>
             </Avatar>

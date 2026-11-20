@@ -32,7 +32,7 @@ export default memo(function CapitalPie({ data }: { data: CapitalAccount[] }) {
             color: "var(--color-popover-foreground)",
             textTransform: "capitalize",
           }}
-          formatter={(value: number, name: string) => [formatCurrency(value), name]}
+          formatter={(value, name) => [formatCurrency(typeof value === "number" ? value : null), String(name ?? "")]}
         />
       </PieChart>
     </ResponsiveContainer>

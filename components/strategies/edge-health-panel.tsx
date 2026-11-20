@@ -32,8 +32,8 @@ function moment(
 }
 
 export function EdgeHealthPanel({ strategy }: { strategy: Strategy }) {
-  const { data, isLoading } = useTrades(strategy.id);
-  const trades = data?.data ?? [];
+  const { data, isLoading } = useTrades(strategy.strategy_id);
+  const trades = data?.data?.items ?? [];
   const { dict } = useI18n();
 
   if (isLoading) {
@@ -46,64 +46,71 @@ export function EdgeHealthPanel({ strategy }: { strategy: Strategy }) {
     );
   }
 
-  const pnls = trades.map((t) => t.pnl);
+  const pnls = trades
+    .map((trade) => trade.pnl ?? trade.profit)
+    .filter((pnl): pnl is number => typeof pnl === "number");
+  const sampleCount = data?.data?.total ?? trades.length;
   const m = mean(pnls);
   const sd = Math.sqrt(moment(pnls, 2, m, 1)); // raw variance sqrt
   const skewness = moment(pnls, 3, m, sd || 1);
   const kurtosis = moment(pnls, 4, m, sd || 1) - 3;
 
-  const wins = (arr: typeof trades) =>
-    arr.length ? arr.filter((t) => t.pnl > 0).length / arr.length : 0;
+  const wins = (arr: typeof trades): number | null => {
+    const values = arr.map((trade) => trade.pnl ?? trade.profit).filter((pnl): pnl is number => typeof pnl === "number");
+    return values.length ? values.filter((pnl) => pnl > 0).length / values.length : null;
+  };
   const recent = trades.slice(0, Math.max(1, Math.floor(trades.length / 3)));
   const overallWin = wins(trades);
   const recentWin = wins(recent);
-  const oosDegradation = overallWin ? (overallWin - recentWin) / overallWin : 0;
+  const oosDegradation = overallWin != null && recentWin != null && overallWin > 0
+    ? (overallWin - recentWin) / overallWin
+    : null;
 
   const grossAbs = pnls.reduce((a, b) => a + Math.abs(b), 0);
   const netPnl = pnls.reduce((a, b) => a + b, 0);
-  const efficiencyRatio = grossAbs ? netPnl / grossAbs : 0;
+  const efficiencyRatio = pnls.length && grossAbs ? netPnl / grossAbs : null;
 
   const metrics = [
     {
       label: dict.edgeHealth.oosDegradation,
       value: formatPercent(oosDegradation),
       icon: ArrowDownRight,
-      negative: oosDegradation > 0.1,
+      negative: oosDegradation != null && oosDegradation > 0.1,
       hint: dict.edgeHealth.oosHint,
     },
     {
       label: dict.edgeHealth.efficiencyRatio,
       value: formatNumber(efficiencyRatio),
       icon: Gauge,
-      negative: efficiencyRatio < 0.05,
+      negative: efficiencyRatio != null && efficiencyRatio < 0.05,
       hint: dict.edgeHealth.efficiencyHint,
     },
     {
       label: dict.edgeHealth.skewness,
-      value: formatNumber(skewness),
+      value: formatNumber(pnls.length ? skewness : null),
       icon: Sigma,
-      negative: skewness < -0.5,
+      negative: pnls.length > 0 && skewness < -0.5,
       hint: dict.edgeHealth.skewnessHint,
     },
     {
       label: dict.edgeHealth.kurtosis,
-      value: formatNumber(kurtosis),
+      value: formatNumber(pnls.length ? kurtosis : null),
       icon: Activity,
-      negative: kurtosis > 3,
+      negative: pnls.length > 0 && kurtosis > 3,
       hint: dict.edgeHealth.kurtosisHint,
     },
     {
       label: dict.edgeHealth.profitFactor,
-      value: formatNumber(strategy.profit_factor),
+      value: formatNumber(strategy.metrics?.profit_factor),
       icon: TrendingDown,
-      negative: strategy.profit_factor < 1.1,
+      negative: typeof strategy.metrics?.profit_factor === "number" && strategy.metrics.profit_factor < 1.1,
       hint: dict.edgeHealth.profitFactorHint,
     },
     {
       label: dict.edgeHealth.sampleSize,
-      value: String(trades.length),
+      value: String(sampleCount),
       icon: Sigma,
-      negative: trades.length < 30,
+      negative: sampleCount < 30,
       hint: dict.edgeHealth.sampleSizeHint,
     },
   ];

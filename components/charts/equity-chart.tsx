@@ -49,7 +49,7 @@ export default memo(function EquityChart({ data }: { data: PerformanceMetric[] }
             color: "var(--color-popover-foreground)",
           }}
           labelFormatter={(l) => formatDateShort(l as string)}
-          formatter={(value: number) => [formatCurrency(value), "Equity"]}
+          formatter={(value) => [formatCurrency(typeof value === "number" ? value : null), "Equity"]}
         />
         <Area
           type="monotone"

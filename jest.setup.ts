@@ -24,6 +24,5 @@ class ResizeObserverStub {
   disconnect() {}
 }
 if (typeof window !== "undefined") {
-  // @ts-expect-error - assigning a stub to the global
   window.ResizeObserver = window.ResizeObserver ?? ResizeObserverStub
 }

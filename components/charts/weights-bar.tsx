@@ -12,12 +12,14 @@ import {
   YAxis,
 } from "recharts"
 import type { PortfolioWeight } from "@/types"
+import { useI18n } from "@/lib/i18n/context"
 
 export default memo(function WeightsBar({ data }: { data: PortfolioWeight[] }) {
+  const { dict } = useI18n()
   const chartData = data.map((w) => ({
     name: w.strategy_name ?? w.strategy_id,
-    target: Math.round((w.target_weight ?? 0) * 100),
-    actual: Math.round((w.actual_weight ?? 0) * 100),
+    target: w.target_weight,
+    actual: w.actual_weight,
   }))
 
   return (
@@ -47,10 +49,10 @@ export default memo(function WeightsBar({ data }: { data: PortfolioWeight[] }) {
             borderRadius: 8,
             color: "var(--color-popover-foreground)",
           }}
-          formatter={(value: number, name: string) => [`${value}%`, name === "target" ? "Objetivo" : "Real"]}
+          formatter={(value, name) => [value == null ? "—" : `${Number(value)}%`, name === "target" ? dict.portfolio.colTarget : dict.portfolio.colActual]}
         />
         <Legend
-          formatter={(v) => (v === "target" ? "Objetivo" : "Real")}
+          formatter={(v) => (v === "target" ? dict.portfolio.colTarget : dict.portfolio.colActual)}
           wrapperStyle={{ fontSize: 12 }}
         />
         <Bar dataKey="target" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} />

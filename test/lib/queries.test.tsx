@@ -3,11 +3,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import {
   qk,
+  healthRefetchInterval,
   useAlerts,
-  useDeleteStrategy,
-  useMarketRegime,
+  useHealth,
+  usePortfolioMetrics,
   useStrategies,
   useStrategy,
+  useStrategyEquity,
   useTrades,
 } from "@/lib/queries";
 
@@ -82,7 +84,22 @@ describe("query hooks", () => {
     });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(mockGetWithFallback).toHaveBeenCalledWith(
-      "/strategies/str-9/trades",
+      "/strategies/str-9/trades?limit=100&offset=0",
+      expect.objectContaining({ token: "mock-token" }),
+    );
+  });
+
+  it("requests a bounded equity page for strategy detail", async () => {
+    mockGetWithFallback.mockResolvedValueOnce({
+      data: { items: [], limit: 500, offset: 0, total: 0 },
+      isFallback: false,
+    } as never);
+    const { result } = renderHook(() => useStrategyEquity("str-4"), {
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockGetWithFallback).toHaveBeenCalledWith(
+      "/strategies/str-4/equity?limit=500&offset=0",
       expect.objectContaining({ token: "mock-token" }),
     );
   });
@@ -102,34 +119,36 @@ describe("query hooks", () => {
     );
   });
 
-  it("useMarketRegime fetches the regime endpoint", async () => {
+  it("passes alert pagination and supported backend filters", async () => {
     mockGetWithFallback.mockResolvedValueOnce({
-      data: { adx: 1 },
+      data: { items: [], limit: 20, offset: 40, total: 0 },
       isFallback: false,
     } as never);
-    const { result } = renderHook(() => useMarketRegime(), {
-      wrapper: createWrapper(),
-    });
+    const { result } = renderHook(
+      () => useAlerts(20, { offset: 40, status: "open", severity: "critical", from: "2026-01-01T00:00:00Z" }),
+      { wrapper: createWrapper() },
+    );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(mockGetWithFallback).toHaveBeenCalledWith(
-      "/market/regime",
+      "/alerts?limit=20&offset=40&status=open&severity=critical&from=2026-01-01T00%3A00%3A00Z",
       expect.objectContaining({ token: "mock-token" }),
     );
   });
 
-  it("useDeleteStrategy calls the DELETE endpoint", async () => {
-    mockApiSend.mockResolvedValueOnce({} as never);
-    const { result } = renderHook(() => useDeleteStrategy(), {
-      wrapper: createWrapper(),
-    });
-    result.current.mutate("str-3");
-    await waitFor(() =>
-      expect(mockApiSend).toHaveBeenCalledWith(
-        "/strategies/str-3",
-        "DELETE",
-        undefined,
-        expect.objectContaining({ token: "mock-token" }),
-      ),
+  it("allows missing portfolio metrics to render as unavailable data", async () => {
+    mockGetWithFallback.mockResolvedValueOnce({ data: null, isFallback: false } as never);
+    const { result } = renderHook(() => usePortfolioMetrics(), { wrapper: createWrapper() });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockGetWithFallback).toHaveBeenCalledWith(
+      "/portfolio/metrics",
+      expect.objectContaining({ token: "mock-token", emptyOnNotFound: true }),
     );
   });
+
+  it("rechecks backend health quickly after a fallback response", async () => {
+    expect(healthRefetchInterval(false, true)).toBe(5_000);
+    expect(healthRefetchInterval(true, false)).toBe(5_000);
+    expect(healthRefetchInterval(false, false)).toBe(60_000);
+  });
+
 });

@@ -54,9 +54,11 @@ export const HealthBadge = memo(function HealthBadge({
 });
 
 const severityMap: Record<Severity, string> = {
+  critical: "border-destructive bg-destructive/15 text-destructive",
   high: "border-destructive/40 bg-destructive/10 text-destructive",
   medium: "border-chart-4/40 bg-chart-4/10 text-chart-4",
   low: "border-muted-foreground/40 bg-muted/40 text-muted-foreground",
+  info: "border-chart-3/40 bg-chart-3/10 text-chart-3",
 };
 
 export const SeverityBadge = memo(function SeverityBadge({

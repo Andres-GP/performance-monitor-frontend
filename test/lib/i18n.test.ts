@@ -45,7 +45,8 @@ describe("dictionaries", () => {
   })
 
   it("keeps the same key shape between locales", () => {
-    expect(Object.keys(es.dashboard)).toEqual(Object.keys(en.dashboard))
     expect(Object.keys(dictionaries.es.nav)).toEqual(Object.keys(dictionaries.en.nav))
+    expect(Object.keys(dictionaries.es.signIn)).toEqual(Object.keys(dictionaries.en.signIn))
+    expect(Object.keys(dictionaries.es.weeklyReview)).toEqual(Object.keys(dictionaries.en.weeklyReview))
   })
 })
