@@ -190,7 +190,6 @@ export default function SignInPage() {
                     aria-invalid={Boolean(error)}
                     aria-describedby={error ? "signin-error" : undefined}
                     className="h-full min-w-0 flex-1 border-0 bg-transparent text-sm text-[#f2f5ef] outline-none placeholder:text-[#80988b] focus:ring-0"
-                    placeholder={dict.signIn.emailPlaceholder}
                   />
                 </div>
               </div>
@@ -209,7 +208,6 @@ export default function SignInPage() {
                     aria-invalid={Boolean(error)}
                     aria-describedby={error ? "signin-error" : undefined}
                     className="h-full min-w-0 flex-1 border-0 bg-transparent text-sm text-[#f2f5ef] outline-none placeholder:text-[#80988b] focus:ring-0"
-                    placeholder={dict.signIn.passwordPlaceholder}
                   />
                   <button
                     type="button"
