@@ -60,7 +60,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-[4.5rem] items-center gap-3 border-b border-white/10 bg-[#1f3d36]/90 px-4 backdrop-blur-xl md:px-7">
+    <header className="sticky top-0 z-30 flex h-[4.5rem] items-center gap-3 border-b border-white/[0.08] bg-[#1f3d36]/95 px-4 backdrop-blur-xl md:px-8">
       <Sheet>
         <SheetTrigger
           render={
