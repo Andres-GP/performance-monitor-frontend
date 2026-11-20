@@ -7,7 +7,7 @@ import { SidebarNav } from "@/components/layout/sidebar-nav";
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="relative flex min-h-svh">
-      <aside className="relative z-20 hidden w-72 shrink-0 border-r border-sidebar-border bg-sidebar/95 shadow-[12px_0_40px_rgba(8,27,21,0.12)] backdrop-blur md:block">
+      <aside className="relative z-20 hidden w-[17rem] shrink-0 border-r border-sidebar-border bg-sidebar md:block">
         <div className="sticky top-0 h-svh">
           <SidebarNav />
         </div>
