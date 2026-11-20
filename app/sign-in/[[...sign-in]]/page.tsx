@@ -43,7 +43,7 @@ export default function SignInPage() {
   useEffect(() => {
     if (isUserLoaded && isSignedIn && !redirected.current) {
       redirected.current = true;
-      router.replace("/");
+      router.replace("/strategies");
     }
   }, [isUserLoaded, isSignedIn, router]);
 
@@ -66,7 +66,7 @@ export default function SignInPage() {
       const result = await client.signIn.create({ identifier: email, password });
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        router.replace("/");
+        router.replace("/strategies");
         return;
       }
 
@@ -75,7 +75,7 @@ export default function SignInPage() {
       const clerkError = getSignInError(caught);
       const firstError = clerkError.errors?.[0];
       if (firstError?.code === "session_exists") {
-        router.replace("/");
+        router.replace("/strategies");
         return;
       }
       setError(
@@ -117,14 +117,14 @@ export default function SignInPage() {
         <LanguageSelector />
       </div>
 
-      <div className="grid w-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/[0.11] bg-[#17342d]/80 shadow-[0_32px_100px_rgba(5,22,17,0.35)] backdrop-blur-xl lg:min-h-[650px] lg:grid-cols-[1.06fr_0.94fr]">
+      <div className="grid w-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/[0.12] bg-gradient-to-br from-[#1d4036]/95 via-[#17342d]/95 to-[#142f28]/95 shadow-[0_36px_110px_rgba(5,22,17,0.42)] backdrop-blur-xl lg:min-h-[650px] lg:grid-cols-[1.06fr_0.94fr]">
         <section className="relative flex flex-col justify-between overflow-hidden border-b border-white/10 p-7 sm:p-10 lg:border-b-0 lg:border-r lg:p-14">
           <div aria-hidden="true" className="absolute -right-16 top-20 size-80 rounded-full border border-[#c8f5a8]/[0.08]" />
           <div aria-hidden="true" className="absolute -right-4 top-32 size-56 rounded-full border border-[#c8f5a8]/[0.08]" />
 
           <div className="relative z-[1]">
             <div className="flex items-center gap-3">
-              <span className="flex size-11 items-center justify-center rounded-2xl bg-[#c8f5a8] text-[#1f3d36] shadow-[0_8px_28px_rgba(200,245,168,0.18)]">
+              <span className="flex size-11 items-center justify-center rounded-full bg-[#c8f5a8] text-[#1f3d36] shadow-[0_8px_28px_rgba(200,245,168,0.2)]">
                 <LineChart aria-hidden="true" className="size-5" strokeWidth={2} />
               </span>
               <span className="leading-tight">
@@ -231,7 +231,8 @@ export default function SignInPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group flex min-h-12 w-full items-center justify-center gap-3 rounded-xl bg-[#c8f5a8] px-5 py-3 text-sm font-semibold text-[#1f3d36] shadow-[0_10px_28px_rgba(200,245,168,0.12)] transition-colors hover:bg-[#d7fac0] disabled:cursor-wait disabled:opacity-65"
+                aria-busy={loading}
+                className="group flex min-h-12 w-full items-center justify-center gap-3 rounded-xl bg-[#c8f5a8] px-5 py-3 text-sm font-semibold text-[#1f3d36] shadow-[0_10px_28px_rgba(200,245,168,0.12)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#d7fac0] hover:shadow-[0_14px_34px_rgba(200,245,168,0.18)] disabled:cursor-wait disabled:opacity-65 motion-reduce:hover:translate-y-0"
               >
                 {loading ? (
                   <>
