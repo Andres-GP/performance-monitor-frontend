@@ -1,5 +1,9 @@
 // lib/api/api-client.ts
 const PROXY_BASE = "/api/proxy";
+const EMPTY_ON_NOT_FOUND_PATHS = new Set([
+  "/portfolio/metrics",
+  "/weekly/reports/latest",
+]);
 
 export class ApiError extends Error {
   status: number;
@@ -63,12 +67,27 @@ export async function apiSend<T>(
 // backend is unreachable. Returns { data, isFallback }.
 export async function getWithFallback<T>(
   path: string,
-  options?: { signal?: AbortSignal; token?: string },
+  options?: { signal?: AbortSignal; token?: string; emptyOnNotFound?: boolean },
 ): Promise<{ data: T | null; isFallback: boolean }> {
   try {
     const data = await apiGet<T>(path, options);
     return { data, isFallback: false };
-  } catch {
+  } catch (error) {
+    // These existing backend resources intentionally return 404 when their
+    // dataset has no rows yet (portfolio metrics and weekly reports).
+    if (
+      error instanceof ApiError &&
+      error.status === 404 &&
+      options?.emptyOnNotFound &&
+      EMPTY_ON_NOT_FOUND_PATHS.has(path.split("?")[0])
+    ) {
+      return { data: null, isFallback: false };
+    }
+    // Authentication and contract errors must remain visible to the caller.
+    // Only transport failures and backend outages may use the empty state.
+    if (error instanceof ApiError && error.status < 500 && error.status !== 408) {
+      throw error;
+    }
     return { data: null, isFallback: true };
   }
 }

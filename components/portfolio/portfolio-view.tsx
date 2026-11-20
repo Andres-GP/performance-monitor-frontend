@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MonitoringPortfolioDashboard } from "./monitoring-dashboard";
 import { Activity, Edit, Receipt, TrendingDown, Library } from "lucide-react";
 import { WeightsBar } from "@/components/charts/lazy";
 import { CorrelationHeatmap } from "@/components/charts/correlation-heatmap";
@@ -39,7 +40,7 @@ import {
   usePortfolioWeights,
   useSetWeight,
 } from "@/lib/queries";
-import { formatCurrency, formatNumber, formatPercent } from "@/lib/format";
+import { formatCurrency, formatNumber, formatPercentPoints } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
 import { toast } from "sonner";
@@ -141,28 +142,26 @@ export function PortfolioView() {
     }),
   );
 
-  const correlationMatrix = pm?.correlation_matrix ?? {};
-  const hasCorrelation =
-    correlationMatrix &&
-    typeof correlationMatrix === "object" &&
-    !correlationMatrix.note &&
-    Object.keys(correlationMatrix).length > 0;
+  const correlationMatrix = pm?.correlation_matrix;
+  const correlationEntries =
+    correlationMatrix && !("note" in correlationMatrix)
+      ? Object.entries(correlationMatrix)
+      : [];
+  const hasCorrelation = correlationEntries.length > 0;
 
   let heatmapStrategies: string[] = [];
-  let heatmapMatrix: number[][] = [];
+  let heatmapMatrix: (number | null)[][] = [];
 
   if (hasCorrelation) {
-    heatmapStrategies = Object.keys(correlationMatrix);
-    heatmapMatrix = heatmapStrategies.map((s1) =>
-      heatmapStrategies.map((s2) => {
-        const val = correlationMatrix[s1]?.[s2];
-        return typeof val === "number" ? val : 0;
-      }),
+    heatmapStrategies = correlationEntries.map(([strategyId]) => strategyId);
+    heatmapMatrix = correlationEntries.map(([, row]) =>
+      heatmapStrategies.map((strategyId) => row[strategyId] ?? null),
     );
   }
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+      <MonitoringPortfolioDashboard />
       <div>
         <h2 className="text-xl font-semibold">{dict.portfolio.title}</h2>
         <p className="text-sm text-muted-foreground">
@@ -171,6 +170,19 @@ export function PortfolioView() {
       </div>
 
       {isFallback && <OfflineBanner />}
+      {(weights.isError || metrics.isError) && (
+        <div role="alert" className="flex flex-wrap items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <span>{dict.portfolio.monitoringError}</span>
+          <button type="button" className="font-medium underline underline-offset-4" onClick={() => { void weights.refetch(); void metrics.refetch(); }}>
+            {dict.portfolio.retry}
+          </button>
+        </div>
+      )}
+      {!metrics.isLoading && !metrics.isError && !metrics.data?.isFallback && !pm && (
+        <p role="status" className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-muted-foreground">
+          {dict.portfolio.metricsUnavailable}
+        </p>
+      )}
 
       <div className="flex flex-wrap gap-4">
         <div
@@ -194,7 +206,7 @@ export function PortfolioView() {
         >
           <StatCard
             label={dict.portfolio.combinedDrawdown}
-            value={formatPercent(pm?.max_drawdown ?? 0)}
+            value={formatPercentPoints(pm?.max_drawdown)}
             icon={TrendingDown}
             hint={dict.portfolio.combinedDrawdownHint}
             trend="down"
@@ -211,7 +223,7 @@ export function PortfolioView() {
         >
           <StatCard
             label={dict.portfolio.transactionCosts}
-            value={formatPercent(pm?.transaction_cost_pct ?? 0)}
+            value={formatPercentPoints(pm?.transaction_cost_pct)}
             icon={Receipt}
             hint={dict.portfolio.transactionCostsHint}
             loading={metrics.isLoading}
@@ -225,7 +237,7 @@ export function PortfolioView() {
         >
           <StatCard
             label={dict.portfolio.ruinProbability}
-            value={formatPercent(pm?.ruin_probability ?? 0)}
+            value={formatPercentPoints(pm?.ruin_probability)}
             icon={Activity}
             hint={dict.portfolio.ruinProbabilityHint}
             loading={metrics.isLoading}
@@ -243,8 +255,8 @@ export function PortfolioView() {
             label={dict.portfolio.concentration}
             value={
               maxConcentration.category
-                ? `${maxConcentration.category} ${formatPercent(maxConcentration.value)}`
-                : "N/A"
+                ? `${maxConcentration.category} ${formatPercentPoints(maxConcentration.value)}`
+                : "—"
             }
             icon={Activity}
             hint={dict.portfolio.concentrationHint}
@@ -312,16 +324,16 @@ export function PortfolioView() {
                 setEditDialogOpen(open);
               }}
             >
-              <DialogTrigger asChild>
-                <Button
+              <DialogTrigger
+                render={<Button
                   variant="outline"
                   size="sm"
                   className="cursor-pointer hover:bg-muted/20"
                 >
                   <Edit className="mr-2 h-4 w-4" />
                   {dict.portfolio.editWeights}
-                </Button>
-              </DialogTrigger>
+                </Button>}
+              />
               <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                   <DialogTitle>{dict.portfolio.editWeightsTitle}</DialogTitle>
@@ -426,21 +438,21 @@ export function PortfolioView() {
                         {d.strategyId}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {formatPercent(d.target)}
+                        {formatPercentPoints(d.target)}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {formatPercent(d.actual)}
+                        {formatPercentPoints(d.actual)}
                       </TableCell>
                       <TableCell
                         className={cn(
                           "text-right tabular-nums",
-                          Math.abs(d.deviation) > 20
+                          typeof d.deviation === "number" && Math.abs(d.deviation) > 20
                             ? "text-chart-4"
                             : "text-muted-foreground",
                         )}
                       >
-                        {d.deviation >= 0 ? "+" : ""}
-                        {formatPercent(d.deviation)}
+                        {d.deviation != null && d.deviation >= 0 ? "+" : ""}
+                        {formatPercentPoints(d.deviation)}
                       </TableCell>
                     </TableRow>
                   ))
@@ -450,7 +462,7 @@ export function PortfolioView() {
                       colSpan={4}
                       className="text-center text-muted-foreground"
                     >
-                      No hay datos de asignación
+                      {dict.portfolio.noWeightData}
                     </TableCell>
                   </TableRow>
                 )}
@@ -514,12 +526,12 @@ export function PortfolioView() {
               <p className="text-sm text-muted-foreground">
                 {pm?.current_drawdown !== undefined &&
                 pm?.current_drawdown !== null
-                  ? `Drawdown actual: ${formatPercent(pm.current_drawdown)}`
+                  ? `Drawdown actual: ${formatPercentPoints(pm.current_drawdown)}`
                   : "Sin datos de drawdown actual"}
               </p>
               <p className="text-sm text-muted-foreground">
                 {pm?.max_drawdown !== undefined && pm?.max_drawdown !== null
-                  ? `Drawdown máximo: ${formatPercent(pm.max_drawdown)}`
+                  ? `Drawdown máximo: ${formatPercentPoints(pm.max_drawdown)}`
                   : ""}
               </p>
             </div>

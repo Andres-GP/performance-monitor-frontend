@@ -2,12 +2,23 @@ import type { Locale } from "./config";
 
 export const en = {
   signIn: {
-    description: "Watch all relevant data about Quant Trading",
+    description: "Clear, connected oversight for your portfolios and trading strategies.",
+    brandHeadline: "A clearer view of your capital.",
+    secureWorkspace: "Private monitoring workspace",
+    formDescription: "Sign in to review portfolio health, strategy performance and market context.",
+    focusPortfolio: "Portfolio performance",
+    focusStrategies: "Strategy analytics",
+    focusRisk: "Risk context",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
+    securityNote: "Your monitoring workspace is available to authorized account members.",
+    loading: "Checking your session…",
+    unexpectedState: "Unexpected sign-in state",
     email: "Email",
     password: "Password",
     signIn: "Sign in",
     onLine: "Online",
-    liveSystem: "Live system",
+    liveSystem: "Portfolio monitoring",
     entering: "Entering...",
     couldntSignIn: "Couldn't sign in",
   },
@@ -23,12 +34,10 @@ export const en = {
     es: "Español",
   },
   nav: {
-    dashboard: "Dashboard",
     strategies: "Strategies",
     portfolio: "Portfolio",
-    marketRegime: "Market Regime",
+    weeklyReview: "Weekly EDA",
     alerts: "Alerts",
-    settings: "Settings",
     main: "Main navigation",
   },
   header: {
@@ -37,11 +46,16 @@ export const en = {
     openMenu: "Open navigation menu",
     navigation: "Navigation",
     closeSession: "Log out",
+    apiChecking: "Checking backend",
+    apiConnected: "Backend connected",
+    apiDataStale: "Market feed is stale",
+    apiAwaitingEvents: "Waiting for market events",
+    apiUnavailable: "Backend unavailable",
   },
   sidebar: {
-    brandTop: "Performance",
-    brandBottom: "Monitor",
-    footer: "Backend connected via secure proxy",
+    brandTop: "Alphaca",
+    brandBottom: "Capital",
+    footer: "Portfolio & strategy monitoring",
   },
   offline: {
     message: "Backend unavailable",
@@ -49,6 +63,7 @@ export const en = {
   status: {
     Running: "Running",
     Stopped: "Stopped",
+    Unknown: "Unknown",
   },
   health: {
     healthy: "Healthy",
@@ -56,185 +71,24 @@ export const en = {
     unhealthy: "Unhealthy",
   },
   severity: {
+    critical: "Critical",
     high: "High",
     medium: "Medium",
     low: "Low",
+    info: "Info",
   },
-  dashboard: {
-    title: "Overview",
-    subtitle: "Current status of your trading strategy portfolio",
-    currentRegime: "Current Market Regime",
-    capitalTotal: "Total Capital",
-    capitalHint: "All accounts",
-    activeStrategies: "Active Strategies",
-    activeHint: "Running",
-    unreadAlerts: "Unread Alerts",
-    unreadHint: "Need attention",
-    avgWinRate: "Average Win Rate",
-    avgWinRateHint: "Mean across strategies",
-    equityTitle: "Capital Evolution",
-    equityDesc: "Equity curve of the last 30 days",
-    latestAlerts: "Latest Health Alerts",
-    latestAlertsDesc: "Recent strategy events",
-    viewAll: "View all",
-  },
-  regime: {
-    adx: "ADX",
-    trendStrength: "Trend strength",
-    trend: "Trend: {value}",
-    vixPercentile: "VIX (percentile)",
-    impliedVol: "Implied volatility",
-    fear: "Fear: {value}",
-    atrPercentile: "ATR (percentile)",
-    averageRange: "Average range",
-    volatility: "Volatility: {value}",
-    breadth: "Breadth",
-    breadthHint: "Market breadth",
-    strength: "Strength",
-    strengthHint: "Relative strength",
-    advanceDecline: "Advance / Decline",
-    advanceDeclineHint: "Advances/declines ratio",
-    newHighsLows: "New Highs / Lows",
-    newHighsLowsHint: "Highs/lows ratio",
-    corrSpyQqq: "Corr. SPY/QQQ",
-    corrSpyTlt: "SPY/TLT: {value}",
-    title: "Market Regime",
-    subtitle: "Macro indicators of trend, volatility and market breadth",
-    updated: "Updated {value}",
-    widgetCorrTitle: "Key Correlations",
-    widgetCorrDesc: "Compared evolution of SPY, QQQ and TLT",
-    widgetVixTitle: "Volatility (VIX)",
-    widgetVixDesc: "S&P 500 implied volatility index",
-    widgetNhnlTitle: "New Highs / New Lows",
-    widgetNhnlDesc: "Market breadth through new highs and lows",
-    symbolsAria: "Symbols for {title}",
-    correlationsTitle: "Correlations SPY, QQQ, TLT",
-    correlationsDesc:
-      "This graph shows the evolution of prices of SPY (S&P 500), QQQ (Nasdaq 100) and TLT (20-year Treasury bonds). Observe how they move together or in opposite directions. The correlation between SPY and QQQ is usually high, while SPY and TLT usually have negative correlation (safe haven).",
-    correlationsInstruments: {
-      "AMEX:SPY": "ETF of the S&P 500, represents the overall market.",
-      "NASDAQ:QQQ": "ETF of the Nasdaq 100, reflects the technology sector.",
-      "NASDAQ:TLT": "ETF of 20-year Treasury bonds, considered a safe haven.",
-    },
-    vixTitle: "Volatility (VIX)",
-    vixDesc:
-      "The VIX (volatility index) measures the 30-day expected volatility of the S&P 500. High values indicate fear and recent drops; low values indicate complacency. It is a market sentiment indicator.",
-    vixInstruments: {
-      VIX: "S&P 500 volatility index (no exchange). May require subscription. Alternative: CBOE:VIX.",
-    },
-    breadthTitle: "Market Breadth (Advances/Declines)",
-    breadthDesc:
-      "This graph shows the evolution of SPY prices and NYSE advance/decline indices (USI:ADVN.NY and USI:DECL.NQ). These indicators reflect the participation of stocks in the market movement. If they rise, the market is broad; if only SPY rises but advances do not, it is a selective rally.",
-    breadthInstruments: {
-      "AMEX:SPY": "S&P 500 ETF, represents the overall market.",
-      "USI:ADVN.NY": "NYSE Advances – number of advancing stocks on the NYSE.",
-      "USI:DECL.NQ":
-        "NASDAQ Declines – number of declining stocks on the NASDAQ.",
-    },
-
-    // --- NUEVAS CLAVES PARA EXPLICACIONES DETALLADAS (ADX) ---
-    adxHelpTitle: "What does ADX measure?",
-    adxHelpDesc:
-      "The Average Directional Index quantifies the strength of a trend, regardless of direction.",
-    adxHelpSideways: "Sideways market (favors mean reversion strategies).",
-    adxHelpTrending: "Strong trend (favors trend following).",
-    adxHelpTransition: "Transition zone (indecision).",
-    adxHelpNow: "Now:",
-    adxHelpNowTrending: "Strong bullish trend.",
-    adxHelpNowSideways: "Sideways market, no clear direction.",
-    adxHelpNowTransition: "In transition, waiting for definition.",
-
-    // --- VIX ---
-    vixHelpTitle: "What does the VIX percentile measure?",
-    vixHelpDesc:
-      "The VIX (volatility index) reflects 30-day expected volatility. Its percentile shows how extreme current fear is compared to the last year.",
-    vixHelpExtremeFear: "Extreme fear (usually good buying opportunities).",
-    vixHelpComplacency: "Extreme complacency (risk of correction).",
-    vixHelpNormal: "Normal fear levels.",
-    vixHelpNow: "Now:",
-    vixHelpNowExtreme: "Extreme fear, buying opportunity.",
-    vixHelpNowComplacency: "Complacency, caution.",
-    vixHelpNowNormal: "Normal fear level.",
-
-    // --- ATR ---
-    atrHelpTitle: "What does the ATR percentile measure?",
-    atrHelpDesc:
-      "The ATR (average true range) measures daily volatility. Its percentile compares current volatility to the last year.",
-    atrHelpHigh: "High volatility (wider stops, smaller position size).",
-    atrHelpLow: "Low volatility (tighter stops, larger position size).",
-    atrHelpNormal: "Normal volatility.",
-    atrHelpNow: "Now:",
-    atrHelpNowHigh: "High volatility, adjust your stops.",
-    atrHelpNowLow: "Low volatility, you can tighten stops.",
-    atrHelpNowNormal: "Normal volatility.",
-
-    // --- Breadth ---
-    breadthHelpTitle: "What does Breadth measure?",
-    breadthHelpDesc:
-      "It indicates whether the market movement is broad (most stocks participate) or selective.",
-    breadthHelpStrongUpside:
-      "Strong upside breadth: most stocks rising, healthy market.",
-    breadthHelpStrongDownside:
-      "Strong downside breadth: most stocks falling, generalized weakness.",
-    breadthHelpNeutral: "Neutral breadth: balanced.",
-    breadthHelpNow: "Now:",
-    breadthHelpNowUpside: "Strong upside breadth.",
-    breadthHelpNowDownside: "Strong downside breadth.",
-    breadthHelpNowNeutral: "Neutral breadth.",
-
-    // --- Strength ---
-    strengthHelpTitle: "What does Strength measure?",
-    strengthHelpDesc:
-      "Compares the number of new 52-week highs versus new lows. Reflects market conviction.",
-    strengthHelpStrong: "Strong: more highs than lows, real strength.",
-    strengthHelpWeak: "Weak: more lows, weakness.",
-    strengthHelpNeutral: "Neutral: balance.",
-    strengthHelpNow: "Now:",
-    strengthHelpNowStrong: "Market strength.",
-    strengthHelpNowWeak: "Market weakness.",
-    strengthHelpNowNeutral: "Neutral strength.",
-
-    // --- Advance/Decline ---
-    advDecHelpTitle: "Advance / Decline Ratio",
-    advDecHelpDesc:
-      "Number of advancing stocks divided by declining stocks. The most direct breadth metric.",
-    advDecHelpStrong:
-      "Strong bullish bias (more than 2 advance for each decline).",
-    advDecHelpWeak: "Strong bearish bias.",
-    advDecHelpNeutral: "Neutral (≈1).",
-    advDecHelpNow: "Now:",
-    advDecHelpNowStrong: "(strong upside)",
-    advDecHelpNowWeak: "(strong downside)",
-    advDecHelpNowNeutral: "(neutral)",
-
-    // --- New Highs/Lows ---
-    nhNlHelpTitle: "New Highs / New Lows Ratio",
-    nhNlHelpDesc:
-      "Number of stocks reaching new 52-week highs divided by those reaching new lows.",
-    nhNlHelpStrong: "Extreme strength (many new highs).",
-    nhNlHelpWeak: "Extreme weakness.",
-    nhNlHelpNeutral: "Balanced (≈1).",
-    nhNlHelpNow: "Now:",
-    nhNlHelpNowStrong: "(strength)",
-    nhNlHelpNowWeak: "(weakness)",
-    nhNlHelpNowNeutral: "(neutral)",
-
-    // --- Correlations ---
-    corrHelpTitle: "SPY vs QQQ and SPY vs TLT Correlations",
-    corrHelpDesc:
-      "Correlation measures the relationship between daily movements of two assets.",
-    corrHelpSpyQqq:
-      "Usually high and positive (both move together). Values near 1 indicate the market is tech-led.",
-    corrHelpSpyTlt:
-      "Usually negative (bonds act as a safe haven when stocks fall).",
-    corrHelpNow: "Now:",
-    corrHelpNowStrong: "strong positive relation",
-    corrHelpNowStrongNeg: "strong negative relation",
-    corrHelpNowWeak: "weak relation",
-    corrHelpNowNeg: "strong negative correlation, typical",
-    corrHelpNowPos: "unusual positive correlation",
-    corrHelpNote:
-      "* If values are 0 or very low, it may be due to insufficient data (we need at least 30 days of data).",
+  weeklyReview: {
+    title: "Weekly strategy EDA", subtitle: "Latest portfolio review and strategy diagnostics",
+    loading: "Loading latest review…", unavailable: "No weekly report is available yet.",
+    error: "Could not load the weekly review.", retry: "Retry", week: "Week", generated: "Generated",
+    overall: "Review status", worstEhi: "Lowest available EHI", strategies: "Strategy review",
+    strategy: "Strategy", portfolio: "Portfolio", accountMode: "Account mode", modeObservedAt: "Last observed", demo: "Demo", realCapital: "Real capital", modeUnconfirmed: "Not confirmed", state: "Review", backtest: "Backtest", regime: "Regime",
+    ehi: "EHI", expectancy: "Expectancy percentile", profitFactor: "Profit factor percentile",
+    winRate: "Win rate percentile", regimeScore: "Regime component", status: "Data status",
+    market: "Market context", noData: "Not available", unconfirmed: "Regime hypothesis unconfirmed; neutral component applied.",
+    verdict: "Backtest verdict", limitations: "Data limitations", signals: "Review signals", note: "Analysis note",
+    provisional: "Provisional analysis: combines bootstrap percentiles for expectancy, profit factor and win rate with a market regime component. Unconfirmed regime hypotheses use a neutral score. This is not a recommendation or execution signal.",
+    alert: "Review required", limited: "Limited by data", ready: "Ready for human review",
   },
   strategies: {
     title: "Strategies",
@@ -258,8 +112,6 @@ export const en = {
     colTrades: "Trades",
     colActions: "Actions",
     empty: "No strategies match the filters.",
-    deleteAria: "Delete {name}",
-    deleteDisabledAria: "Delete Disabled {name}",
     viewAria: "View {name}",
     strategyId: "Strategy Id",
     creationDate: "Creation Date",
@@ -272,8 +124,6 @@ export const en = {
     back: "Strategies",
     notFound: "The requested strategy was not found.",
     backToStrategies: "Back to strategies",
-    delete: "Delete",
-    onlyStoppedCanBeDeleted: "Only stopped strategies can be deleted",
     subtitle: "{instrument} · {platform} · {trades} trades",
     winRate: "Win Rate",
     profitFactor: "Profit Factor",
@@ -298,13 +148,6 @@ export const en = {
     noMetrics: "No metric data is available for this strategy.",
     noOpsYet: "The data will be generated when the strategy begins to operate.",
     comparison: "Comparison",
-  },
-  strategyDelete: {
-    title: "Delete strategy",
-    description:
-      "Are you sure you want to delete {name}? This action cannot be undone and it will stop being monitored.",
-    confirm: "Delete",
-    deleting: "Deleting...",
   },
   trades: {
     colSymbol: "Symbol",
@@ -332,7 +175,6 @@ export const en = {
     submitting: "Uploading...",
     startOfPeriod: "Period Start",
     endOfPeriod: "Period End",
-    expectedPnl: "Expected PNL",
     expectedSharpe: "Expected Sharpe",
     expectedDrowdown: "Expected Drowdown",
     parametersOptionalJSON: "Parameters (optional JSON)",
@@ -352,7 +194,6 @@ export const en = {
     difference: "Difference",
     pnlExpected: "Expected PNL",
     periodOfBacktest: "Period of backtest:",
-    parameters: "Parameters:",
   },
   edgeHealth: {
     oosDegradation: "OOS Degradation",
@@ -378,14 +219,39 @@ export const en = {
   portfolio: {
     title: "Portfolio",
     subtitle: "Capital allocation, correlations and combined portfolio risk",
+    monitoringTitle: "Portfolio monitoring and EDA",
+    monitoringSubtitle: "Equity, correlations, alerts and account modes by portfolio.",
+    selectPortfolio: "Portfolio",
+    currentEquity: "Current equity",
+    currentDrawdown: "Current drawdown",
+    openAlerts: "Open alerts",
+    freeMargin: "Free margin",
+    monitoringLoading: "Loading portfolio monitoring…",
+    monitoringError: "Could not load portfolio monitoring.",
+    metricsUnavailable: "Portfolio risk metrics are not available yet.",
+    noWeightData: "No portfolio weight data is available yet.",
+    noPortfolios: "No normalized portfolios are available.",
+    retry: "Retry",
+    equityCurve: "Portfolio equity curve",
+    noEquitySamples: "No portfolio equity samples are available.",
+    correlation: "Strategy correlation",
+    noCorrelations: "No strategy correlations are available.",
+    strategiesHeading: "Portfolio strategies",
+    attention: "Attention",
+    warning: "Warning",
+    alertCount: "{count} alerts",
+    noAlerts: "No open alerts",
+    lastHeartbeat: "Last heartbeat",
+    expected: "Expected",
+    observed: "Observed",
+    noExecutionDetails: "Positions and execution details are not available from the current backend feed.",
+    dataUnavailableNote: "Risk limits and execution data appear only when supplied by the backend; missing values are not estimated.",
     capitalTotal: "Total Capital",
     capitalHint: "All accounts",
     portfolioSharpe: "Portfolio Sharpe",
     portfolioSharpeHint: "Risk-adjusted return",
     combinedDrawdown: "Combined Drawdown",
     combinedDrawdownHint: "Maximum portfolio drawdown",
-    transactionCosts: "Transaction Costs",
-    transactionCostsHint: "Accumulated",
     capitalByAccount: "Capital by Account Type",
     capitalByAccountDesc: "Distribution across demo, real and funded accounts",
     weightsTitle: "Target vs Actual Weights",
@@ -404,6 +270,12 @@ export const en = {
     accountDemo: "Demo",
     accountReal: "Real",
     accountFunded: "Funded",
+    expectedMode: "Expected mode",
+    modeObservedAt: "Last observed",
+    observedDemo: "Demo account",
+    observedLive: "Real capital",
+    modeUnconfirmed: "Mode not confirmed",
+    modeMismatch: "Observed mode differs from configuration",
     ruinProbability: "Ruin Probability",
     ruinProbabilityHint: "Risk of catastrophic loss",
     concentration: "Concentration",
@@ -440,9 +312,6 @@ export const en = {
     helpTransactionCostsTitle: "Transaction Costs",
     helpTransactionCostsDesc:
       "Transaction costs include commissions, slippage and other expenses. They are expressed as a percentage of monthly capital.",
-    helpRuinTitle: "Ruin Probability",
-    helpRuinDesc:
-      "Ruin probability estimates the risk of losing more than 40% of capital, based on Monte Carlo simulations of historical returns.",
     helpConcentration:
       "Concentration shows the percentage exposure to each instrument category. High concentration (>30%) indicates non-diversified risk.",
     totalSum: "Total sum",
@@ -458,9 +327,12 @@ export const en = {
     subtitle: "Health events detected across all monitored strategies",
     filterStrategy: "Strategy",
     filterSeverity: "Severity",
+    filterStatus: "Status",
     filterFrom: "From",
     filterTo: "To",
     all: "All",
+    open: "Open",
+    resolved: "Resolved",
     high: "High",
     medium: "Medium",
     low: "Low",
@@ -474,44 +346,47 @@ export const en = {
     count: "{count} alerts · page {page} of {total}",
     prevPage: "Previous page",
     nextPage: "Next page",
-  },
-  settings: {
-    title: "Settings",
-    subtitle: "Notification, appearance and system status preferences",
-    notifications: "Notifications",
-    notificationsDesc: "Control how you receive health alerts",
-    emailAlerts: "Email alerts",
-    emailAlertsDesc: "Get an email when a strategy has issues",
-    pushAlerts: "Push alerts",
-    pushAlertsDesc: "Real-time notifications in the browser",
-    dailyDigest: "Daily digest",
-    dailyDigestDesc: "A summary of portfolio performance every day",
-    appearance: "Appearance",
-    appearanceDesc: "Interface theme",
-    darkMode: "Dark mode",
-    darkModeDesc: "The dashboard is optimized exclusively for dark theme",
-    active: "Active",
-    system: "System",
-    systemDesc: "Connection to the backend via secure proxy",
-    backendStatus: "Backend status",
-    backendStatusDesc:
-      "Requests are routed through the Next.js server-side middleware",
-    checking: "Checking",
-    online: "Online",
-    offline: "Offline",
+    acknowledge: "Acknowledge",
+    acknowledged: "Acknowledged",
+    loadError: "Could not load alerts.",
+    retry: "Retry",
+    strategyFilterLimit: "The strategy filter is applied to the first 1,000 alerts returned by the API.",
   },
 } as const;
 
-export type Dictionary = typeof en;
+type DeepWiden<T> = T extends string
+  ? string
+  : T extends number
+    ? number
+    : T extends boolean
+      ? boolean
+      : T extends readonly (infer U)[]
+        ? readonly DeepWiden<U>[]
+        : T extends object
+          ? { readonly [K in keyof T]: DeepWiden<T[K]> }
+          : T;
+
+export type Dictionary = DeepWiden<typeof en>;
 
 export const es: Dictionary = {
   signIn: {
-    description: "Mira todos los datos relevantes sobre Quant Trading",
+    description: "Una visión clara y conectada de tus portfolios y estrategias de trading.",
+    brandHeadline: "Entiende tu capital con claridad.",
+    secureWorkspace: "Espacio privado de monitoreo",
+    formDescription: "Inicia sesión para revisar la salud del portfolio, el rendimiento de estrategias y el contexto del mercado.",
+    focusPortfolio: "Rendimiento del portfolio",
+    focusStrategies: "Análisis de estrategias",
+    focusRisk: "Contexto de riesgo",
+    showPassword: "Mostrar contraseña",
+    hidePassword: "Ocultar contraseña",
+    securityNote: "El espacio de monitoreo está disponible para miembros autorizados de la cuenta.",
+    loading: "Comprobando tu sesión…",
+    unexpectedState: "Estado de inicio inesperado",
     email: "Correo Electrónico",
     password: "Contraseña",
     signIn: "Iniciar sesión",
     onLine: "En línea",
-    liveSystem: "Sistema en vivo",
+    liveSystem: "Monitoreo de portfolios",
     entering: "Ingresando...",
     couldntSignIn: "No se pudo iniciar sesión",
   },
@@ -527,12 +402,10 @@ export const es: Dictionary = {
     es: "Español",
   },
   nav: {
-    dashboard: "Dashboard",
     strategies: "Estrategias",
     portfolio: "Portafolio",
-    marketRegime: "Régimen de Mercado",
+    weeklyReview: "EDA semanal",
     alerts: "Alertas",
-    settings: "Ajustes",
     main: "Navegación principal",
   },
   header: {
@@ -541,11 +414,16 @@ export const es: Dictionary = {
     openMenu: "Abrir menú de navegación",
     navigation: "Navegación",
     closeSession: "Cerrar sesión",
+    apiChecking: "Comprobando backend",
+    apiConnected: "Backend conectado",
+    apiDataStale: "Feed de mercado desactualizado",
+    apiAwaitingEvents: "Esperando eventos de mercado",
+    apiUnavailable: "Backend no disponible",
   },
   sidebar: {
-    brandTop: "Performance",
-    brandBottom: "Monitor",
-    footer: "Backend conectado vía proxy seguro",
+    brandTop: "Alphaca",
+    brandBottom: "Capital",
+    footer: "Monitoreo de portfolios y estrategias",
   },
   offline: {
     message: "Backend no disponible",
@@ -553,6 +431,7 @@ export const es: Dictionary = {
   status: {
     Running: "En ejecución",
     Stopped: "Detenida",
+    Unknown: "Desconocido",
   },
   health: {
     healthy: "Saludable",
@@ -560,190 +439,24 @@ export const es: Dictionary = {
     unhealthy: "No saludable",
   },
   severity: {
+    critical: "Crítica",
     high: "Alta",
     medium: "Media",
     low: "Baja",
+    info: "Información",
   },
-  dashboard: {
-    title: "Resumen General",
-    subtitle: "Estado actual de tu cartera de estrategias de trading",
-    currentRegime: "Régimen de Mercado Actual",
-    capitalTotal: "Capital Total",
-    capitalHint: "Todas las cuentas",
-    activeStrategies: "Estrategias Activas",
-    activeHint: "En ejecución",
-    unreadAlerts: "Alertas no Leídas",
-    unreadHint: "Requieren atención",
-    avgWinRate: "Win Rate Promedio",
-    avgWinRateHint: "Media de estrategias",
-    equityTitle: "Evolución del Capital",
-    equityDesc: "Curva de equity de los últimos 30 días",
-    latestAlerts: "Últimas Alertas de Salud",
-    latestAlertsDesc: "Eventos recientes de las estrategias",
-    viewAll: "Ver todas",
-  },
-  regime: {
-    adx: "ADX",
-    trendStrength: "Fuerza de tendencia",
-    trend: "Tendencia: {value}",
-    vixPercentile: "VIX (percentil)",
-    impliedVol: "Volatilidad implícita",
-    fear: "Miedo: {value}",
-    atrPercentile: "ATR (percentil)",
-    averageRange: "Rango medio",
-    volatility: "Volatilidad: {value}",
-    breadth: "Breadth",
-    breadthHint: "Amplitud del mercado",
-    strength: "Strength",
-    strengthHint: "Fortaleza relativa",
-    advanceDecline: "Advance / Decline",
-    advanceDeclineHint: "Ratio avances/retrocesos",
-    newHighsLows: "New Highs / Lows",
-    newHighsLowsHint: "Ratio máximos/mínimos",
-    corrSpyQqq: "Corr. SPY/QQQ",
-    corrSpyTlt: "SPY/TLT: {value}",
-    title: "Régimen de Mercado",
-    subtitle:
-      "Indicadores macro de tendencia, volatilidad y amplitud del mercado",
-    updated: "Actualizado {value}",
-    widgetCorrTitle: "Correlaciones Clave",
-    widgetCorrDesc: "Evolución comparada de SPY, QQQ y TLT",
-    widgetVixTitle: "Volatilidad (VIX)",
-    widgetVixDesc: "Índice de volatilidad implícita del S&P 500",
-    widgetNhnlTitle: "New Highs / New Lows",
-    widgetNhnlDesc: "Amplitud del mercado mediante nuevos máximos y mínimos",
-    symbolsAria: "Símbolos para {title}",
-    correlationsTitle: "Correlaciones SPY, QQQ, TLT",
-    correlationsDesc:
-      "Este gráfico muestra la evolución de los precios de SPY (S&P 500), QQQ (Nasdaq 100) y TLT (bonos del Tesoro a 20 años). Observa cómo se mueven juntos o en direcciones opuestas. La correlación entre SPY y QQQ suele ser alta, mientras que SPY y TLT suelen tener correlación negativa (refugio).",
-    correlationsInstruments: {
-      "AMEX:SPY": "ETF del S&P 500, representa el mercado general.",
-      "NASDAQ:QQQ": "ETF del Nasdaq 100, refleja el sector tecnológico.",
-      "NASDAQ:TLT":
-        "ETF de bonos del Tesoro a 20 años, considerado refugio seguro.",
-    },
-    vixTitle: "Volatilidad (VIX)",
-    vixDesc:
-      "El VIX (índice de volatilidad) mide la volatilidad esperada a 30 días del S&P 500. Valores altos indican miedo y caídas recientes; valores bajos indican complacencia. Es un indicador de sentimiento del mercado.",
-    vixInstruments: {
-      VIX: "Índice de volatilidad del S&P 500 (sin exchange). Puede requerir suscripción. Alternativa: CBOE:VIX.",
-    },
-    breadthTitle: "Amplitud del Mercado (Avances/Declives)",
-    breadthDesc:
-      "Este gráfico muestra la evolución de los precios de SPY y los índices de avances/declives de NYSE (USI:ADVN.NY y USI:DECL.NQ). Estos indicadores reflejan la participación de las acciones en el movimiento del mercado. Si suben, el mercado es amplio; si solo SPY sube pero los avances no, es un rally selectivo.",
-    breadthInstruments: {
-      "AMEX:SPY": "ETF del S&P 500, representa el mercado general.",
-      "USI:ADVN.NY": "NYSE Advances – número de acciones en avance en NYSE.",
-      "USI:DECL.NQ":
-        "NASDAQ Declines – número de acciones en declive en NASDAQ.",
-    },
-
-    // --- NUEVAS CLAVES PARA EXPLICACIONES DETALLADAS (ADX) ---
-    adxHelpTitle: "¿Qué mide el ADX?",
-    adxHelpDesc:
-      "El Average Directional Index cuantifica la fuerza de una tendencia, sin importar su dirección.",
-    adxHelpSideways:
-      "Mercado lateral (favorece estrategias de mean reversion).",
-    adxHelpTrending: "Tendencia fuerte (favorece el seguimiento de tendencia).",
-    adxHelpTransition: "Zona de transición (indecisión).",
-    adxHelpNow: "Ahora:",
-    adxHelpNowTrending: "Tendencia alcista fuerte.",
-    adxHelpNowSideways: "Mercado lateral, sin dirección clara.",
-    adxHelpNowTransition: "En transición, esperando definición.",
-
-    // --- VIX ---
-    vixHelpTitle: "¿Qué mide el percentil del VIX?",
-    vixHelpDesc:
-      "El VIX (índice de volatilidad) refleja la volatilidad esperada a 30 días. Su percentil muestra cuán extremo es el miedo actual comparado con el último año.",
-    vixHelpExtremeFear:
-      "Miedo extremo (suelen ser buenos momentos para comprar).",
-    vixHelpComplacency: "Complacencia extrema (riesgo de corrección).",
-    vixHelpNormal: "Nivel normal de miedo.",
-    vixHelpNow: "Ahora:",
-    vixHelpNowExtreme: "Miedo extremo, oportunidad de compra.",
-    vixHelpNowComplacency: "Complacencia, precaución.",
-    vixHelpNowNormal: "Nivel normal de miedo.",
-
-    // --- ATR ---
-    atrHelpTitle: "¿Qué mide el percentil del ATR?",
-    atrHelpDesc:
-      "El ATR (rango verdadero promedio) mide la volatilidad diaria. Su percentil compara la volatilidad actual con el último año.",
-    atrHelpHigh:
-      "Alta volatilidad (stops más amplios, menor tamaño de posición).",
-    atrHelpLow: "Baja volatilidad (stops más ajustados, mayor tamaño).",
-    atrHelpNormal: "Volatilidad normal.",
-    atrHelpNow: "Ahora:",
-    atrHelpNowHigh: "Alta volatilidad, ajusta tus stops.",
-    atrHelpNowLow: "Baja volatilidad, puedes ajustar más los stops.",
-    atrHelpNowNormal: "Volatilidad normal.",
-
-    // --- Breadth ---
-    breadthHelpTitle: "¿Qué mide el Breadth?",
-    breadthHelpDesc:
-      "Indica si el movimiento del mercado es amplio (la mayoría de las acciones participan) o selectivo.",
-    breadthHelpStrongUpside:
-      "Amplitud fuerte al alza: mayoría de acciones subiendo, mercado saludable.",
-    breadthHelpStrongDownside:
-      "Amplitud fuerte a la baja: mayoría bajando, debilidad generalizada.",
-    breadthHelpNeutral: "Amplitud neutral: equilibrio.",
-    breadthHelpNow: "Ahora:",
-    breadthHelpNowUpside: "Amplitud fuerte al alza.",
-    breadthHelpNowDownside: "Amplitud fuerte a la baja.",
-    breadthHelpNowNeutral: "Amplitud neutral.",
-
-    // --- Strength ---
-    strengthHelpTitle: "¿Qué mide el Strength?",
-    strengthHelpDesc:
-      "Compara el número de nuevos máximos de 52 semanas frente a nuevos mínimos. Refleja la convicción del mercado.",
-    strengthHelpStrong: "Fuerte: más máximos que mínimos, fortaleza real.",
-    strengthHelpWeak: "Débil: más mínimos, debilidad.",
-    strengthHelpNeutral: "Neutral: equilibrio.",
-    strengthHelpNow: "Ahora:",
-    strengthHelpNowStrong: "Fortaleza de mercado.",
-    strengthHelpNowWeak: "Debilidad de mercado.",
-    strengthHelpNowNeutral: "Fortaleza neutral.",
-
-    // --- Advance/Decline ---
-    advDecHelpTitle: "Ratio Advance / Decline",
-    advDecHelpDesc:
-      "Número de acciones en avance dividido entre las que declinan. La métrica más directa de amplitud.",
-    advDecHelpStrong:
-      "Sesgo alcista fuerte (más de 2 suben por cada 1 que baja).",
-    advDecHelpWeak: "Sesgo bajista fuerte.",
-    advDecHelpNeutral: "Neutral (≈1).",
-    advDecHelpNow: "Ahora:",
-    advDecHelpNowStrong: "(fuerte alza)",
-    advDecHelpNowWeak: "(fuerte baja)",
-    advDecHelpNowNeutral: "(neutral)",
-
-    // --- New Highs/Lows ---
-    nhNlHelpTitle: "Ratio New Highs / New Lows",
-    nhNlHelpDesc:
-      "Número de acciones que alcanzan nuevos máximos de 52 semanas dividido entre las que alcanzan nuevos mínimos.",
-    nhNlHelpStrong: "Fortaleza extrema (muchos nuevos máximos).",
-    nhNlHelpWeak: "Debilidad extrema.",
-    nhNlHelpNeutral: "Equilibrio (≈1).",
-    nhNlHelpNow: "Ahora:",
-    nhNlHelpNowStrong: "(fortaleza)",
-    nhNlHelpNowWeak: "(debilidad)",
-    nhNlHelpNowNeutral: "(neutral)",
-
-    // --- Correlations ---
-    corrHelpTitle: "Correlaciones SPY vs QQQ y SPY vs TLT",
-    corrHelpDesc:
-      "La correlación mide la relación entre los movimientos diarios de dos activos.",
-    corrHelpSpyQqq:
-      "Suele ser alta y positiva (ambos se mueven juntos). Valores cercanos a 1 indican que el mercado está liderado por tecnológicas.",
-    corrHelpSpyTlt:
-      "Suele ser negativa (los bonos actúan como refugio cuando las acciones caen).",
-    corrHelpNow: "Ahora:",
-    corrHelpNowStrong: "relación positiva fuerte",
-    corrHelpNowStrongNeg: "relación negativa fuerte",
-    corrHelpNowWeak: "relación débil",
-    corrHelpNowNeg: "correlación negativa fuerte, típica",
-    corrHelpNowPos: "correlación positiva inusual",
-    corrHelpNote:
-      "* Si los valores son 0 o muy bajos, puede deberse a datos insuficientes (necesitamos al menos 30 días de datos).",
+  weeklyReview: {
+    title: "EDA semanal de estrategias", subtitle: "Último análisis del portfolio y diagnóstico de estrategias",
+    loading: "Cargando el último informe…", unavailable: "Aún no hay informes semanales.",
+    error: "No se pudo cargar el informe semanal.", retry: "Reintentar", week: "Semana", generated: "Generado",
+    overall: "Estado de revisión", worstEhi: "EHI disponible más bajo", strategies: "Revisión de estrategias",
+    strategy: "Estrategia", portfolio: "Portfolio", accountMode: "Modo de cuenta", modeObservedAt: "Última observación", demo: "Demo", realCapital: "Capital real", modeUnconfirmed: "Sin confirmar", state: "Revisión", backtest: "Backtest", regime: "Régimen",
+    ehi: "EHI", expectancy: "Percentil de expectancy", profitFactor: "Percentil de profit factor",
+    winRate: "Percentil de win rate", regimeScore: "Componente de régimen", status: "Estado de datos",
+    market: "Contexto de mercado", noData: "No disponible", unconfirmed: "Hipótesis de régimen sin confirmar; se aplica componente neutral.",
+    verdict: "Veredicto del backtest", limitations: "Limitaciones de datos", signals: "Señales para revisión", note: "Nota del análisis",
+    provisional: "Análisis provisional: combina percentiles bootstrap de expectancy, profit factor y win rate con un componente de régimen. Las hipótesis de régimen sin confirmar usan una puntuación neutral. No es una recomendación ni una señal de ejecución.",
+    alert: "Requiere revisión", limited: "Datos limitados", ready: "Lista para revisión humana",
   },
   strategies: {
     title: "Estrategias",
@@ -767,7 +480,6 @@ export const es: Dictionary = {
     colTrades: "Trades",
     colActions: "Acciones",
     empty: "No hay estrategias que coincidan con los filtros.",
-    deleteAria: "Eliminar {name}",
     viewAria: "Ver {name}",
     alertsInLast30Days: "Alertas en los ultimos 30 dias",
     strategyId: "Id de estrategia",
@@ -780,8 +492,6 @@ export const es: Dictionary = {
     back: "Estrategias",
     notFound: "No se encontró la estrategia solicitada.",
     backToStrategies: "Volver a estrategias",
-    delete: "Eliminar",
-    onlyStoppedCanBeDeleted: "Solo se pueden eliminar estrategias detenidas",
     subtitle: "{instrument} · {platform} · {trades} trades",
     winRate: "Win Rate",
     profitFactor: "Profit Factor",
@@ -806,13 +516,6 @@ export const es: Dictionary = {
     noMetrics: "No hay datos de métricas disponibles para esta estrategia.",
     noOpsYet: "Los datos se generarán cuando la estrategia comience a operar.",
     comparison: "Comparativa",
-  },
-  strategyDelete: {
-    title: "Eliminar estrategia",
-    description:
-      "¿Seguro que deseas eliminar {name}? Esta acción no se puede deshacer y dejará de monitorearse.",
-    confirm: "Eliminar",
-    deleting: "Eliminando...",
   },
   trades: {
     colSymbol: "Símbolo",
@@ -840,7 +543,6 @@ export const es: Dictionary = {
     submitting: "Subiendo...",
     startOfPeriod: "Inicio de Periodo",
     endOfPeriod: "Fin de Periodo",
-    expectedPnl: "PNL esperado",
     expectedSharpe: "Sharpe esperado",
     expectedDrowdown: "Drowdown esperado",
     parametersOptionalJSON: "Parámetros (JSON opcional)",
@@ -860,7 +562,6 @@ export const es: Dictionary = {
     difference: "Diferencia",
     pnlExpected: "PNL esperado",
     periodOfBacktest: "Perodio del backtest:",
-    parameters: "Parámetros:",
   },
   edgeHealth: {
     oosDegradation: "Degradación OOS",
@@ -885,6 +586,33 @@ export const es: Dictionary = {
   },
   portfolio: {
     title: "Portafolio",
+    monitoringTitle: "Monitoreo y EDA del portafolio",
+    monitoringSubtitle: "Equity, correlaciones, alertas y modos de cuenta por portafolio.",
+    selectPortfolio: "Portafolio",
+    currentEquity: "Equity actual",
+    currentDrawdown: "Drawdown actual",
+    openAlerts: "Alertas abiertas",
+    freeMargin: "Margen libre",
+    monitoringLoading: "Cargando monitoreo del portafolio…",
+    monitoringError: "No se pudo cargar el monitoreo del portafolio.",
+    metricsUnavailable: "Las métricas de riesgo del portfolio aún no están disponibles.",
+    noWeightData: "Aún no hay datos de pesos del portfolio.",
+    noPortfolios: "No hay portafolios normalizados disponibles.",
+    retry: "Reintentar",
+    equityCurve: "Curva de equity del portafolio",
+    noEquitySamples: "No hay muestras de equity del portafolio.",
+    correlation: "Correlación entre estrategias",
+    noCorrelations: "No hay correlaciones disponibles.",
+    strategiesHeading: "Estrategias del portafolio",
+    attention: "Atención",
+    warning: "Advertencia",
+    alertCount: "{count} alertas",
+    noAlerts: "Sin alertas abiertas",
+    lastHeartbeat: "Último heartbeat",
+    expected: "Esperado",
+    observed: "Observado",
+    noExecutionDetails: "El feed actual del backend no proporciona posiciones ni detalles de ejecución.",
+    dataUnavailableNote: "Los límites de riesgo y datos de ejecución se muestran cuando el backend los proporciona; no se estiman valores faltantes.",
     subtitle:
       "Asignación de capital, correlaciones y riesgo combinado de la cartera",
     capitalTotal: "Capital Total",
@@ -893,8 +621,6 @@ export const es: Dictionary = {
     portfolioSharpeHint: "Retorno ajustado a riesgo",
     combinedDrawdown: "Drawdown Combinado",
     combinedDrawdownHint: "Máxima caída de la cartera",
-    transactionCosts: "Costos de Transacción",
-    transactionCostsHint: "Acumulado",
     capitalByAccount: "Capital por Tipo de Cuenta",
     capitalByAccountDesc: "Distribución entre cuentas demo, real y fondeada",
     weightsTitle: "Pesos Objetivo vs Reales",
@@ -913,6 +639,12 @@ export const es: Dictionary = {
     accountDemo: "Demo",
     accountReal: "Real",
     accountFunded: "Fondeada",
+    expectedMode: "Modo esperado",
+    modeObservedAt: "Última observación",
+    observedDemo: "Cuenta demo",
+    observedLive: "Capital real",
+    modeUnconfirmed: "Modo sin confirmar",
+    modeMismatch: "El modo observado difiere de la configuración",
     ruinProbability: "Probabilidad de Ruina",
     ruinProbabilityHint: "Riesgo de pérdida catastrófica",
     concentration: "Concentración",
@@ -944,13 +676,11 @@ export const es: Dictionary = {
     helpSharpeTitle: "Portfolio Sharpe",
     helpSharpeDesc:
       "El ratio de Sharpe mide el retorno ajustado al riesgo del portafolio. Valores superiores a 1 son considerados buenos.",
-    helpDrawdownDesc:
+    helpDrawdown:
       "El drawdown combinado muestra la caída máxima del capital desde un pico. El drawdown actual es la caída desde el último pico.",
     helpTransactionCostsTitle: "Costos de transaccion",
     helpTransactionCostsDesc:
       "Los costos de transacción incluyen comisiones, slippage y otros gastos. Se expresan como porcentaje del capital mensual.",
-    helpRuinDesc:
-      "La probabilidad de ruina estima el riesgo de perder más del 40% del capital, basada en simulaciones Monte Carlo de retornos históricos.",
     helpConcentration:
       "La concentración muestra la exposición porcentual a cada categoría de instrumento. Una concentración alta (>30%) indica riesgo no diversificado.",
     totalSum: "Suma total",
@@ -967,9 +697,12 @@ export const es: Dictionary = {
       "Eventos de salud detectados en todas las estrategias monitoreadas",
     filterStrategy: "Estrategia",
     filterSeverity: "Severidad",
+    filterStatus: "Estado",
     filterFrom: "Desde",
     filterTo: "Hasta",
     all: "Todas",
+    open: "Abierta",
+    resolved: "Resuelta",
     high: "Alta",
     medium: "Media",
     low: "Baja",
@@ -983,32 +716,11 @@ export const es: Dictionary = {
     count: "{count} alertas · página {page} de {total}",
     prevPage: "Página anterior",
     nextPage: "Página siguiente",
-  },
-  settings: {
-    title: "Ajustes",
-    subtitle: "Preferencias de notificaciones, apariencia y estado del sistema",
-    notifications: "Notificaciones",
-    notificationsDesc: "Controla cómo recibes las alertas de salud",
-    emailAlerts: "Alertas por email",
-    emailAlertsDesc:
-      "Recibe un correo cuando una estrategia presenta problemas",
-    pushAlerts: "Alertas push",
-    pushAlertsDesc: "Notificaciones en tiempo real en el navegador",
-    dailyDigest: "Resumen diario",
-    dailyDigestDesc: "Un resumen del rendimiento de la cartera cada día",
-    appearance: "Apariencia",
-    appearanceDesc: "Tema de la interfaz",
-    darkMode: "Modo oscuro",
-    darkModeDesc: "El panel está optimizado exclusivamente para tema oscuro",
-    active: "Activo",
-    system: "Sistema",
-    systemDesc: "Conexión con el backend vía proxy seguro",
-    backendStatus: "Estado del backend",
-    backendStatusDesc:
-      "Las peticiones se enrutan por el middleware server-side de Next.js",
-    checking: "Comprobando",
-    online: "En línea",
-    offline: "Sin conexión",
+    acknowledge: "Reconocer",
+    acknowledged: "Reconocida",
+    loadError: "No se pudieron cargar las alertas.",
+    retry: "Reintentar",
+    strategyFilterLimit: "El filtro de estrategia se aplica a las primeras 1.000 alertas devueltas por la API.",
   },
 };
 

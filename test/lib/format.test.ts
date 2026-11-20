@@ -4,6 +4,7 @@ import {
   formatDateShort,
   formatNumber,
   formatPercent,
+  formatPercentPoints,
 } from "@/lib/format"
 
 describe("formatCurrency", () => {
@@ -35,6 +36,17 @@ describe("formatPercent", () => {
     expect(formatPercent(null)).toBe("—")
     expect(formatPercent(undefined)).toBe("—")
     expect(formatPercent(Number.NaN)).toBe("—")
+  })
+})
+
+describe("formatPercentPoints", () => {
+  it("formats API percentage points without scaling", () => {
+    expect(formatPercentPoints(12.5)).toBe("12.5%")
+    expect(formatPercentPoints(0)).toBe("0.0%")
+  })
+
+  it("keeps missing API values unavailable", () => {
+    expect(formatPercentPoints(null)).toBe("—")
   })
 })
 

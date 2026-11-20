@@ -12,6 +12,12 @@ export function formatPercent(value: number | undefined | null, digits = 1): str
   return `${(value * 100).toFixed(digits)}%`
 }
 
+/** Format a value that the API already reports in percentage points (for example, 12.5 => 12.5%). */
+export function formatPercentPoints(value: number | undefined | null, digits = 1): string {
+  if (value == null || Number.isNaN(value)) return "—"
+  return `${value.toFixed(digits)}%`
+}
+
 export function formatNumber(value: number | undefined | null, digits = 2): string {
   if (value == null || Number.isNaN(value)) return "—"
   return value.toFixed(digits)

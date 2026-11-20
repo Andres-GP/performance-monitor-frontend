@@ -1,10 +1,13 @@
 export type HealthStatus = "healthy" | "unhealthy" | "edge_decay";
-export type Severity = "high" | "medium" | "low";
+export type Severity = "critical" | "high" | "medium" | "low" | "info";
 export type AccountType = "demo" | "real" | "funded";
 export type Platform = "NT8" | "MT5" | "Unknown";
 export type StrategyStatus = "Running" | "Stopped" | "Unknown";
 
 export interface PerformanceMetric {
+  date?: string;
+  timestamp?: string;
+  equity?: number | null;
   win_rate?: number;
   profit_factor?: number;
   drawdown?: number;
@@ -20,11 +23,16 @@ export interface BacktestData {
   expected_pnl?: number;
   expected_sharpe?: number;
   expected_drawdown?: number;
-  parameters?: Record<string, any>;
+  parameters?: Record<string, unknown>;
 }
 
 export interface EdgeMetrics {
-  [key: string]: any;
+  oos_degradation?: number | null;
+  efficiency_ratio?: number | null;
+  skewness?: number | null;
+  kurtosis?: number | null;
+  sample_size?: number | null;
+  notes?: string | null;
 }
 
 export interface Strategy {
@@ -34,43 +42,65 @@ export interface Strategy {
   instrument_type?: string | null;
   timeframe?: string | null;
   data_type?: string | null;
-  platform: Platform;
+  platform: Platform | string | null;
   sizing?: number | null;
-  start_date: string; // ISO 8601
+  start_date?: string; // ISO 8601
   state: StrategyStatus;
   health_status: HealthStatus;
   last_heartbeat?: string | null;
-  created_at: string;
-  updated_at: string;
-  alerts_30d: number;
-  trades_count: number;
-  metrics: PerformanceMetric | null;
-  backtest: BacktestData | null;
-  edge_health: EdgeMetrics | null;
+  created_at?: string;
+  updated_at?: string;
+  alerts_30d?: number;
+  trades_count?: number;
+  metrics?: PerformanceMetric | null;
+  backtest?: BacktestData | null;
+  edge_health?: EdgeMetrics | null;
 }
 
 export interface Trade {
-  id: string;
+  id: number | string;
   strategy_id: string;
   symbol?: string;
-  side: "long" | "short";
+  instrument?: string;
+  side?: "long" | "short";
+  direction?: "long" | "short";
   entry_price?: number;
   exit_price?: number;
   quantity?: number;
-  pnl: number;
+  pnl?: number;
+  profit?: number;
   entry_time: string;
   exit_time?: string;
 }
 
 export interface Alert {
-  id: string;
-  strategy_id: string;
+  id: number | string;
+  strategy_id?: string | null;
+  portfolio_id?: string | null;
   strategy_name?: string;
-  problem: string;
+  problem?: string;
+  problem_type?: string;
+  rule_key?: string;
   details?: string;
   severity: Severity;
+  status?: "open" | "ack" | "resolved";
+  first_seen?: string;
+  last_seen?: string;
+  timestamp?: string;
   read?: boolean;
-  timestamp: string;
+}
+
+export interface MonitoringPage<T> {
+  items: T[];
+  limit: number;
+  offset: number;
+  total: number | null;
+}
+
+export interface EquitySample {
+  strategy_id: string;
+  ts: string;
+  equity: number;
 }
 
 export interface CapitalAccount {
@@ -83,15 +113,6 @@ export interface CapitalSummary {
   accounts: CapitalAccount[];
 }
 
-export interface PerformanceMetric {
-  timestamp: string;
-  equity: number;
-  win_rate?: number;
-  profit_factor?: number;
-  drawdown?: number;
-  sharpe?: number;
-}
-
 export interface EdgeHealth {
   oos_degradation?: number;
   efficiency_ratio?: number;
@@ -101,38 +122,28 @@ export interface EdgeHealth {
   notes?: string;
 }
 
-export interface MarketRegime {
-  trend?: string;
-  fear?: string;
-  volatility?: string;
-  adx: number;
-  vix_percentile: number;
-  atr_percentile: number;
-  breadth: number;
-  strength: number;
-  advance_decline_ratio: number;
-  nh_nl_ratio: number;
-  correlation_spy_qqq: number;
-  correlation_spy_tlt: number;
-  timestamp?: string;
-}
-
 export interface PortfolioWeight {
   strategy_id: string;
   strategy_name?: string;
   target_weight: number;
-  actual_weight?: number;
+  actual_weight?: number | null;
 }
 
 export interface PortfolioMetrics {
-  sharpe: number;
-  combined_drawdown: number;
-  transaction_costs: number;
-  correlation_matrix?: {
-    strategies: string[];
-    matrix: number[][];
-  };
-  drawdown_series?: { timestamp: string; drawdown: number }[];
+  date?: string;
+  sharpe?: number | null;
+  max_drawdown?: number | null;
+  current_drawdown?: number | null;
+  transaction_cost_pct?: number | null;
+  ruin_probability?: number | null;
+  exposure_by_category?: Record<string, number> | null;
+  concentration_metrics?: Record<string, number> | null;
+  allocation_deviations?: Record<string, {
+    target: number | null;
+    actual: number | null;
+    deviation: number | null;
+  }> | null;
+  correlation_matrix?: Record<string, Record<string, number | null>> | { note: string } | null;
 }
 
 export interface HealthResponse {

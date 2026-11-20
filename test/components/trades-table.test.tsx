@@ -6,7 +6,7 @@ import type { Trade } from "@/types";
 // ----- Mock de useTrades -----
 const useTrades = jest.fn();
 jest.mock("@/lib/queries", () => ({
-  useTrades: (id: string) => useTrades(id),
+  useTrades: (id: string, page?: number, pageSize?: number) => useTrades(id, page, pageSize),
 }));
 
 // ----- Mock de useI18n (CRUCIAL para que los textos se rendericen) -----
@@ -67,10 +67,10 @@ describe("TradesTable", () => {
 
   it("renders trades and paginates beyond the page size", async () => {
     const trades = buildTrades(20);
-    useTrades.mockReturnValue({
-      data: { data: trades, isFallback: false },
+    useTrades.mockImplementation((_id: string, page = 0, pageSize = 12) => ({
+      data: { data: { items: trades.slice(page * pageSize, (page + 1) * pageSize), total: trades.length, limit: pageSize, offset: page * pageSize }, isFallback: false },
       isLoading: false,
-    });
+    }));
 
     render(<TradesTable strategyId="str-1" />);
 
