@@ -4,9 +4,10 @@ import SignInPage from "@/app/sign-in/[[...sign-in]]/page";
 const mockSetActive = jest.fn();
 const mockCreate = jest.fn();
 const mockReplace = jest.fn();
+let mockIsSignedIn = false;
 
 jest.mock("@clerk/nextjs", () => ({
-  useUser: () => ({ isLoaded: true, isSignedIn: false }),
+  useUser: () => ({ isLoaded: true, isSignedIn: mockIsSignedIn }),
   useClerk: () => ({
     setActive: mockSetActive,
     client: { signIn: { create: mockCreate } },
@@ -20,6 +21,7 @@ jest.mock("@/components/layout/language-selector", () => ({
 
 describe("sign-in page", () => {
   beforeEach(() => {
+    mockIsSignedIn = false;
     mockSetActive.mockReset().mockResolvedValue(undefined);
     mockCreate.mockReset().mockResolvedValue({ status: "complete", createdSessionId: "session-test" });
     mockReplace.mockReset();
@@ -38,6 +40,15 @@ describe("sign-in page", () => {
     expect(screen.getByRole("button", { name: "Hide password" })).toBeInTheDocument();
   });
 
+  it("routes an existing session directly to the dashboard", async () => {
+    mockIsSignedIn = true;
+
+    render(<SignInPage />);
+
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith("/strategies"));
+    expect(mockReplace).toHaveBeenCalledTimes(1);
+  });
+
   it("activates the Clerk session after a successful sign-in", async () => {
     render(<SignInPage />);
     fireEvent.change(screen.getByLabelText("Email"), { target: { value: "user@example.com" } });
@@ -46,6 +57,6 @@ describe("sign-in page", () => {
 
     await waitFor(() => expect(mockCreate).toHaveBeenCalledWith({ identifier: "user@example.com", password: "test-password" }));
     expect(mockSetActive).toHaveBeenCalledWith({ session: "session-test" });
-    expect(mockReplace).toHaveBeenCalledWith("/");
+    expect(mockReplace).toHaveBeenCalledWith("/strategies");
   });
 });
