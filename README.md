@@ -72,6 +72,6 @@ This project includes a complete GitHub Actions workflow for continuous integrat
   - Deploys to a preview environment for `develop` and `staging` branches.
   - Deploys to **production** for the `main` branch.
   - Uses environment secrets (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`) for secure deployments.
-  - Checks these three GitHub Actions secrets and verifies the Vercel token with the pinned CLI before deploying. If verification fails, create a valid Vercel access token and replace `VERCEL_TOKEN` in the repository or deployment environment's Actions secrets. Never commit the token.
+  - Checks that these three GitHub Actions secrets are present, then validates token access by deploying to the configured project with the pinned CLI. Never commit the token.
 
 ---

@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Validate Vercel credentials
+      - name: Check required Vercel secrets
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -36,7 +36,7 @@ jobs:
               exit 1
             fi
           done
-          npx --yes vercel@66.5.0 whoami --token "$VERCEL_TOKEN"
+          echo "Vercel deployment configuration is present."
 
       - name: Deploy to Vercel
         env:
