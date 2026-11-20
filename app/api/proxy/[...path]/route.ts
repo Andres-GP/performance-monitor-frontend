@@ -50,8 +50,21 @@ async function forward(req: NextRequest, path: string[]) {
     if (body) init.body = body;
   }
 
+  let url: string;
   try {
-    const url = backendUrl(`/${targetPath}`, search);
+    url = backendUrl(`/${targetPath}`, search);
+  } catch (error) {
+    console.error(
+      "[Proxy] Backend is not configured",
+      error instanceof Error ? error.message : "unknown error",
+    );
+    return NextResponse.json(
+      { error: "Backend not configured" },
+      { status: 503 },
+    );
+  }
+
+  try {
     const res = await fetch(url, init);
     const text = await res.text();
     const contentTypeRes =
@@ -62,7 +75,12 @@ async function forward(req: NextRequest, path: string[]) {
       headers: { "content-type": contentTypeRes },
     });
   } catch (error) {
-    console.error("[Proxy] Backend request failed", error instanceof Error ? error.name : "unknown error");
+    const cause = error instanceof Error ? error.cause : undefined;
+    console.error(
+      "[Proxy] Backend request failed",
+      error instanceof Error ? error.name : "unknown error",
+      cause instanceof Error ? cause.message : "",
+    );
     return NextResponse.json(
       { error: "Backend unreachable" },
       { status: 502 },

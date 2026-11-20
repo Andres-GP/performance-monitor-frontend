@@ -9,7 +9,11 @@ function getBackendUrl(): string | null {
   if (explicit) return normalizeBackendUrl(explicit);
 
   const branch =
-    process.env.RENDER_GIT_BRANCH || process.env.GITHUB_REF_NAME || "";
+    process.env.BACKEND_GIT_BRANCH ||
+    process.env.VERCEL_GIT_COMMIT_REF ||
+    process.env.RENDER_GIT_BRANCH ||
+    process.env.GITHUB_REF_NAME ||
+    "";
   let serviceId: string | undefined;
 
   if (branch === "main") {
