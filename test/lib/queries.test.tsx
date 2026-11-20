@@ -3,7 +3,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import {
   qk,
+  healthRefetchInterval,
   useAlerts,
+  useHealth,
   useMarketRegime,
   useStrategies,
   useStrategy,
@@ -146,6 +148,12 @@ describe("query hooks", () => {
       "/market/regime",
       expect.objectContaining({ token: "mock-token" }),
     );
+  });
+
+  it("rechecks backend health quickly after a fallback response", async () => {
+    expect(healthRefetchInterval(false, true)).toBe(5_000);
+    expect(healthRefetchInterval(true, false)).toBe(5_000);
+    expect(healthRefetchInterval(false, false)).toBe(60_000);
   });
 
 });

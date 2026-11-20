@@ -232,6 +232,10 @@ export function useSetWeight() {
   });
 }
 
+export function healthRefetchInterval(isError: boolean, isFallback: boolean): number {
+  return isError || isFallback ? 5_000 : 60_000;
+}
+
 export function useHealth() {
   const getToken = useApiToken();
   return useQuery({
@@ -244,6 +248,13 @@ export function useHealth() {
       });
     },
     staleTime: STALE,
-    refetchInterval: 60_000,
+    // A cold or slow Supabase health check can time out once while Render
+    // wakes. Retry health quickly after an offline/error result, then settle
+    // back to the normal one-minute freshness poll.
+    refetchInterval: (query) =>
+      healthRefetchInterval(
+        query.state.status === "error",
+        query.state.data?.isFallback ?? false,
+      ),
   });
 }
