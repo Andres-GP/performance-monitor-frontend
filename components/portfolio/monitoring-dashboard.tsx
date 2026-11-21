@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, HeartPulse } from "lucide-react";
+import { AlertTriangle, HeartPulse, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import {
   CartesianGrid,
   Line,
@@ -16,8 +16,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiGet } from "@/lib/api-client";
 import { useI18n } from "@/lib/i18n/context";
-import { useApiToken, useCapitalSummary } from "@/lib/queries";
+import { useApiToken, useCapitalSummary, useExecutionEvents, usePortfolioTrades } from "@/lib/queries";
 import { formatDate, formatNumber, formatPercentPoints } from "@/lib/format";
+import type { Trade } from "@/types";
 
 interface PortfolioIndex {
   items: Array<{ id: string; name?: string }>;
@@ -105,6 +106,9 @@ export function MonitoringPortfolioDashboard() {
   const { dict, locale, t } = useI18n();
   const copy = dict.portfolio;
   const [selectedId, setSelectedId] = useState<string>();
+  const [tradePage, setTradePage] = useState(0);
+  const [executionStrategy, setExecutionStrategy] = useState("");
+  const [executionPage, setExecutionPage] = useState(0);
   const capital = useCapitalSummary();
 
   const portfolios = useQuery({
@@ -139,8 +143,11 @@ export function MonitoringPortfolioDashboard() {
       }),
     staleTime: STALE_TIME,
   });
+  const trades = usePortfolioTrades(portfolioId ?? "", tradePage, 10);
 
   const data = detail.data;
+  const executionStrategyId = executionStrategy || data?.strategies[0]?.id || "";
+  const executionEvents = useExecutionEvents(executionStrategyId, executionPage, 10);
   const correlationItems = correlation.data?.items ?? [];
   const strategyIds = Array.from(
     new Set(
@@ -168,7 +175,7 @@ export function MonitoringPortfolioDashboard() {
               aria-label={copy.selectPortfolio}
               className="rounded-md border bg-background p-2"
               value={portfolioId}
-              onChange={(event) => setSelectedId(event.target.value)}
+              onChange={(event) => { setSelectedId(event.target.value); setTradePage(0); setExecutionStrategy(""); setExecutionPage(0); }}
             >
               {portfolios.data.items.map((portfolio) => (
                 <option key={portfolio.id} value={portfolio.id}>
@@ -468,12 +475,99 @@ export function MonitoringPortfolioDashboard() {
                         </div>
                       ))}
                     </div>
-                    <p className="mt-3 text-xs text-muted-foreground">
-                      {copy.noExecutionDetails}
-                    </p>
                   </article>
                 );
               })}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
+              <div>
+                <CardTitle className="text-base">{locale === "es" ? "Operaciones recientes" : "Recent executions"}</CardTitle>
+                <p className="mt-1 text-xs text-muted-foreground">{locale === "es" ? "Resultados netos y costos reportados por MT5" : "Net results and costs reported by MT5"}</p>
+              </div>
+              <button type="button" onClick={() => void trades.refetch()} disabled={trades.isFetching} className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors hover:bg-muted disabled:opacity-50">
+                <RefreshCw className={`size-3.5 ${trades.isFetching ? "animate-spin" : ""}`} aria-hidden="true" />
+                {locale === "es" ? "Actualizar" : "Refresh"}
+              </button>
+            </CardHeader>
+            <CardContent>
+              {trades.isError ? (
+                <div role="alert" className="flex flex-wrap items-center justify-between gap-3 text-sm text-destructive">
+                  <span>{copy.monitoringError}</span><button type="button" className="underline" onClick={() => void trades.refetch()}>{copy.retry}</button>
+                </div>
+              ) : trades.isLoading ? (
+                <div className="space-y-2" aria-live="polite">{Array.from({ length: 4 }, (_, index) => <Skeleton key={index} className="h-12" />)}</div>
+              ) : (trades.data?.data?.items.length ?? 0) === 0 ? (
+                <p className="py-6 text-center text-sm text-muted-foreground">{locale === "es" ? "Todavía no hay operaciones registradas para este portafolio." : "No executions have been recorded for this portfolio yet."}</p>
+              ) : (
+                <>
+                  <div className="space-y-3 md:hidden">
+                    {trades.data?.data?.items.map((trade) => <ExecutionCard key={trade.id} trade={trade} locale={locale} />)}
+                  </div>
+                  <div className="hidden overflow-x-auto md:block">
+                    <table className="w-full min-w-[900px] text-sm">
+                      <thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="py-3 pr-3">{locale === "es" ? "Cierre" : "Closed"}</th><th className="py-3 pr-3">{locale === "es" ? "Estrategia / activo" : "Strategy / symbol"}</th><th className="py-3 pr-3">{locale === "es" ? "Lado" : "Side"}</th><th className="py-3 pr-3 text-right">{locale === "es" ? "Volumen" : "Volume"}</th><th className="py-3 pr-3 text-right">P&L</th><th className="py-3 pr-3 text-right">{locale === "es" ? "Comisión" : "Commission"}</th><th className="py-3 pr-3 text-right">{locale === "es" ? "Swap" : "Swap"}</th><th className="py-3 text-right">{locale === "es" ? "Spread / slippage" : "Spread / slippage"}</th></tr></thead>
+                      <tbody>{trades.data?.data?.items.map((trade) => <ExecutionRow key={trade.id} trade={trade} />)}</tbody>
+                    </table>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between gap-3 border-t pt-3 text-xs text-muted-foreground">
+                    <span>{locale === "es" ? `Mostrando ${trades.data?.data?.items.length ?? 0} de ${trades.data?.data?.total ?? "—"} operaciones` : `Showing ${trades.data?.data?.items.length ?? 0} of ${trades.data?.data?.total ?? "—"} executions`}</span>
+                    <div className="flex items-center gap-2">
+                      <button type="button" aria-label={locale === "es" ? "Página anterior de operaciones" : "Previous executions page"} onClick={() => setTradePage((page) => Math.max(0, page - 1))} disabled={tradePage === 0 || trades.isFetching} className="rounded-md border p-2 hover:bg-muted disabled:opacity-40"><ChevronLeft className="size-4" /></button>
+                      <span>{tradePage + 1}</span>
+                      <button type="button" aria-label={locale === "es" ? "Página siguiente de operaciones" : "Next executions page"} onClick={() => setTradePage((page) => page + 1)} disabled={tradePage + 1 >= Math.ceil((trades.data?.data?.total ?? 0) / 10) || trades.isFetching} className="rounded-md border p-2 hover:bg-muted disabled:opacity-40"><ChevronRight className="size-4" /></button>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{locale === "es" ? "Los costos que no fueron enviados por el EA se muestran como —; no se estiman. El P&L es el valor neto reportado por el broker." : "Costs not sent by the EA appear as —; they are not estimated. P&L is the net value reported by the broker."}</p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle className="text-base">{locale === "es" ? "Señales y ejecución" : "Signals and execution"}</CardTitle>
+                <p className="mt-1 text-xs text-muted-foreground">{locale === "es" ? "Referencia de entrada y resultado comunicado por el EA" : "Entry reference and outcome reported by the EA"}</p>
+              </div>
+              {data.strategies.length > 1 ? (
+                <label className="flex flex-col gap-1 text-xs sm:min-w-56">
+                  <span>{locale === "es" ? "Estrategia" : "Strategy"}</span>
+                  <select className="rounded-md border bg-background px-3 py-2 text-sm" value={executionStrategyId} onChange={(event) => { setExecutionStrategy(event.target.value); setExecutionPage(0); }}>
+                    {data.strategies.map((strategy) => <option key={strategy.id} value={strategy.id}>{strategy.name ?? strategy.id}</option>)}
+                  </select>
+                </label>
+              ) : null}
+            </CardHeader>
+            <CardContent>
+              {executionEvents.isError ? (
+                <div role="alert" className="flex flex-wrap items-center justify-between gap-3 text-sm text-destructive"><span>{copy.monitoringError}</span><button type="button" className="underline" onClick={() => void executionEvents.refetch()}>{copy.retry}</button></div>
+              ) : executionEvents.isLoading ? (
+                <div className="space-y-2" aria-live="polite">{Array.from({ length: 3 }, (_, index) => <Skeleton key={index} className="h-16" />)}</div>
+              ) : (executionEvents.data?.data?.items.length ?? 0) === 0 ? (
+                <p className="py-5 text-center text-sm text-muted-foreground">{locale === "es" ? "El EA todavía no ha enviado eventos de señal. Se muestran solo eventos que el broker y el EA reportan; no se infieren estados." : "The EA has not sent signal events yet. Only broker and EA reported events are shown; statuses are never inferred."}</p>
+              ) : (
+                <>
+                  <ol className="space-y-2">
+                    {executionEvents.data?.data?.items.map((event) => {
+                      const intent = event.event_type === "signal_intent";
+                      const payload = event.payload;
+                      const label = intent ? (locale === "es" ? "Intención" : "Intent") : (locale === "es" ? "Resultado" : "Outcome");
+                      const status = intent ? (locale === "es" ? "señal enviada" : "signal sent") : payload.status ?? event.ingest_status;
+                      return (
+                        <li key={event.id} className="flex flex-col gap-2 rounded-lg border p-3 transition-colors hover:bg-muted/20 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">{label}</span><span className="text-xs text-muted-foreground">{payload.signal_id ?? "—"}</span></div><p className="mt-1 text-sm font-medium">{payload.symbol ?? executionStrategyId} {payload.direction ? `· ${payload.direction}` : ""}</p><p className="text-xs text-muted-foreground">{intent ? `${locale === "es" ? "Referencia" : "Reference"}: ${formatNumber(payload.reference_price)} · ${locale === "es" ? "Solicitado" : "Requested"}: ${formatNumber(payload.volume, 3)}` : `${locale === "es" ? "Ejecutado" : "Filled"}: ${formatNumber(payload.filled_volume, 3)} · ${locale === "es" ? "Precio medio" : "Average price"}: ${formatNumber(payload.fill_price)}${payload.reason ? ` · ${payload.reason}` : ""}`}</p></div>
+                          <div className="flex shrink-0 items-center justify-between gap-3 text-xs sm:flex-col sm:items-end"><span className="rounded-full border px-2.5 py-1 capitalize">{status}</span><time className="text-muted-foreground">{formatDate(event.ts ?? event.received_at)}</time></div>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                  <div className="mt-4 flex items-center justify-between border-t pt-3 text-xs text-muted-foreground">
+                    <span>{locale === "es" ? `${executionEvents.data?.data?.total ?? 0} eventos` : `${executionEvents.data?.data?.total ?? 0} events`}</span>
+                    <div className="flex items-center gap-2"><button type="button" aria-label={locale === "es" ? "Página anterior de eventos" : "Previous events page"} onClick={() => setExecutionPage((page) => Math.max(0, page - 1))} disabled={executionPage === 0 || executionEvents.isFetching} className="rounded-md border p-2 hover:bg-muted disabled:opacity-40"><ChevronLeft className="size-4" /></button><span>{executionPage + 1}</span><button type="button" aria-label={locale === "es" ? "Página siguiente de eventos" : "Next events page"} onClick={() => setExecutionPage((page) => page + 1)} disabled={executionPage + 1 >= Math.ceil((executionEvents.data?.data?.total ?? 0) / 10) || executionEvents.isFetching} className="rounded-md border p-2 hover:bg-muted disabled:opacity-40"><ChevronRight className="size-4" /></button></div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
           <p className="text-xs text-muted-foreground">
@@ -482,5 +576,58 @@ export function MonitoringPortfolioDashboard() {
         </>
       )}
     </section>
+  );
+}
+
+function formatTradeMoney(value: number | null | undefined, currency?: string | null) {
+  if (value == null || !Number.isFinite(value)) return "—";
+  const code = currency && /^[A-Z]{3}$/.test(currency) ? currency : "USD";
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: code,
+      maximumFractionDigits: 2,
+    }).format(value);
+  } catch {
+    return `${code} ${formatNumber(value)}`;
+  }
+}
+
+function tradeSide(trade: Trade) {
+  return trade.trade_type ?? trade.direction ?? trade.side ?? "—";
+}
+
+function ExecutionRow({ trade }: { trade: Trade }) {
+  const pnl = trade.profit ?? trade.pnl;
+  const instrument = trade.symbol ?? trade.instrument ?? "—";
+  const costs = [trade.spread_cost, trade.slippage]
+    .filter((value): value is number => value != null && Number.isFinite(value));
+  return (
+    <tr className="border-b border-border/60 transition-colors hover:bg-muted/30 last:border-0">
+      <td className="py-3 pr-3 text-muted-foreground">{formatDate(trade.exit_time)}</td>
+      <td className="py-3 pr-3"><span className="block font-medium">{trade.strategy_id}</span><span className="text-xs text-muted-foreground">{instrument}</span></td>
+      <td className="py-3 pr-3 capitalize">{tradeSide(trade)}</td>
+      <td className="py-3 pr-3 text-right tabular-nums">{formatNumber(trade.volume ?? trade.quantity, 3)}</td>
+      <td className={`py-3 pr-3 text-right font-medium tabular-nums ${pnl == null ? "text-muted-foreground" : pnl >= 0 ? "text-emerald-500" : "text-destructive"}`}>{formatTradeMoney(pnl, trade.currency)}</td>
+      <td className="py-3 pr-3 text-right tabular-nums">{formatTradeMoney(trade.commission, trade.currency)}</td>
+      <td className="py-3 pr-3 text-right tabular-nums">{formatTradeMoney(trade.swap, trade.currency)}</td>
+      <td className="py-3 text-right tabular-nums">{costs.length ? costs.map((cost) => formatTradeMoney(cost, trade.currency)).join(" / ") : "—"}</td>
+    </tr>
+  );
+}
+
+function ExecutionCard({ trade, locale }: { trade: Trade; locale: string }) {
+  const pnl = trade.profit ?? trade.pnl;
+  const instrument = trade.symbol ?? trade.instrument ?? "—";
+  const currency = trade.currency;
+  return (
+    <article className="rounded-lg border p-3 transition-colors hover:bg-muted/20">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0"><p className="truncate text-sm font-medium">{trade.strategy_id}</p><p className="text-xs text-muted-foreground">{instrument} · {tradeSide(trade)}</p></div>
+        <p className={`shrink-0 text-sm font-semibold tabular-nums ${pnl == null ? "text-muted-foreground" : pnl >= 0 ? "text-emerald-500" : "text-destructive"}`}>{formatTradeMoney(pnl, currency)}</p>
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">{formatDate(trade.exit_time)} · {locale === "es" ? "Volumen" : "Volume"} {formatNumber(trade.volume ?? trade.quantity, 3)}</p>
+      <dl className="mt-3 grid grid-cols-2 gap-2 text-xs"><div><dt className="text-muted-foreground">{locale === "es" ? "Comisión" : "Commission"}</dt><dd className="mt-0.5 tabular-nums">{formatTradeMoney(trade.commission, currency)}</dd></div><div><dt className="text-muted-foreground">Swap</dt><dd className="mt-0.5 tabular-nums">{formatTradeMoney(trade.swap, currency)}</dd></div><div><dt className="text-muted-foreground">{locale === "es" ? "Spread" : "Spread"}</dt><dd className="mt-0.5 tabular-nums">{formatTradeMoney(trade.spread_cost, currency)}</dd></div><div><dt className="text-muted-foreground">Slippage</dt><dd className="mt-0.5 tabular-nums">{formatNumber(trade.slippage)}</dd></div></dl>
+    </article>
   );
 }

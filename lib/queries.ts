@@ -14,6 +14,7 @@ import type {
   EquitySample,
   Strategy,
   Trade,
+  ExecutionEvent,
 } from "@/types";
 
 export const qk = {
@@ -114,6 +115,38 @@ export function useStrategyEquity(id: string, page = 0, pageSize = 500) {
       const token = await getToken();
       return getWithFallback<MonitoringPage<EquitySample>>(
         `/strategies/${id}/equity?limit=${pageSize}&offset=${page * pageSize}`,
+        { signal, token },
+      );
+    },
+    staleTime: STALE,
+    enabled: !!id,
+  });
+}
+
+export function usePortfolioTrades(id: string, page = 0, pageSize = 10) {
+  const getToken = useApiToken();
+  return useQuery({
+    queryKey: ["portfolios", id, "trades", page, pageSize],
+    queryFn: async ({ signal }) => {
+      const token = await getToken();
+      return getWithFallback<MonitoringPage<Trade>>(
+        `/portfolios/${id}/trades?limit=${pageSize}&offset=${page * pageSize}`,
+        { signal, token },
+      );
+    },
+    staleTime: STALE,
+    enabled: !!id,
+  });
+}
+
+export function useExecutionEvents(id: string, page = 0, pageSize = 10) {
+  const getToken = useApiToken();
+  return useQuery({
+    queryKey: ["strategies", id, "execution-events", page, pageSize],
+    queryFn: async ({ signal }) => {
+      const token = await getToken();
+      return getWithFallback<MonitoringPage<ExecutionEvent>>(
+        `/strategies/${id}/execution-events?limit=${pageSize}&offset=${page * pageSize}`,
         { signal, token },
       );
     },

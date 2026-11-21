@@ -67,10 +67,39 @@ export interface Trade {
   entry_price?: number;
   exit_price?: number;
   quantity?: number;
+  volume?: number;
   pnl?: number;
   profit?: number;
+  trade_type?: "long" | "short";
+  commission?: number | null;
+  swap?: number | null;
+  spread_cost?: number | null;
+  slippage?: number | null;
+  reference_price?: number | null;
+  currency?: string | null;
+  pnl_pct_equity?: number | null;
   entry_time: string;
   exit_time?: string;
+}
+
+export interface ExecutionEvent {
+  id: number | string;
+  strategy_id: string;
+  event_type: "signal_intent" | "execution_update";
+  ts?: string | null;
+  received_at?: string;
+  ingest_status: "received" | "processed" | "rejected";
+  payload: {
+    signal_id?: string;
+    symbol?: string;
+    direction?: "long" | "short";
+    reference_price?: number;
+    volume?: number;
+    status?: "submitted" | "filled" | "partial" | "cancelled" | "rejected" | "not_sent";
+    filled_volume?: number;
+    fill_price?: number | null;
+    reason?: string | null;
+  };
 }
 
 export interface Alert {
