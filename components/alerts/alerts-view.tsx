@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Bell, ChevronLeft, ChevronRight } from "lucide-react";
 import { SeverityBadge } from "@/components/shared/badges";
 import { OfflineBanner } from "@/components/shared/offline-banner";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,18 @@ import type { Alert, Strategy } from "@/types";
 const EMPTY_ALERTS: Alert[] = [];
 const EMPTY_STRATEGIES: Strategy[] = [];
 
+function summarizeContext(context: Alert["context"]): string {
+  if (!context || typeof context !== "object") return "—";
+  const preferred = ["message", "description", "reason", "correlation", "observations", "window_days", "ticket"];
+  const entries = [...preferred.flatMap((key) => key in context ? [[key, context[key]] as const] : []),
+    ...Object.entries(context).filter(([key]) => !preferred.includes(key))];
+  return entries
+    .filter(([, value]) => value !== null && value !== undefined)
+    .slice(0, 5)
+    .map(([key, value]) => `${key.replaceAll("_", " ")}: ${typeof value === "object" ? JSON.stringify(value) : String(value)}`)
+    .join(" · ") || "—";
+}
+
 export function AlertsView() {
   const { dict } = useI18n();
   const strategies = useStrategies();
@@ -47,7 +59,9 @@ export function AlertsView() {
 
   const requestLimit = strategy === "all" ? pageSize : 1000;
   const requestOffset = strategy === "all" ? page * pageSize : 0;
+  const dateRangeInvalid = Boolean(from && to && from > to);
   const alertsQuery = useAlerts(requestLimit, {
+    enabled: !dateRangeInvalid,
     offset: requestOffset,
     status: status === "all" ? undefined : status as "open" | "ack" | "resolved",
     severity: severity === "all" ? undefined : severity as Alert["severity"],
@@ -150,17 +164,18 @@ export function AlertsView() {
   ) => template.replace(/\{(\w+)\}/g, (_, key) => String(values[key] ?? ""));
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-      <div>
-        <h2 className="text-xl font-semibold">{dict.alerts.title}</h2>
-        <p className="text-sm text-muted-foreground">{dict.alerts.subtitle}</p>
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-5">
+      <div className="border-b border-white/[0.06] pb-4">
+        <h2 className="text-2xl font-semibold tracking-tight">{dict.alerts.title}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{dict.alerts.subtitle}</p>
       </div>
 
       {data?.isFallback && <OfflineBanner />}
+      {dateRangeInvalid && <p role="alert" className="notice-warning rounded-xl px-4 py-3 text-sm text-amber-100">{dict.alerts.dateRangeError}</p>}
       {strategyFilterLimited && <p className="rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">{dict.alerts.strategyFilterLimit}</p>}
 
       <Card>
-        <CardContent className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-5">
+        <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="flex flex-col gap-1.5">
             <Label className="text-xs text-muted-foreground">
               {dict.alerts.filterStrategy}
@@ -237,24 +252,27 @@ export function AlertsView() {
       </Card>
 
       {alertsQuery.isError ? (
-        <div role="alert" className="flex items-center justify-between gap-3 rounded-lg border border-destructive/30 p-4 text-sm text-destructive">
+        <div role="alert" className="notice-error flex items-center justify-between gap-3 text-sm text-destructive">
           <span>{dict.alerts.loadError}</span>
           <Button variant="outline" size="sm" onClick={() => alertsQuery.refetch()}>{dict.alerts.retry}</Button>
         </div>
-      ) : isLoading ? (
+      ) : dateRangeInvalid ? null : isLoading ? (
         <div className="flex flex-col gap-2">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-12 w-full" />
           ))}
         </div>
       ) : totalAlerts === 0 || filtered.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-          {dict.alerts.empty}
+        <div className="empty-state px-6 py-14 text-center text-sm text-muted-foreground">
+          <div className="relative z-[1] mx-auto flex max-w-sm flex-col items-center gap-3">
+            <span className="flex size-11 items-center justify-center rounded-xl border border-primary/10 bg-primary/[0.06] text-primary/80"><Bell className="size-5" /></span>
+            <p>{dict.alerts.empty}</p>
+          </div>
         </div>
       ) : (
         <>
           <div className="overflow-x-auto rounded-lg border border-border">
-            <Table className="min-w-[700px]">
+            <Table className="min-w-[760px]">
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
                   <TableHead>{dict.alerts.colProblem}</TableHead>
@@ -265,10 +283,11 @@ export function AlertsView() {
                     {dict.alerts.colStrategy}
                   </TableHead>
                   <TableHead>{dict.alerts.colSeverity}</TableHead>
-                  <TableHead>{dict.alerts.acknowledge}</TableHead>
+                  <TableHead>{dict.alerts.filterStatus}</TableHead>
                   <TableHead className="text-right">
                     {dict.alerts.colDate}
                   </TableHead>
+                  <TableHead className="text-right">{dict.alerts.acknowledge}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -276,25 +295,31 @@ export function AlertsView() {
                   <TableRow key={a.id}>
                     <TableCell className="font-medium">
                       {a.problem_type ?? a.rule_key ?? a.problem ?? "—"}
+                      {a.count && a.count > 1 ? <span className="ml-2 text-xs text-muted-foreground">×{a.count}</span> : null}
                     </TableCell>
                     <TableCell className="hidden max-w-sm md:table-cell">
                       <div
                         className="max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap text-muted-foreground"
-                        title={a.details ?? "—"}
+                        title={a.details ?? summarizeContext(a.context)}
                       >
-                        {a.details ?? "—"}
+                        {a.details ?? summarizeContext(a.context)}
                       </div>
                     </TableCell>
                     <TableCell className="hidden text-muted-foreground sm:table-cell">
-                      {a.strategy_name ?? a.strategy_id ?? a.portfolio_id ?? "—"}
+                      {a.strategy_name ?? (a.strategy_id ? strategyItems[a.strategy_id] : undefined) ?? a.strategy_id ?? a.portfolio_id ?? "—"}
                     </TableCell>
                     <TableCell>
                       <SeverityBadge severity={a.severity} />
                     </TableCell>
+                    <TableCell>
+                      <span className={a.status === "open" ? "rounded-full border border-amber-300/20 bg-amber-300/10 px-2 py-1 text-xs text-amber-100" : "rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-xs text-muted-foreground"}>
+                        {a.status === "open" ? dict.alerts.open : a.status === "ack" ? dict.alerts.acknowledged : a.status === "resolved" ? dict.alerts.resolved : "—"}
+                      </span>
+                    </TableCell>
                     <TableCell className="text-right text-muted-foreground">
                       {formatDate(a.last_seen ?? a.first_seen ?? a.timestamp)}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-right">
                       {a.status === "open" ? (
                         <Button size="sm" variant="outline" disabled={acknowledge.isPending} onClick={() => acknowledge.mutate(a.id)}>
                           {dict.alerts.acknowledge}

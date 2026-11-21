@@ -67,10 +67,45 @@ export interface Trade {
   entry_price?: number;
   exit_price?: number;
   quantity?: number;
+  volume?: number;
   pnl?: number;
   profit?: number;
+  trade_type?: "long" | "short";
+  commission?: number | null;
+  swap?: number | null;
+  spread_cost?: number | null;
+  slippage?: number | null;
+  reference_price?: number | null;
+  currency?: string | null;
+  pnl_pct_equity?: number | null;
   entry_time: string;
   exit_time?: string;
+}
+
+export interface ExecutionEvent {
+  id: number | string;
+  strategy_id: string;
+  event_type: "signal_intent" | "execution_update";
+  ts?: string | null;
+  received_at?: string;
+  ingest_status: "received" | "processed" | "rejected";
+  payload: {
+    signal_id?: string;
+    symbol?: string;
+    direction?: "long" | "short";
+    reference_price?: number;
+    volume?: number;
+    bid_price?: number;
+    ask_price?: number;
+    spread_points?: number;
+    status?: "submitted" | "filled" | "partial" | "cancelled" | "rejected" | "not_sent";
+    filled_volume?: number;
+    fill_price?: number | null;
+    slippage_price?: number;
+    slippage_bps?: number;
+    signal_to_fill_seconds?: number;
+    reason?: string | null;
+  };
 }
 
 export interface Alert {
@@ -82,6 +117,10 @@ export interface Alert {
   problem_type?: string;
   rule_key?: string;
   details?: string;
+  context?: Record<string, unknown> | null;
+  count?: number;
+  ack_at?: string | null;
+  resolved_at?: string | null;
   severity: Severity;
   status?: "open" | "ack" | "resolved";
   first_seen?: string;
@@ -109,8 +148,11 @@ export interface CapitalAccount {
 }
 
 export interface CapitalSummary {
-  total: number;
-  accounts: CapitalAccount[];
+  total?: number;
+  by_type?: Record<string, {
+    total: number;
+    accounts: Array<{ capital: number; currency: string }>;
+  }>;
 }
 
 export interface EdgeHealth {
