@@ -36,10 +36,16 @@ interface PortfolioStrategy {
   metrics?: {
     equity?: number | null;
     total_dd_pct?: number | null;
+    average_net_per_trade?: number | null;
+    t_stat_net_per_trade?: number | null;
     rolling_20?: { n_trades?: number; win_rate?: number | null; profit_factor?: number | null; expectancy_pct?: number | null };
+    rolling_50?: { n_trades?: number; win_rate?: number | null; profit_factor?: number | null; expectancy_pct?: number | null };
     current_loss_streak?: number;
     trade_count?: number;
   } | null;
+  positions?: Array<{ ticket: string; symbol: string; direction: string; volume: number; profit: number; swap: number; risk_at_stop?: number | null }> | null;
+  position_state?: "fresh" | "stale" | "unavailable";
+  position_snapshot_at?: string | null;
   alerts?: Array<{
     id: number;
     severity?: string;
@@ -54,6 +60,17 @@ interface PortfolioDetail {
   strategies: PortfolioStrategy[];
   alerts: Array<{ id: number; status?: string }>;
   equity_curve: Array<{ ts: string; equity: number }>;
+  position_state?: {
+    status: "fresh" | "unavailable";
+    open_positions_count: number | null;
+    floating_pnl: number | null;
+    risk_at_stop?: number | null;
+    stop_risk_complete?: boolean;
+    margin_used: number | null;
+    free_margin: number | null;
+    currency: string | null;
+    snapshot_at: string | null;
+  };
 }
 
 interface PortfolioCorrelation {
@@ -246,6 +263,44 @@ export function MonitoringPortfolioDashboard() {
             </p>
           ) : null}
 
+          <Card className="border-white/[0.07] bg-gradient-to-br from-white/[0.025] to-transparent">
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
+              <div>
+                <CardTitle className="text-sm">{locale === "es" ? "Posiciones y margen" : "Positions and margin"}</CardTitle>
+                <p className="mt-1 text-xs text-muted-foreground">{locale === "es" ? "Snapshots por estrategia, actualizados por los EAs cada minuto." : "Per-strategy snapshots, refreshed by the EAs every minute."}</p>
+              </div>
+              <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${data.position_state?.status === "fresh" ? "border-emerald-400/15 bg-emerald-400/[0.08] text-emerald-200" : "border-amber-300/15 bg-amber-300/[0.07] text-amber-100"}`}>
+                {data.position_state?.status === "fresh" ? (locale === "es" ? "Snapshot reciente" : "Fresh snapshot") : (locale === "es" ? "Sin muestra" : "No sample")}
+              </span>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+                {[
+                  [locale === "es" ? "Posiciones abiertas" : "Open positions", data.position_state?.open_positions_count == null ? "Sin muestra" : String(data.position_state.open_positions_count)],
+                  [locale === "es" ? "P&L flotante + swap" : "Floating P&L + swap", data.position_state?.floating_pnl == null ? "Sin muestra" : formatNumber(data.position_state.floating_pnl)],
+                  [locale === "es" ? "Riesgo hasta SL" : "Risk to stop", data.position_state?.stop_risk_complete ? formatNumber(data.position_state.risk_at_stop) : (locale === "es" ? "Sin SL / sin muestra" : "No stop / no sample")],
+                  [locale === "es" ? "Margen usado" : "Margin used", data.position_state?.margin_used == null ? "Sin muestra" : `${formatNumber(data.position_state.margin_used)} ${data.position_state.currency ?? ""}`],
+                  [locale === "es" ? "Margen libre" : "Free margin", data.position_state?.free_margin == null ? "Sin muestra" : `${formatNumber(data.position_state.free_margin)} ${data.position_state.currency ?? ""}`],
+                ].map(([label, value]) => <div key={label} className="rounded-xl border border-white/[0.06] bg-black/[0.08] px-3 py-2.5"><p className="text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">{label}</p><p className="mt-1 truncate text-sm font-semibold tabular-nums">{value}</p></div>)}
+              </div>
+              {data.strategies.some((strategy) => strategy.position_state === "fresh" && strategy.positions?.length) ? (
+                <div className="grid gap-2 md:grid-cols-2">
+                  {data.strategies.flatMap((strategy) => (strategy.positions ?? []).map((position) => (
+                    <div key={`${strategy.id}-${position.ticket}`} className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.06] bg-white/[0.018] px-3 py-2.5 transition hover:border-primary/15 hover:bg-white/[0.03]">
+                      <div className="min-w-0"><p className="truncate text-xs font-semibold">{position.symbol} <span className={`ml-1 text-[10px] uppercase ${position.direction === "long" ? "text-emerald-300" : "text-rose-300"}`}>{position.direction}</span></p><p className="mt-1 truncate text-[10px] text-muted-foreground">{strategy.name ?? strategy.id} · {formatNumber(position.volume, 4)} lots</p></div>
+                      <p className={`shrink-0 text-xs font-semibold tabular-nums ${position.profit + position.swap < 0 ? "text-rose-300" : "text-emerald-300"}`}>{formatNumber(position.profit + position.swap)}</p>
+                    </div>
+                  ))) }
+                </div>
+              ) : data.position_state?.status === "fresh" ? (
+                <p className="rounded-lg border border-white/[0.055] bg-white/[0.015] px-3 py-2.5 text-xs text-muted-foreground">{locale === "es" ? "El último snapshot confirma que no hay posiciones abiertas." : "The latest snapshot confirms there are no open positions."}</p>
+              ) : (
+                <p className="rounded-lg border border-amber-300/10 bg-amber-300/[0.035] px-3 py-2.5 text-xs text-muted-foreground">{locale === "es" ? "Esperando snapshots válidos. No se asume que la cuenta esté plana." : "Waiting for valid snapshots. The account is not assumed to be flat."}</p>
+              )}
+              {data.position_state?.snapshot_at ? <p className="text-right text-[10px] text-muted-foreground">{locale === "es" ? "Última captura" : "Last snapshot"}: {formatDate(data.position_state.snapshot_at)}</p> : null}
+            </CardContent>
+          </Card>
+
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader>
@@ -376,7 +431,7 @@ export function MonitoringPortfolioDashboard() {
             <CardContent className="grid gap-3 md:grid-cols-2">
               {data.strategies.map((strategy) => {
                 const alerts = strategy.alerts ?? [];
-                const rolling20 = strategy.metrics?.rolling_20;
+                const rolling20 = strategy.metrics?.rolling_50 ?? strategy.metrics?.rolling_20;
                 const openAlerts = alerts.filter((alert) => alert.status === "open");
                 const critical = openAlerts.some(
                   (alert) => alert.severity === "high" || alert.severity === "critical",
@@ -467,13 +522,15 @@ export function MonitoringPortfolioDashboard() {
                         </dd>
                       </div>
                     </dl>
-                    <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-5">
+                    <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-7">
                       {[
-                        [copy.rollingSample, rolling20?.n_trades == null ? "—" : `${rolling20.n_trades}/20`],
+                        [copy.rollingSample, rolling20?.n_trades == null ? (locale === "es" ? "Sin muestra" : "No sample") : `${rolling20.n_trades}/50`],
                         [copy.winRate, formatPercentPoints(rolling20?.win_rate)],
                         [copy.profitFactor, formatNumber(rolling20?.profit_factor)],
                         [copy.expectancy, formatPercentPoints(rolling20?.expectancy_pct)],
-                        [copy.lossStreak, strategy.metrics?.current_loss_streak == null ? "—" : String(strategy.metrics.current_loss_streak)],
+                        [locale === "es" ? "Media neta" : "Avg net trade", strategy.metrics?.average_net_per_trade == null ? (locale === "es" ? "Sin muestra" : "No sample") : formatNumber(strategy.metrics.average_net_per_trade)],
+                        [locale === "es" ? "T-stat neto" : "Net t-stat", (strategy.metrics?.trade_count ?? 0) < 20 || strategy.metrics?.t_stat_net_per_trade == null ? (locale === "es" ? "Sin muestra" : "No sample") : formatNumber(strategy.metrics.t_stat_net_per_trade)],
+                        [copy.lossStreak, strategy.metrics?.current_loss_streak == null ? (locale === "es" ? "Sin muestra" : "No sample") : String(strategy.metrics.current_loss_streak)],
                       ].map(([label, value]) => (
                         <div key={label} className="min-w-0 rounded-lg border border-white/[0.07] bg-black/10 px-2.5 py-2">
                           <dt className="truncate text-[10px] text-muted-foreground">{label}</dt>
