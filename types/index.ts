@@ -95,9 +95,15 @@ export interface ExecutionEvent {
     direction?: "long" | "short";
     reference_price?: number;
     volume?: number;
+    bid_price?: number;
+    ask_price?: number;
+    spread_points?: number;
     status?: "submitted" | "filled" | "partial" | "cancelled" | "rejected" | "not_sent";
     filled_volume?: number;
     fill_price?: number | null;
+    slippage_price?: number;
+    slippage_bps?: number;
+    signal_to_fill_seconds?: number;
     reason?: string | null;
   };
 }

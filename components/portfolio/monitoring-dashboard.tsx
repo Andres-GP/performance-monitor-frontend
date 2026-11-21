@@ -32,6 +32,8 @@ interface PortfolioStrategy {
   current_mode?: "demo" | "live" | null;
   mode_status?: "unconfirmed" | "matches_expected" | "mode_mismatch";
   mode_observed_at?: string | null;
+  broker_utc_offset_minutes?: number | null;
+  baselines?: { bt_spread_points?: number | null };
   last_heartbeat_at?: string | null;
   metrics?: {
     equity?: number | null;
@@ -163,6 +165,7 @@ export function MonitoringPortfolioDashboard() {
   const trades = usePortfolioTrades(portfolioId ?? "", tradePage, 10);
 
   const data = detail.data;
+  const strategyById = new Map((data?.strategies ?? []).map((strategy) => [strategy.id, strategy]));
   const executionStrategyId = executionStrategy || data?.strategies[0]?.id || "";
   const executionEvents = useExecutionEvents(executionStrategyId, executionPage, 10);
   const correlationItems = correlation.data?.items ?? [];
@@ -521,6 +524,10 @@ export function MonitoringPortfolioDashboard() {
                             : "—"}
                         </dd>
                       </div>
+                      <div>
+                        <dt className="inline font-medium">{locale === "es" ? "Offset broker / UTC" : "Broker / UTC offset"}: </dt>
+                        <dd className="inline">{strategy.broker_utc_offset_minutes == null ? (locale === "es" ? "Sin muestra" : "No sample") : `UTC${strategy.broker_utc_offset_minutes >= 0 ? "+" : ""}${strategy.broker_utc_offset_minutes / 60}`}</dd>
+                      </div>
                     </dl>
                     <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-7">
                       {[
@@ -619,7 +626,7 @@ export function MonitoringPortfolioDashboard() {
                       const status = intent ? (locale === "es" ? "señal enviada" : "signal sent") : payload.status ?? event.ingest_status;
                       return (
                         <li key={event.id} className="flex flex-col gap-2 rounded-xl border border-white/[0.07] bg-white/[0.018] p-3.5 transition-colors hover:border-white/[0.12] hover:bg-white/[0.03] sm:flex-row sm:items-center sm:justify-between">
-                          <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">{label}</span><span className="text-xs text-muted-foreground">{payload.signal_id ?? "—"}</span></div><p className="mt-1 text-sm font-medium">{payload.symbol ?? executionStrategyId} {payload.direction ? `· ${payload.direction}` : ""}</p><p className="text-xs text-muted-foreground">{intent ? `${locale === "es" ? "Referencia" : "Reference"}: ${formatNumber(payload.reference_price)} · ${locale === "es" ? "Solicitado" : "Requested"}: ${formatNumber(payload.volume, 3)}` : `${locale === "es" ? "Ejecutado" : "Filled"}: ${formatNumber(payload.filled_volume, 3)} · ${locale === "es" ? "Precio medio" : "Average price"}: ${formatNumber(payload.fill_price)}${payload.reason ? ` · ${payload.reason}` : ""}`}</p></div>
+                          <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">{label}</span><span className="text-xs text-muted-foreground">{payload.signal_id ?? "—"}</span></div><p className="mt-1 text-sm font-medium">{payload.symbol ?? executionStrategyId} {payload.direction ? `· ${payload.direction}` : ""}</p><p className="text-xs text-muted-foreground">{intent ? `${locale === "es" ? "Referencia" : "Reference"}: ${formatNumber(payload.reference_price)} · ${locale === "es" ? "Solicitado" : "Requested"}: ${formatNumber(payload.volume, 3)} · ${locale === "es" ? "Spread real / supuesto" : "Live / expected spread"}: ${payload.spread_points == null ? (locale === "es" ? "Sin muestra" : "No sample") : `${formatNumber(payload.spread_points, 1)} / ${strategyById.get(executionStrategyId)?.baselines?.bt_spread_points == null ? (locale === "es" ? "sin baseline" : "no baseline") : formatNumber(strategyById.get(executionStrategyId)?.baselines?.bt_spread_points, 1)} pt`}` : `${locale === "es" ? "Ejecutado" : "Filled"}: ${formatNumber(payload.filled_volume, 3)} · ${locale === "es" ? "Precio medio" : "Average price"}: ${formatNumber(payload.fill_price)}${payload.slippage_bps == null ? ` · ${locale === "es" ? "Slippage" : "Slippage"}: ${locale === "es" ? "Sin muestra" : "No sample"}` : ` · ${locale === "es" ? "Slippage adverso" : "Adverse slippage"}: ${formatNumber(payload.slippage_bps, 2)} bps`}${payload.signal_to_fill_seconds == null ? "" : ` · ${locale === "es" ? "Tiempo de fill" : "Fill time"}: ${formatNumber(payload.signal_to_fill_seconds, 2)}s`}${payload.reason ? ` · ${payload.reason}` : ""}`}</p></div>
                           <div className="flex shrink-0 items-center justify-between gap-3 text-xs sm:flex-col sm:items-end"><span className="rounded-full border px-2.5 py-1 capitalize">{status}</span><time className="text-muted-foreground">{formatDate(event.ts ?? event.received_at)}</time></div>
                         </li>
                       );
