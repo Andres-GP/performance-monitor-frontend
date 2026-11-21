@@ -11,6 +11,8 @@ jest.mock("@tanstack/react-query", () => ({
 jest.mock("@/lib/queries", () => ({
   useApiToken: () => jest.fn().mockResolvedValue("session-token"),
   useCapitalSummary: () => ({ data: undefined, isError: false, refetch: jest.fn() }),
+  useExecutionEvents: () => ({ data: undefined, isLoading: false, isError: false, refetch: refetchMock }),
+  usePortfolioTrades: () => ({ data: undefined, isLoading: false, isError: false, refetch: refetchMock }),
 }));
 
 jest.mock("@/lib/api-client", () => ({ apiGet: jest.fn() }));
