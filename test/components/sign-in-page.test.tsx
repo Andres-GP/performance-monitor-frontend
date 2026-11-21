@@ -45,7 +45,7 @@ describe("sign-in page", () => {
 
     render(<SignInPage />);
 
-    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith("/strategies"));
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith("/portfolio"));
     expect(mockReplace).toHaveBeenCalledTimes(1);
   });
 
@@ -57,6 +57,6 @@ describe("sign-in page", () => {
 
     await waitFor(() => expect(mockCreate).toHaveBeenCalledWith({ identifier: "user@example.com", password: "test-password" }));
     expect(mockSetActive).toHaveBeenCalledWith({ session: "session-test" });
-    expect(mockReplace).toHaveBeenCalledWith("/strategies");
+    expect(mockReplace).toHaveBeenCalledWith("/portfolio");
   });
 });

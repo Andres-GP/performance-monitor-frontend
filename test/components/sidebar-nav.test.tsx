@@ -13,8 +13,7 @@ describe("SidebarNav", () => {
   it("fires onNavigate when a link is clicked", async () => {
     const onNavigate = jest.fn();
     render(<SidebarNav onNavigate={onNavigate} />);
-    // El primer link ahora es "Strategies" (no "Dashboard")
-    await userEvent.click(screen.getByRole("link", { name: /Strategies/i }));
+    await userEvent.click(screen.getByRole("link", { name: /Portfolio/i }));
     expect(onNavigate).toHaveBeenCalled();
   });
 });

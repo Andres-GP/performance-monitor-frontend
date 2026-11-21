@@ -52,12 +52,12 @@ describe("Header", () => {
     jest.clearAllMocks();
   });
 
-  it("shows the Strategies title on the root route", () => {
-    mockUsePathname.mockReturnValue("/strategies");
+  it("shows the Portfolio title on the portfolio route", () => {
+    mockUsePathname.mockReturnValue("/portfolio");
     render(<Header />);
 
     expect(
-      screen.getByRole("heading", { name: "Strategies" }),
+      screen.getByRole("heading", { name: "Portfolio" }),
     ).toBeInTheDocument();
   });
 });

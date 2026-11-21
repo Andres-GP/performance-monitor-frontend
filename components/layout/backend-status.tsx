@@ -42,7 +42,8 @@ export function BackendStatus() {
       role="status"
       aria-live="polite"
       aria-label={label}
-      className={`flex size-9 shrink-0 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] text-xs md:h-9 md:w-auto md:px-3 ${tone}`}
+      data-healthy={!unavailable && !stale && !waiting && !health.isLoading}
+      className={`status-indicator flex size-9 shrink-0 items-center justify-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.025] text-xs md:h-8 md:w-auto md:px-3 ${tone}`}
       title={label}
     >
       <Icon aria-hidden="true" className="size-3.5" />

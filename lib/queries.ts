@@ -9,10 +9,12 @@ import type {
   PerformanceMetric,
   PortfolioMetrics,
   PortfolioWeight,
+  CapitalSummary,
   MonitoringPage,
   EquitySample,
   Strategy,
   Trade,
+  ExecutionEvent,
 } from "@/types";
 
 export const qk = {
@@ -121,7 +123,40 @@ export function useStrategyEquity(id: string, page = 0, pageSize = 500) {
   });
 }
 
+export function usePortfolioTrades(id: string, page = 0, pageSize = 10) {
+  const getToken = useApiToken();
+  return useQuery({
+    queryKey: ["portfolios", id, "trades", page, pageSize],
+    queryFn: async ({ signal }) => {
+      const token = await getToken();
+      return getWithFallback<MonitoringPage<Trade>>(
+        `/portfolios/${id}/trades?limit=${pageSize}&offset=${page * pageSize}`,
+        { signal, token },
+      );
+    },
+    staleTime: STALE,
+    enabled: !!id,
+  });
+}
+
+export function useExecutionEvents(id: string, page = 0, pageSize = 10) {
+  const getToken = useApiToken();
+  return useQuery({
+    queryKey: ["strategies", id, "execution-events", page, pageSize],
+    queryFn: async ({ signal }) => {
+      const token = await getToken();
+      return getWithFallback<MonitoringPage<ExecutionEvent>>(
+        `/strategies/${id}/execution-events?limit=${pageSize}&offset=${page * pageSize}`,
+        { signal, token },
+      );
+    },
+    staleTime: STALE,
+    enabled: !!id,
+  });
+}
+
 export interface AlertQueryOptions {
+  enabled?: boolean;
   offset?: number;
   status?: "open" | "ack" | "resolved";
   severity?: Alert["severity"];
@@ -146,6 +181,7 @@ export function useAlerts(limit = 100, options: AlertQueryOptions = {}) {
         { signal, token },
       );
     },
+    enabled: options.enabled !== false,
     staleTime: STALE,
   });
 }
@@ -195,6 +231,21 @@ export function usePortfolioMetrics() {
   });
 }
 
+export function useCapitalSummary() {
+  const getToken = useApiToken();
+  return useQuery({
+    queryKey: qk.capital,
+    queryFn: async ({ signal }) => {
+      const token = await getToken();
+      return getWithFallback<CapitalSummary>("/capital/summary", {
+        signal,
+        token,
+      });
+    },
+    staleTime: STALE,
+  });
+}
+
 export function useSetWeight() {
   const qc = useQueryClient();
   const getToken = useApiToken();
@@ -212,7 +263,6 @@ export function useSetWeight() {
       qc.invalidateQueries({ queryKey: qk.weights });
       qc.invalidateQueries({ queryKey: qk.portfolioMetrics });
     },
-    onError: (error) => toast.error(error.message || "Could not update weight"),
   });
 }
 

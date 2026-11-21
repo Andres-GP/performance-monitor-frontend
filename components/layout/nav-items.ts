@@ -2,7 +2,6 @@ import {
   Activity,
   Bell,
   ClipboardList,
-  LineChart,
   Wallet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -16,7 +15,6 @@ export interface NavItem {
 }
 
 export const navItems: NavItem[] = [
-  { labelKey: "strategies", href: "/strategies", icon: LineChart },
   { labelKey: "portfolio", href: "/portfolio", icon: Wallet },
   { labelKey: "weeklyReview", href: "/weekly-review", icon: ClipboardList },
   { labelKey: "alerts", href: "/alerts", icon: Bell },
