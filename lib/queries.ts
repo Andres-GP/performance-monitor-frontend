@@ -9,6 +9,7 @@ import type {
   PerformanceMetric,
   PortfolioMetrics,
   PortfolioWeight,
+  CapitalSummary,
   MonitoringPage,
   EquitySample,
   Strategy,
@@ -122,6 +123,7 @@ export function useStrategyEquity(id: string, page = 0, pageSize = 500) {
 }
 
 export interface AlertQueryOptions {
+  enabled?: boolean;
   offset?: number;
   status?: "open" | "ack" | "resolved";
   severity?: Alert["severity"];
@@ -146,6 +148,7 @@ export function useAlerts(limit = 100, options: AlertQueryOptions = {}) {
         { signal, token },
       );
     },
+    enabled: options.enabled !== false,
     staleTime: STALE,
   });
 }
@@ -195,6 +198,21 @@ export function usePortfolioMetrics() {
   });
 }
 
+export function useCapitalSummary() {
+  const getToken = useApiToken();
+  return useQuery({
+    queryKey: qk.capital,
+    queryFn: async ({ signal }) => {
+      const token = await getToken();
+      return getWithFallback<CapitalSummary>("/capital/summary", {
+        signal,
+        token,
+      });
+    },
+    staleTime: STALE,
+  });
+}
+
 export function useSetWeight() {
   const qc = useQueryClient();
   const getToken = useApiToken();
@@ -212,7 +230,6 @@ export function useSetWeight() {
       qc.invalidateQueries({ queryKey: qk.weights });
       qc.invalidateQueries({ queryKey: qk.portfolioMetrics });
     },
-    onError: (error) => toast.error(error.message || "Could not update weight"),
   });
 }
 

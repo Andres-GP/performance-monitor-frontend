@@ -10,6 +10,7 @@ jest.mock("@tanstack/react-query", () => ({
 
 jest.mock("@/lib/queries", () => ({
   useApiToken: () => jest.fn().mockResolvedValue("session-token"),
+  useCapitalSummary: () => ({ data: undefined, isError: false, refetch: jest.fn() }),
 }));
 
 jest.mock("@/lib/api-client", () => ({ apiGet: jest.fn() }));
@@ -30,7 +31,8 @@ jest.mock("@/lib/i18n/context", () => ({
         currentEquity: "Current equity",
         currentDrawdown: "Current drawdown",
         openAlerts: "Open alerts",
-        freeMargin: "Free margin",
+        capitalTracked: "Reported capital",
+        capitalUnavailable: "Reported capital unavailable.",
         monitoringLoading: "Loading portfolio monitoring…",
         monitoringError: "Could not load portfolio monitoring.",
         noPortfolios: "No normalized portfolios are available.",

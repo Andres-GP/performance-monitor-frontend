@@ -2,6 +2,7 @@
 
 import { Menu, LogOut } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +28,7 @@ function useTitle() {
   const pathname = usePathname();
   const { dict } = useI18n();
   const match = navItems.find((i) =>
-    i.href === "/" ? pathname === "/" : pathname.startsWith(i.href),
+    pathname === i.href || pathname.startsWith(`${i.href}/`),
   );
   return match ? dict.nav[match.labelKey] : dict.common.appName;
 }
@@ -38,6 +39,7 @@ export function Header() {
   const { signOut } = useClerk();
   const { user } = useUser();
   const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
@@ -60,7 +62,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-30 flex h-[4.5rem] items-center gap-3 border-b border-white/[0.08] bg-[#1f3d36]/95 px-4 backdrop-blur-xl md:px-8">
-      <Sheet>
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetTrigger
           render={
             <Button
@@ -75,7 +77,7 @@ export function Header() {
         </SheetTrigger>
         <SheetContent side="left" className="w-72 bg-sidebar p-0">
           <SheetTitle className="sr-only">{dict.header.navigation}</SheetTitle>
-          <SidebarNav />
+          <SidebarNav onNavigate={() => setMobileMenuOpen(false)} />
         </SheetContent>
       </Sheet>
 

@@ -15,7 +15,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <Header />
         <main className="relative z-0 w-full flex-1 px-4 py-6 sm:px-6 lg:px-9 lg:py-8">
-          <div className="mx-auto w-full max-w-[1600px]">{children}</div>
+          <div className="app-content-enter mx-auto w-full max-w-[1600px]">{children}</div>
         </main>
       </div>
     </div>

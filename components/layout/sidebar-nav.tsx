@@ -43,6 +43,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
               className={cn(
+                "nav-link",
                 "group relative flex items-center gap-3 rounded-xl px-3 py-3 text-[13px] font-medium transition-all duration-200",
                 active
                   ? "bg-[#c8f5a8]/10 text-[#d7f9c2] shadow-[inset_0_0_0_1px_rgba(200,245,168,0.12)] before:absolute before:bottom-2 before:left-0 before:top-2 before:w-[3px] before:rounded-full before:bg-[#c8f5a8]"

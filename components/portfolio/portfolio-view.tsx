@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type KeyboardEvent } from "react";
 import { MonitoringPortfolioDashboard } from "./monitoring-dashboard";
 import { Activity, Edit, Receipt, TrendingDown, Library } from "lucide-react";
 import { WeightsBar } from "@/components/charts/lazy";
@@ -72,46 +72,60 @@ export function PortfolioView() {
     setHelpDialogOpen(true);
   };
 
+  const openHelpFromKeyboard = (event: KeyboardEvent<HTMLDivElement>, titleKey: string, descKey: string) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openHelp(titleKey, descKey);
+    }
+  };
+
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editableWeights, setEditableWeights] = useState<
-    { strategy_id: string; strategy_name: string; target_weight: number }[]
+    { strategy_id: string; strategy_name: string; target_weight: string }[]
   >([]);
 
   const handleWeightChange = (index: number, value: string) => {
-    const numValue = parseFloat(value);
-    if (isNaN(numValue)) return;
-    const newWeights = [...editableWeights];
-    newWeights[index].target_weight = Math.min(Math.max(numValue, 0), 100);
-    setEditableWeights(newWeights);
+    setEditableWeights((current) => current.map((weight, weightIndex) =>
+      weightIndex === index ? { ...weight, target_weight: value } : weight,
+    ));
   };
 
-  const totalWeight = editableWeights.reduce(
-    (sum, w) => sum + (w.target_weight || 0),
+  const parsedWeights = editableWeights.map((weight) => Number(weight.target_weight));
+  const totalWeight = parsedWeights.reduce(
+    (sum, weight) => sum + (Number.isFinite(weight) ? weight : 0),
     0,
   );
-  const isWeightSumValid = Math.abs(totalWeight - 100) < 0.01;
+  const isWeightSumValid = parsedWeights.length > 0 &&
+    parsedWeights.every((weight, index) => editableWeights[index].target_weight.trim() !== "" && Number.isFinite(weight) && weight >= 0 && weight <= 100) &&
+    Math.abs(totalWeight - 100) < 0.01;
 
   const handleSaveWeights = async () => {
     if (!isWeightSumValid) {
-      toast.error("La suma de los pesos debe ser 100%");
+      toast.error(dict.portfolio.weightSumError);
       return;
     }
 
     const promises = editableWeights.map((w) =>
       setWeight.mutateAsync({
         strategy_id: w.strategy_id,
-        target_weight: w.target_weight,
+        target_weight: Number(w.target_weight),
       }),
     );
 
-    try {
-      await Promise.all(promises);
-      setEditDialogOpen(false);
-    } catch (error) {}
+    const results = await Promise.allSettled(promises);
+    if (results.some((result) => result.status === "rejected")) {
+      toast.error(dict.portfolio.weightsSaveError);
+      await Promise.all([weights.refetch(), metrics.refetch()]);
+      return;
+    }
+    setEditDialogOpen(false);
   };
 
   const allocationDeviations = pm?.allocation_deviations ?? {};
   const concentrationMetrics = pm?.concentration_metrics ?? {};
+  const pnlMix = Object.entries(pm?.exposure_by_category ?? {})
+    .filter(([, value]) => Number.isFinite(value))
+    .sort((left, right) => right[1] - left[1]);
 
   const maxConcentration = Object.entries(concentrationMetrics).reduce(
     (max, [category, pct]) => {
@@ -161,13 +175,14 @@ export function PortfolioView() {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-      <MonitoringPortfolioDashboard />
       <div>
-        <h2 className="text-xl font-semibold">{dict.portfolio.title}</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{dict.portfolio.title}</h2>
+        <p className="mt-1 text-sm text-muted-foreground sm:text-base">
           {dict.portfolio.subtitle}
         </p>
       </div>
+
+      <MonitoringPortfolioDashboard />
 
       {isFallback && <OfflineBanner />}
       {(weights.isError || metrics.isError) && (
@@ -186,6 +201,10 @@ export function PortfolioView() {
 
       <div className="flex flex-wrap gap-4">
         <div
+          role="button"
+          tabIndex={0}
+          aria-label={dict.portfolio.helpSharpeTitle}
+          onKeyDown={(event) => openHelpFromKeyboard(event, "helpSharpeTitle", "helpSharpeDesc")}
           className="flex-1 min-w-[180px] lg:flex-[1_1_calc(33.333%-1rem)] h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30"
           onClick={() => openHelp("helpSharpeTitle", "helpSharpeDesc")}
         >
@@ -201,6 +220,10 @@ export function PortfolioView() {
         </div>
 
         <div
+          role="button"
+          tabIndex={0}
+          aria-label={dict.portfolio.helpDrawdownTitle}
+          onKeyDown={(event) => openHelpFromKeyboard(event, "helpDrawdownTitle", "helpDrawdownDesc")}
           className="flex-1 min-w-[180px] lg:flex-[1_1_calc(33.333%-1rem)] h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30"
           onClick={() => openHelp("helpDrawdownTitle", "helpDrawdownDesc")}
         >
@@ -216,6 +239,10 @@ export function PortfolioView() {
         </div>
 
         <div
+          role="button"
+          tabIndex={0}
+          aria-label={dict.portfolio.helpTransactionCostsTitle}
+          onKeyDown={(event) => openHelpFromKeyboard(event, "helpTransactionCostsTitle", "helpTransactionCostsDesc")}
           className="flex-1 min-w-[180px] lg:flex-[1_1_calc(33.333%-1rem)] h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30"
           onClick={() =>
             openHelp("helpTransactionCostsTitle", "helpTransactionCostsDesc")
@@ -232,6 +259,10 @@ export function PortfolioView() {
         </div>
 
         <div
+          role="button"
+          tabIndex={0}
+          aria-label={dict.portfolio.helpRuinTitle}
+          onKeyDown={(event) => openHelpFromKeyboard(event, "helpRuinTitle", "helpRuinDesc")}
           className="flex-1 min-w-[180px] lg:flex-[1_1_calc(50%-0.5rem)] h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30"
           onClick={() => openHelp("helpRuinTitle", "helpRuinDesc")}
         >
@@ -246,6 +277,10 @@ export function PortfolioView() {
         </div>
 
         <div
+          role="button"
+          tabIndex={0}
+          aria-label={dict.portfolio.helpConcentrationTitle}
+          onKeyDown={(event) => openHelpFromKeyboard(event, "helpConcentrationTitle", "helpConcentrationDesc")}
           className="flex-1 min-w-[180px] lg:flex-[1_1_calc(50%-0.5rem)] h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30"
           onClick={() =>
             openHelp("helpConcentrationTitle", "helpConcentrationDesc")
@@ -266,6 +301,38 @@ export function PortfolioView() {
         </div>
       </div>
 
+      {pnlMix.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{dict.portfolio.pnlMixHeading}</CardTitle>
+            <CardDescription>{dict.portfolio.pnlMixDescription}</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 sm:grid-cols-2">
+            {pnlMix.map(([category, value]) => {
+              const pct = Math.max(0, Math.min(100, value));
+              return (
+                <div key={category} className="min-w-0 space-y-2">
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="truncate">{category}</span>
+                    <span className="shrink-0 font-medium tabular-nums">{formatPercentPoints(value)}</span>
+                  </div>
+                  <div
+                    role="progressbar"
+                    aria-label={`${category} · ${dict.portfolio.pnlMixHeading}`}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={pct}
+                    className="h-2 overflow-hidden rounded-full bg-muted"
+                  >
+                    <div className="h-full rounded-full bg-primary transition-[width] duration-500 ease-out" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="relative">
         <CardHeader>
           <CardTitle className="text-base">
@@ -278,6 +345,7 @@ export function PortfolioView() {
             variant="ghost"
             size="icon"
             className="cursor-pointer absolute right-2 top-2 z-10 h-6 w-6 p-0 text-muted-foreground/60 hover:bg-muted/80"
+              aria-label={dict.portfolio.helpWeightsTitle}
             onClick={() => openHelp("helpWeightsTitle", "helpWeightsDesc")}
           >
             <Library className="h-3.5 w-3.5" />
@@ -303,6 +371,7 @@ export function PortfolioView() {
               variant="ghost"
               size="icon"
               className="cursor-pointer h-6 w-6 p-0 text-muted-foreground/60 hover:bg-muted/80"
+              aria-label={dict.portfolio.helpAllocationTitle}
               onClick={() =>
                 openHelp("helpAllocationTitle", "helpAllocationDesc")
               }
@@ -317,7 +386,7 @@ export function PortfolioView() {
                     weightList.map((w) => ({
                       strategy_id: w.strategy_id,
                       strategy_name: w.strategy_name ?? w.strategy_id,
-                      target_weight: w.target_weight ?? 0,
+                      target_weight: String(w.target_weight ?? 0),
                     })),
                   );
                 }
@@ -346,9 +415,9 @@ export function PortfolioView() {
                     {editableWeights.map((w, idx) => (
                       <div
                         key={w.strategy_id}
-                        className="flex items-center gap-4"
+                        className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4"
                       >
-                        <div className="w-1/3">
+                        <div className="w-full sm:w-1/3">
                           <Label
                             htmlFor={`weight-${idx}`}
                             className="text-sm font-medium"
@@ -363,7 +432,7 @@ export function PortfolioView() {
                             min="0"
                             max="100"
                             step="0.5"
-                            value={w.target_weight ?? 0}
+                            value={w.target_weight}
                             onChange={(e) =>
                               handleWeightChange(idx, e.target.value)
                             }
@@ -414,7 +483,7 @@ export function PortfolioView() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="rounded-lg border border-border">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
@@ -451,7 +520,6 @@ export function PortfolioView() {
                             : "text-muted-foreground",
                         )}
                       >
-                        {d.deviation != null && d.deviation >= 0 ? "+" : ""}
                         {formatPercentPoints(d.deviation)}
                       </TableCell>
                     </TableRow>
@@ -485,6 +553,7 @@ export function PortfolioView() {
               variant="ghost"
               size="icon"
               className="cursor-pointer absolute right-2 top-2 z-10 h-6 w-6 p-0 text-muted-foreground/60 hover:bg-muted/80"
+              aria-label={dict.portfolio.helpCorrelationTitle}
               onClick={() =>
                 openHelp("helpCorrelationTitle", "helpCorrelationDesc")
               }
@@ -503,6 +572,7 @@ export function PortfolioView() {
                 {dict.portfolio.noCorrelation}
               </p>
             )}
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">{dict.portfolio.correlationDataCaveat}</p>
           </CardContent>
         </Card>
 
@@ -518,6 +588,7 @@ export function PortfolioView() {
               variant="ghost"
               size="icon"
               className="cursor-pointer absolute right-2 top-2 z-10 h-6 w-6 p-0 text-muted-foreground/60 hover:bg-muted/80"
+              aria-label={dict.portfolio.helpDrawdownTitle}
               onClick={() => openHelp("helpDrawdownTitle", "helpDrawdownDesc")}
             >
               <Library className="h-3.5 w-3.5" />

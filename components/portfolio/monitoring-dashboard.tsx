@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiGet } from "@/lib/api-client";
 import { useI18n } from "@/lib/i18n/context";
-import { useApiToken } from "@/lib/queries";
+import { useApiToken, useCapitalSummary } from "@/lib/queries";
 import { formatDate, formatNumber, formatPercentPoints } from "@/lib/format";
 
 interface PortfolioIndex {
@@ -32,7 +32,13 @@ interface PortfolioStrategy {
   mode_status?: "unconfirmed" | "matches_expected" | "mode_mismatch";
   mode_observed_at?: string | null;
   last_heartbeat_at?: string | null;
-  metrics?: { equity?: number | null; total_dd_pct?: number | null } | null;
+  metrics?: {
+    equity?: number | null;
+    total_dd_pct?: number | null;
+    rolling_20?: { n_trades?: number; win_rate?: number | null; profit_factor?: number | null; expectancy_pct?: number | null };
+    current_loss_streak?: number;
+    trade_count?: number;
+  } | null;
   alerts?: Array<{
     id: number;
     severity?: string;
@@ -54,6 +60,10 @@ interface PortfolioCorrelation {
     strategy_a: string;
     strategy_b: string;
     correlation: number | null;
+    observations?: number;
+    window_days?: number;
+    band?: string;
+    last_evaluated_at?: string;
   }>;
 }
 
@@ -65,9 +75,29 @@ function Metric({ label, value }: { label: string; value: string }) {
       <CardHeader className="pb-2">
         <CardTitle className="text-sm">{label}</CardTitle>
       </CardHeader>
-      <CardContent className="text-xl font-semibold">{value}</CardContent>
+      <CardContent className="break-words text-lg font-semibold leading-7 tabular-nums sm:text-xl">{value}</CardContent>
     </Card>
   );
+}
+
+function capitalByCurrency(data: import("@/types").CapitalSummary | null | undefined, locale: string) {
+  const totals = new Map<string, number>();
+  for (const group of Object.values(data?.by_type ?? {})) {
+    for (const account of group.accounts ?? []) {
+      if (!Number.isFinite(account.capital) || !account.currency) continue;
+      totals.set(account.currency, (totals.get(account.currency) ?? 0) + account.capital);
+    }
+  }
+  if (!totals.size) return "—";
+  return [...totals.entries()].map(([currency, amount]) => {
+    try {
+      return new Intl.NumberFormat(locale === "es" ? "es-CO" : "en-US", {
+        style: "currency", currency, maximumFractionDigits: 0,
+      }).format(amount);
+    } catch {
+      return `${currency} ${formatNumber(amount, 0)}`;
+    }
+  }).join(" · ");
 }
 
 export function MonitoringPortfolioDashboard() {
@@ -75,6 +105,7 @@ export function MonitoringPortfolioDashboard() {
   const { dict, locale, t } = useI18n();
   const copy = dict.portfolio;
   const [selectedId, setSelectedId] = useState<string>();
+  const capital = useCapitalSummary();
 
   const portfolios = useQuery({
     queryKey: ["monitoring-portfolios"],
@@ -198,8 +229,13 @@ export function MonitoringPortfolioDashboard() {
               label={copy.openAlerts}
               value={String(data.alerts.filter((alert) => alert.status === "open").length)}
             />
-            <Metric label={copy.freeMargin} value="—" />
+            <Metric label={copy.capitalTracked} value={capitalByCurrency(capital.data?.data, locale)} />
           </div>
+          {capital.isError ? (
+            <p role="status" className="text-xs text-muted-foreground">
+              {copy.capitalUnavailable} <button type="button" className="underline underline-offset-4" onClick={() => void capital.refetch()}>{copy.retry}</button>
+            </p>
+          ) : null}
 
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
@@ -302,7 +338,7 @@ export function MonitoringPortfolioDashboard() {
                               return (
                                 <td
                                   key={strategyB}
-                                  title={`${strategyA} / ${strategyB}`}
+                                  title={pair ? `${strategyA} / ${strategyB} · ${pair.observations ?? "—"} ${copy.overlapDays} · ${pair.window_days ?? 60} ${copy.days} · ${pair.last_evaluated_at ?? ""}` : `${strategyA} / ${strategyB} · ${copy.noCorrelation}`}
                                   className="h-10 min-w-12 rounded bg-muted p-2 text-center"
                                 >
                                   {value === null ? "—" : formatNumber(value)}
@@ -316,6 +352,7 @@ export function MonitoringPortfolioDashboard() {
                   </div>
                 )}
               </CardContent>
+              <p className="px-6 pb-5 text-xs leading-relaxed text-muted-foreground">{copy.correlationDataCaveat}</p>
             </Card>
           </div>
 
@@ -326,6 +363,7 @@ export function MonitoringPortfolioDashboard() {
             <CardContent className="grid gap-3 md:grid-cols-2">
               {data.strategies.map((strategy) => {
                 const alerts = strategy.alerts ?? [];
+                const rolling20 = strategy.metrics?.rolling_20;
                 const openAlerts = alerts.filter((alert) => alert.status === "open");
                 const critical = openAlerts.some(
                   (alert) => alert.severity === "high" || alert.severity === "critical",
@@ -416,6 +454,20 @@ export function MonitoringPortfolioDashboard() {
                         </dd>
                       </div>
                     </dl>
+                    <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-5">
+                      {[
+                        [copy.rollingSample, rolling20?.n_trades == null ? "—" : `${rolling20.n_trades}/20`],
+                        [copy.winRate, formatPercentPoints(rolling20?.win_rate)],
+                        [copy.profitFactor, formatNumber(rolling20?.profit_factor)],
+                        [copy.expectancy, formatPercentPoints(rolling20?.expectancy_pct)],
+                        [copy.lossStreak, strategy.metrics?.current_loss_streak == null ? "—" : String(strategy.metrics.current_loss_streak)],
+                      ].map(([label, value]) => (
+                        <div key={label} className="min-w-0 rounded-lg border border-white/[0.07] bg-black/10 px-2.5 py-2">
+                          <dt className="truncate text-[10px] text-muted-foreground">{label}</dt>
+                          <dd className="mt-1 truncate text-sm font-semibold tabular-nums">{value}</dd>
+                        </div>
+                      ))}
+                    </div>
                     <p className="mt-3 text-xs text-muted-foreground">
                       {copy.noExecutionDetails}
                     </p>

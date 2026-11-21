@@ -82,6 +82,10 @@ export interface Alert {
   problem_type?: string;
   rule_key?: string;
   details?: string;
+  context?: Record<string, unknown> | null;
+  count?: number;
+  ack_at?: string | null;
+  resolved_at?: string | null;
   severity: Severity;
   status?: "open" | "ack" | "resolved";
   first_seen?: string;
@@ -109,8 +113,11 @@ export interface CapitalAccount {
 }
 
 export interface CapitalSummary {
-  total: number;
-  accounts: CapitalAccount[];
+  total?: number;
+  by_type?: Record<string, {
+    total: number;
+    accounts: Array<{ capital: number; currency: string }>;
+  }>;
 }
 
 export interface EdgeHealth {
