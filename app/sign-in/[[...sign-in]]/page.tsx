@@ -43,7 +43,7 @@ export default function SignInPage() {
   useEffect(() => {
     if (isUserLoaded && isSignedIn && !redirected.current) {
       redirected.current = true;
-      router.replace("/strategies");
+      router.replace("/portfolio");
     }
   }, [isUserLoaded, isSignedIn, router]);
 
@@ -66,7 +66,7 @@ export default function SignInPage() {
       const result = await client.signIn.create({ identifier: email, password });
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        router.replace("/strategies");
+        router.replace("/portfolio");
         return;
       }
 
@@ -75,7 +75,7 @@ export default function SignInPage() {
       const clerkError = getSignInError(caught);
       const firstError = clerkError.errors?.[0];
       if (firstError?.code === "session_exists") {
-        router.replace("/strategies");
+        router.replace("/portfolio");
         return;
       }
       setError(

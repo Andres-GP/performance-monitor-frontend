@@ -26,7 +26,6 @@ import {
 function useTitle() {
   const pathname = usePathname();
   const { dict } = useI18n();
-  if (pathname.startsWith("/strategies/")) return dict.header.strategyDetail;
   const match = navItems.find((i) =>
     i.href === "/" ? pathname === "/" : pathname.startsWith(i.href),
   );
