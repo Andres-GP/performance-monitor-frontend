@@ -22,8 +22,11 @@ export function StrategiesTable({ strategies }: { strategies: Strategy[] }) {
 
   if (strategies.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-        {dict.strategies.empty}
+      <div className="empty-state px-6 py-14 text-center text-sm text-muted-foreground">
+        <div className="relative z-[1] mx-auto flex max-w-sm flex-col items-center gap-3">
+          <span className="flex size-11 items-center justify-center rounded-xl border border-primary/10 bg-primary/[0.06] text-primary/80"><ChevronRight className="size-5" /></span>
+          <p>{dict.strategies.empty}</p>
+        </div>
       </div>
     );
   }

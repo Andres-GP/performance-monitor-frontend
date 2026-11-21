@@ -22,6 +22,10 @@ export default memo(function WeightsBar({ data }: { data: PortfolioWeight[] }) {
     actual: w.actual_weight,
   }))
 
+  if (!chartData.length) {
+    return <div className="chart-empty h-[300px] px-5 text-sm">{dict.portfolio.noWeightData}</div>
+  }
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={chartData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>

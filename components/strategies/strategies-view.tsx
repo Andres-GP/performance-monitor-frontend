@@ -52,24 +52,24 @@ export function StrategiesView() {
   }, [strategies, search, status, health]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h2 className="text-xl font-semibold">{dict.strategies.title}</h2>
-        <p className="text-sm text-muted-foreground">
+    <div className="flex flex-col gap-5">
+      <div className="border-b border-white/[0.06] pb-4">
+        <h2 className="text-2xl font-semibold tracking-tight">{dict.strategies.title}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           {t(dict.strategies.subtitle, { count: strategies.length })}
         </p>
       </div>
 
       {data?.isFallback && <OfflineBanner />}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-2 rounded-xl border border-white/[0.07] bg-white/[0.018] p-2 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder={dict.strategies.searchPlaceholder}
             value={search}
             onChange={handleSearchChange}
-            className="pl-9"
+            className="h-9 border-transparent bg-transparent pl-9 shadow-none hover:bg-white/[0.025] focus-visible:border-white/15 focus-visible:bg-white/[0.035]"
           />
         </div>
         <Select

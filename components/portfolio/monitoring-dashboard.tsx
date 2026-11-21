@@ -160,20 +160,22 @@ export function MonitoringPortfolioDashboard() {
   const dateLocale = locale === "es" ? "es-ES" : "en-US";
 
   return (
-    <section className="space-y-4" aria-labelledby="portfolio-monitoring-title">
-      <header>
-        <h3 id="portfolio-monitoring-title" className="text-lg font-semibold">
+    <section className="space-y-5" aria-labelledby="portfolio-monitoring-title">
+      <header className="flex flex-col gap-3 border-b border-white/[0.06] pb-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+        <h3 id="portfolio-monitoring-title" className="text-lg font-semibold tracking-tight">
           {copy.monitoringTitle}
         </h3>
         <p className="text-sm text-muted-foreground">
           {copy.monitoringSubtitle}
         </p>
+        </div>
         {portfolios.data?.items.length ? (
-          <label className="mt-3 flex max-w-md flex-col gap-1 text-sm">
-            <span>{copy.selectPortfolio}</span>
+          <label className="flex w-full max-w-xs flex-col gap-1.5 text-xs font-medium text-muted-foreground">
+            <span className="uppercase tracking-[0.1em]">{copy.selectPortfolio}</span>
             <select
               aria-label={copy.selectPortfolio}
-              className="rounded-md border bg-background p-2"
+              className="h-10 w-full rounded-lg border border-white/10 bg-white/[0.025] px-3 text-sm text-foreground shadow-inner outline-none transition hover:border-white/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/10"
               value={portfolioId}
               onChange={(event) => { setSelectedId(event.target.value); setTradePage(0); setExecutionStrategy(""); setExecutionPage(0); }}
             >
@@ -194,14 +196,14 @@ export function MonitoringPortfolioDashboard() {
           ))}
         </div>
       ) : portfolios.isError ? (
-        <div role="alert" className="flex flex-wrap items-center gap-3 text-sm text-destructive">
+        <div role="alert" className="notice-error flex flex-wrap items-center gap-3 text-sm text-destructive">
           <span>{copy.monitoringError}</span>
           <button type="button" className="underline" onClick={() => portfolios.refetch()}>
             {copy.retry}
           </button>
         </div>
       ) : !portfolios.data?.items.length ? (
-        <p className="text-sm text-muted-foreground">{copy.noPortfolios}</p>
+        <div className="empty-state px-6 py-12 text-center text-sm text-muted-foreground"><div className="relative z-[1] mx-auto flex max-w-sm flex-col items-center gap-3"><span className="flex size-11 items-center justify-center rounded-xl border border-primary/10 bg-primary/[0.06] text-primary/80"><HeartPulse className="size-5" /></span><p>{copy.noPortfolios}</p></div></div>
       ) : detail.isLoading ? (
         <div className="space-y-4" aria-live="polite">
           <p className="sr-only">{copy.monitoringLoading}</p>
@@ -213,14 +215,14 @@ export function MonitoringPortfolioDashboard() {
           <Skeleton className="h-72" />
         </div>
       ) : detail.isError ? (
-        <div role="alert" className="flex flex-wrap items-center gap-3 text-sm text-destructive">
+        <div role="alert" className="notice-error flex flex-wrap items-center gap-3 text-sm text-destructive">
           <span>{copy.monitoringError}</span>
           <button type="button" className="underline" onClick={() => detail.refetch()}>
             {copy.retry}
           </button>
         </div>
       ) : !data ? (
-        <p className="text-sm text-muted-foreground">{copy.noPortfolios}</p>
+        <div className="empty-state px-6 py-12 text-center text-sm text-muted-foreground"><div className="relative z-[1] mx-auto flex max-w-sm flex-col items-center gap-3"><span className="flex size-11 items-center justify-center rounded-xl border border-primary/10 bg-primary/[0.06] text-primary/80"><HeartPulse className="size-5" /></span><p>{copy.noPortfolios}</p></div></div>
       ) : (
         <>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -239,7 +241,7 @@ export function MonitoringPortfolioDashboard() {
             <Metric label={copy.capitalTracked} value={capitalByCurrency(capital.data?.data, locale)} />
           </div>
           {capital.isError ? (
-            <p role="status" className="text-xs text-muted-foreground">
+          <p role="status" className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-muted-foreground">
               {copy.capitalUnavailable} <button type="button" className="underline underline-offset-4" onClick={() => void capital.refetch()}>{copy.retry}</button>
             </p>
           ) : null}
@@ -283,9 +285,11 @@ export function MonitoringPortfolioDashboard() {
                     </ResponsiveContainer>
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">
+                  <div className="chart-empty h-full px-5 text-sm">
+                    <div><HeartPulse className="mx-auto mb-2 size-5 opacity-50" /><p>
                     {copy.noEquitySamples}
-                  </p>
+                    </p></div>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -307,9 +311,11 @@ export function MonitoringPortfolioDashboard() {
                 {correlation.isLoading ? (
                   <Skeleton className="h-40" />
                 ) : correlation.isError || !strategyIds.length ? (
-                  <p className="text-sm text-muted-foreground">
+                  <div className="chart-empty px-5 text-sm">
+                    <div><HeartPulse className="mx-auto mb-2 size-5 opacity-50" /><p>
                     {copy.noCorrelations}
-                  </p>
+                    </p></div>
+                  </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="border-separate border-spacing-1 text-xs">
@@ -392,16 +398,16 @@ export function MonitoringPortfolioDashboard() {
                       : "—";
 
                 return (
-                  <article key={strategy.id} className="rounded-lg border p-4">
+                  <article key={strategy.id} className="rounded-xl border border-white/[0.07] bg-white/[0.018] p-4 transition-colors hover:border-white/[0.12] hover:bg-white/[0.03]">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <b>{strategy.name ?? strategy.id}</b>
                       <span
                         className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs ${
                           critical
-                            ? "bg-red-100 text-red-800"
+                            ? "border border-red-300/15 bg-red-400/10 text-red-200"
                             : warning
-                              ? "bg-amber-100 text-amber-900"
-                              : "bg-muted text-muted-foreground"
+                              ? "border border-amber-300/15 bg-amber-300/10 text-amber-100"
+                              : "border border-white/[0.07] bg-white/[0.035] text-muted-foreground"
                         }`}
                       >
                         {critical ? (
@@ -428,7 +434,7 @@ export function MonitoringPortfolioDashboard() {
                         <dd className="inline">{observed}</dd>
                       </div>
                       {strategy.mode_status === "mode_mismatch" ? (
-                        <div className="text-amber-700 sm:col-span-2">
+                        <div className="text-amber-200 sm:col-span-2">
                           {copy.modeMismatch}
                         </div>
                       ) : null}
@@ -493,13 +499,13 @@ export function MonitoringPortfolioDashboard() {
             </CardHeader>
             <CardContent>
               {trades.isError ? (
-                <div role="alert" className="flex flex-wrap items-center justify-between gap-3 text-sm text-destructive">
+                <div role="alert" className="notice-error flex flex-wrap items-center justify-between gap-3 text-sm text-destructive">
                   <span>{copy.monitoringError}</span><button type="button" className="underline" onClick={() => void trades.refetch()}>{copy.retry}</button>
                 </div>
               ) : trades.isLoading ? (
                 <div className="space-y-2" aria-live="polite">{Array.from({ length: 4 }, (_, index) => <Skeleton key={index} className="h-12" />)}</div>
               ) : (trades.data?.data?.items.length ?? 0) === 0 ? (
-                <p className="py-6 text-center text-sm text-muted-foreground">{locale === "es" ? "Todavía no hay operaciones registradas para este portafolio." : "No executions have been recorded for this portfolio yet."}</p>
+                <div className="chart-empty px-5 text-sm">{locale === "es" ? "Todavía no hay operaciones registradas para este portafolio." : "No executions have been recorded for this portfolio yet."}</div>
               ) : (
                 <>
                   <div className="space-y-3 md:hidden">
@@ -533,7 +539,7 @@ export function MonitoringPortfolioDashboard() {
               {data.strategies.length > 1 ? (
                 <label className="flex flex-col gap-1 text-xs sm:min-w-56">
                   <span>{locale === "es" ? "Estrategia" : "Strategy"}</span>
-                  <select className="rounded-md border bg-background px-3 py-2 text-sm" value={executionStrategyId} onChange={(event) => { setExecutionStrategy(event.target.value); setExecutionPage(0); }}>
+                  <select className="h-9 rounded-lg border border-white/10 bg-white/[0.025] px-3 text-sm text-foreground outline-none transition hover:border-white/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/10" value={executionStrategyId} onChange={(event) => { setExecutionStrategy(event.target.value); setExecutionPage(0); }}>
                     {data.strategies.map((strategy) => <option key={strategy.id} value={strategy.id}>{strategy.name ?? strategy.id}</option>)}
                   </select>
                 </label>
@@ -541,11 +547,11 @@ export function MonitoringPortfolioDashboard() {
             </CardHeader>
             <CardContent>
               {executionEvents.isError ? (
-                <div role="alert" className="flex flex-wrap items-center justify-between gap-3 text-sm text-destructive"><span>{copy.monitoringError}</span><button type="button" className="underline" onClick={() => void executionEvents.refetch()}>{copy.retry}</button></div>
+                <div role="alert" className="notice-error flex flex-wrap items-center justify-between gap-3 text-sm text-destructive"><span>{copy.monitoringError}</span><button type="button" onClick={() => void executionEvents.refetch()}>{copy.retry}</button></div>
               ) : executionEvents.isLoading ? (
                 <div className="space-y-2" aria-live="polite">{Array.from({ length: 3 }, (_, index) => <Skeleton key={index} className="h-16" />)}</div>
               ) : (executionEvents.data?.data?.items.length ?? 0) === 0 ? (
-                <p className="py-5 text-center text-sm text-muted-foreground">{locale === "es" ? "El EA todavía no ha enviado eventos de señal. Se muestran solo eventos que el broker y el EA reportan; no se infieren estados." : "The EA has not sent signal events yet. Only broker and EA reported events are shown; statuses are never inferred."}</p>
+                <div className="chart-empty px-5 text-sm">{locale === "es" ? "El EA todavía no ha enviado eventos de señal. Se muestran solo eventos que el broker y el EA reportan; no se infieren estados." : "The EA has not sent signal events yet. Only broker and EA reported events are shown; statuses are never inferred."}</div>
               ) : (
                 <>
                   <ol className="space-y-2">
@@ -555,7 +561,7 @@ export function MonitoringPortfolioDashboard() {
                       const label = intent ? (locale === "es" ? "Intención" : "Intent") : (locale === "es" ? "Resultado" : "Outcome");
                       const status = intent ? (locale === "es" ? "señal enviada" : "signal sent") : payload.status ?? event.ingest_status;
                       return (
-                        <li key={event.id} className="flex flex-col gap-2 rounded-lg border p-3 transition-colors hover:bg-muted/20 sm:flex-row sm:items-center sm:justify-between">
+                        <li key={event.id} className="flex flex-col gap-2 rounded-xl border border-white/[0.07] bg-white/[0.018] p-3.5 transition-colors hover:border-white/[0.12] hover:bg-white/[0.03] sm:flex-row sm:items-center sm:justify-between">
                           <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">{label}</span><span className="text-xs text-muted-foreground">{payload.signal_id ?? "—"}</span></div><p className="mt-1 text-sm font-medium">{payload.symbol ?? executionStrategyId} {payload.direction ? `· ${payload.direction}` : ""}</p><p className="text-xs text-muted-foreground">{intent ? `${locale === "es" ? "Referencia" : "Reference"}: ${formatNumber(payload.reference_price)} · ${locale === "es" ? "Solicitado" : "Requested"}: ${formatNumber(payload.volume, 3)}` : `${locale === "es" ? "Ejecutado" : "Filled"}: ${formatNumber(payload.filled_volume, 3)} · ${locale === "es" ? "Precio medio" : "Average price"}: ${formatNumber(payload.fill_price)}${payload.reason ? ` · ${payload.reason}` : ""}`}</p></div>
                           <div className="flex shrink-0 items-center justify-between gap-3 text-xs sm:flex-col sm:items-end"><span className="rounded-full border px-2.5 py-1 capitalize">{status}</span><time className="text-muted-foreground">{formatDate(event.ts ?? event.received_at)}</time></div>
                         </li>

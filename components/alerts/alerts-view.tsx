@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Bell, ChevronLeft, ChevronRight } from "lucide-react";
 import { SeverityBadge } from "@/components/shared/badges";
 import { OfflineBanner } from "@/components/shared/offline-banner";
 import { Button } from "@/components/ui/button";
@@ -164,18 +164,18 @@ export function AlertsView() {
   ) => template.replace(/\{(\w+)\}/g, (_, key) => String(values[key] ?? ""));
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-      <div>
-        <h2 className="text-xl font-semibold">{dict.alerts.title}</h2>
-        <p className="text-sm text-muted-foreground">{dict.alerts.subtitle}</p>
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-5">
+      <div className="border-b border-white/[0.06] pb-4">
+        <h2 className="text-2xl font-semibold tracking-tight">{dict.alerts.title}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{dict.alerts.subtitle}</p>
       </div>
 
       {data?.isFallback && <OfflineBanner />}
-      {dateRangeInvalid && <p role="alert" className="rounded-xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">{dict.alerts.dateRangeError}</p>}
+      {dateRangeInvalid && <p role="alert" className="notice-warning rounded-xl px-4 py-3 text-sm text-amber-100">{dict.alerts.dateRangeError}</p>}
       {strategyFilterLimited && <p className="rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">{dict.alerts.strategyFilterLimit}</p>}
 
       <Card>
-        <CardContent className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-5">
+        <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="flex flex-col gap-1.5">
             <Label className="text-xs text-muted-foreground">
               {dict.alerts.filterStrategy}
@@ -252,7 +252,7 @@ export function AlertsView() {
       </Card>
 
       {alertsQuery.isError ? (
-        <div role="alert" className="flex items-center justify-between gap-3 rounded-lg border border-destructive/30 p-4 text-sm text-destructive">
+        <div role="alert" className="notice-error flex items-center justify-between gap-3 text-sm text-destructive">
           <span>{dict.alerts.loadError}</span>
           <Button variant="outline" size="sm" onClick={() => alertsQuery.refetch()}>{dict.alerts.retry}</Button>
         </div>
@@ -263,8 +263,11 @@ export function AlertsView() {
           ))}
         </div>
       ) : totalAlerts === 0 || filtered.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-          {dict.alerts.empty}
+        <div className="empty-state px-6 py-14 text-center text-sm text-muted-foreground">
+          <div className="relative z-[1] mx-auto flex max-w-sm flex-col items-center gap-3">
+            <span className="flex size-11 items-center justify-center rounded-xl border border-primary/10 bg-primary/[0.06] text-primary/80"><Bell className="size-5" /></span>
+            <p>{dict.alerts.empty}</p>
+          </div>
         </div>
       ) : (
         <>

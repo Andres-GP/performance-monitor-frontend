@@ -4,7 +4,7 @@ import { useClerk, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { ArrowRight, Eye, EyeOff, LineChart, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
+import { ArrowRight, CircleAlert, Eye, EyeOff, LineChart, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import { LanguageSelector } from "@/components/layout/language-selector";
 import { useI18n } from "@/lib/i18n/context";
 
@@ -50,12 +50,39 @@ export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading) return;
     setError(null);
+    setFieldErrors({});
+
+    const emailField = event.currentTarget.elements.namedItem("email");
+    const passwordField = event.currentTarget.elements.namedItem("password");
+    const nextFieldErrors: { email?: string; password?: string } = {};
+
+    if (emailField instanceof HTMLInputElement && !emailField.validity.valid) {
+      nextFieldErrors.email = emailField.validity.valueMissing
+        ? dict.signIn.emailRequired
+        : emailField.validity.typeMismatch
+          ? dict.signIn.emailInvalid
+          : emailField.validationMessage;
+    }
+    if (passwordField instanceof HTMLInputElement && !passwordField.validity.valid) {
+      nextFieldErrors.password = dict.signIn.passwordRequired;
+    }
+    if (nextFieldErrors.email || nextFieldErrors.password) {
+      setFieldErrors(nextFieldErrors);
+      const firstInvalidField = nextFieldErrors.email ? emailField : passwordField;
+      if (firstInvalidField instanceof HTMLInputElement) {
+        firstInvalidField.focus();
+      }
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -91,8 +118,8 @@ export default function SignInPage() {
 
   if (!isUserLoaded) {
     return (
-      <main className="flex min-h-svh items-center justify-center bg-[#1f3d36]" aria-label={dict.signIn.loading}>
-        <div className="flex flex-col items-center gap-4 rounded-3xl border border-white/10 bg-[#2b4d44] px-10 py-8 shadow-2xl">
+      <main className="signin-loading flex min-h-svh items-center justify-center px-4" aria-label={dict.signIn.loading} role="status" aria-live="polite" aria-busy="true">
+        <div className="signin-loading-card flex flex-col items-center gap-4 rounded-3xl px-10 py-8">
           <span className="flex size-12 items-center justify-center rounded-2xl bg-[#c8f5a8] text-[#1f3d36]">
             <LineChart aria-hidden="true" className="size-6" />
           </span>
@@ -106,21 +133,21 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="relative isolate flex min-h-svh items-center justify-center overflow-hidden px-4 py-8 sm:px-8 lg:py-12">
+    <main className="signin-page relative isolate flex min-h-svh items-center justify-center overflow-hidden px-4 py-8 sm:px-8 lg:py-12">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -right-36 -top-44 size-[34rem] rounded-full bg-[#adc5b7]/10 blur-3xl" />
         <div className="absolute -bottom-48 -left-40 size-[34rem] rounded-full bg-[#c8f5a8]/[0.07] blur-3xl" />
         <div className="absolute inset-0 opacity-[0.16] [background-image:radial-gradient(rgba(200,245,168,0.26)_0.7px,transparent_0.8px)] [background-size:22px_22px] [mask-image:linear-gradient(135deg,#000,transparent_70%)]" />
       </div>
 
-      <div className="absolute right-4 top-4 z-10 sm:right-8 sm:top-7">
+      <div className="signin-language absolute right-4 top-4 z-10 sm:right-8 sm:top-7">
         <LanguageSelector />
       </div>
 
-      <div className="grid w-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/[0.12] bg-gradient-to-br from-[#1d4036]/95 via-[#17342d]/95 to-[#142f28]/95 shadow-[0_36px_110px_rgba(5,22,17,0.42)] backdrop-blur-xl lg:min-h-[650px] lg:grid-cols-[1.06fr_0.94fr]">
-        <section className="relative flex flex-col justify-between overflow-hidden border-b border-white/10 p-7 sm:p-10 lg:border-b-0 lg:border-r lg:p-14">
-          <div aria-hidden="true" className="absolute -right-16 top-20 size-80 rounded-full border border-[#c8f5a8]/[0.08]" />
-          <div aria-hidden="true" className="absolute -right-4 top-32 size-56 rounded-full border border-[#c8f5a8]/[0.08]" />
+      <div className="signin-panel grid w-full max-w-6xl overflow-hidden rounded-[2rem] border backdrop-blur-xl lg:min-h-[650px] lg:grid-cols-[1.06fr_0.94fr]">
+        <section className="signin-brand-panel order-2 relative flex flex-col justify-between overflow-hidden border-t border-white/10 p-7 sm:p-10 lg:order-1 lg:border-t-0 lg:border-r lg:p-14">
+          <div aria-hidden="true" className="signin-orbit absolute -right-16 top-20 size-80 rounded-full border border-[#c8f5a8]/[0.08]" />
+          <div aria-hidden="true" className="signin-orbit absolute -right-4 top-32 size-56 rounded-full border border-[#c8f5a8]/[0.08] [animation-delay:-7s]" />
 
           <div className="relative z-[1]">
             <div className="flex items-center gap-3">
@@ -150,7 +177,7 @@ export default function SignInPage() {
 
           <div className="relative z-[1] mt-12 grid gap-3 sm:grid-cols-3 lg:mt-16">
             {[dict.signIn.focusPortfolio, dict.signIn.focusStrategies, dict.signIn.focusRisk].map((item, index) => (
-              <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.035] px-3 py-3.5">
+              <div key={item} className="signin-feature flex items-center gap-3 rounded-2xl border px-3 py-3.5">
                 <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#c8f5a8]/10 text-[#c8f5a8]">
                   {index === 0 ? <LineChart aria-hidden="true" className="size-4" /> : index === 1 ? <ArrowRight aria-hidden="true" className="size-4" /> : <ShieldCheck aria-hidden="true" className="size-4" />}
                 </span>
@@ -163,7 +190,7 @@ export default function SignInPage() {
           </p>
         </section>
 
-        <section className="flex items-center justify-center p-5 sm:p-10 lg:p-14" aria-labelledby="signin-title">
+        <section className="order-1 flex items-center justify-center p-5 sm:p-10 lg:order-2 lg:p-14" aria-labelledby="signin-title">
           <div className="w-full max-w-md">
             <div className="mb-8">
               <span className="mb-5 flex size-11 items-center justify-center rounded-2xl border border-[#c8f5a8]/20 bg-[#c8f5a8]/[0.08] text-[#c8f5a8]">
@@ -174,56 +201,65 @@ export default function SignInPage() {
               <p className="mt-2 text-sm leading-6 text-[#b4c8bc]">{dict.signIn.formDescription}</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form noValidate onSubmit={handleSubmit} className="signin-form space-y-5" aria-busy={loading}>
               <div className="space-y-2">
                 <label htmlFor="email" className="text-xs font-semibold uppercase tracking-[0.12em] text-[#d4e1d8]">{dict.signIn.email}</label>
-                <div className="flex h-12 items-center gap-3 rounded-xl border border-white/[0.13] bg-[#102820]/65 px-4 transition-colors focus-within:border-[#c8f5a8]/55 focus-within:bg-[#102820]">
+                <div className="signin-field flex h-12 items-center gap-3 rounded-xl px-4">
                   <Mail aria-hidden="true" className="size-4 shrink-0 text-[#91aa9b]" />
                   <input
                     id="email"
+                    name="email"
                     type="email"
                     autoComplete="username"
                     inputMode="email"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    enterKeyHint="next"
                     required
                     value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    aria-invalid={Boolean(error)}
-                    aria-describedby={error ? "signin-error" : undefined}
+                    onChange={(event) => { setEmail(event.target.value); setError(null); setFieldErrors((current) => ({ ...current, email: undefined })); }}
+                    aria-invalid={Boolean(fieldErrors.email)}
+                    aria-describedby={fieldErrors.email ? "email-error" : error ? "signin-error" : undefined}
                     className="h-full min-w-0 flex-1 border-0 bg-transparent text-sm text-[#f2f5ef] outline-none placeholder:text-[#80988b] focus:ring-0"
                   />
                 </div>
+                {fieldErrors.email && <p id="email-error" aria-live="polite" className="signin-field-error"><CircleAlert aria-hidden="true" className="size-3.5 shrink-0" />{fieldErrors.email}</p>}
               </div>
 
               <div className="space-y-2">
                 <label htmlFor="password" className="text-xs font-semibold uppercase tracking-[0.12em] text-[#d4e1d8]">{dict.signIn.password}</label>
-                <div className="flex h-12 items-center gap-3 rounded-xl border border-white/[0.13] bg-[#102820]/65 px-4 transition-colors focus-within:border-[#c8f5a8]/55 focus-within:bg-[#102820]">
+                <div className="signin-field flex h-12 items-center gap-3 rounded-xl px-4">
                   <LockKeyhole aria-hidden="true" className="size-4 shrink-0 text-[#91aa9b]" />
                   <input
                     id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
+                    enterKeyHint="go"
                     required
                     value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    aria-invalid={Boolean(error)}
-                    aria-describedby={error ? "signin-error" : undefined}
+                    onChange={(event) => { setPassword(event.target.value); setError(null); setFieldErrors((current) => ({ ...current, password: undefined })); }}
+                    aria-invalid={Boolean(fieldErrors.password)}
+                    aria-describedby={fieldErrors.password ? "password-error" : error ? "signin-error" : undefined}
                     className="h-full min-w-0 flex-1 border-0 bg-transparent text-sm text-[#f2f5ef] outline-none placeholder:text-[#80988b] focus:ring-0"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((visible) => !visible)}
                     aria-label={showPassword ? dict.signIn.hidePassword : dict.signIn.showPassword}
-                    className="flex size-8 shrink-0 items-center justify-center rounded-lg text-[#adc5b7] transition-colors hover:bg-white/[0.06] hover:text-white"
+                    aria-pressed={showPassword}
+                    className="signin-password-toggle flex size-9 shrink-0 items-center justify-center rounded-lg"
                   >
                     {showPassword ? <EyeOff aria-hidden="true" className="size-4" /> : <Eye aria-hidden="true" className="size-4" />}
                   </button>
                 </div>
+                {fieldErrors.password && <p id="password-error" aria-live="polite" className="signin-field-error"><CircleAlert aria-hidden="true" className="size-3.5 shrink-0" />{fieldErrors.password}</p>}
               </div>
 
               <div id="clerk-captcha" />
 
               {error && (
-                <div id="signin-error" role="alert" aria-live="assertive" className="rounded-xl border border-rose-300/20 bg-rose-300/[0.08] px-4 py-3 text-sm leading-5 text-rose-100">
+                <div id="signin-error" role="alert" aria-live="assertive" className="signin-error rounded-xl border border-rose-300/20 bg-rose-300/[0.08] px-4 py-3 text-sm leading-5 text-rose-100">
                   {error}
                 </div>
               )}
@@ -232,7 +268,7 @@ export default function SignInPage() {
                 type="submit"
                 disabled={loading}
                 aria-busy={loading}
-                className="group flex min-h-12 w-full items-center justify-center gap-3 rounded-xl bg-[#c8f5a8] px-5 py-3 text-sm font-semibold text-[#1f3d36] shadow-[0_10px_28px_rgba(200,245,168,0.12)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#d7fac0] hover:shadow-[0_14px_34px_rgba(200,245,168,0.18)] disabled:cursor-wait disabled:opacity-65 motion-reduce:hover:translate-y-0"
+                className="signin-submit group flex min-h-12 w-full items-center justify-center gap-3 rounded-xl bg-[#c8f5a8] px-5 py-3 text-sm font-semibold text-[#14231a] shadow-[0_10px_28px_rgba(200,245,168,0.12)] hover:-translate-y-0.5 hover:bg-[#d7fac0] hover:shadow-[0_14px_34px_rgba(200,245,168,0.18)] disabled:cursor-wait disabled:opacity-65 motion-reduce:hover:translate-y-0"
               >
                 {loading ? (
                   <>

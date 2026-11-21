@@ -24,14 +24,14 @@ export const StatCard = memo(function StatCard({
   className,
 }: StatCardProps) {
   return (
-    <Card className={className}>
-      <CardContent className="flex items-start justify-between gap-3 p-5">
-        <div className="flex min-w-0 flex-col gap-1">
-          <span className="text-sm text-muted-foreground">{label}</span>
+    <Card className={className} aria-busy={loading} data-empty={!loading && (value == null || value === "—")}>
+      <CardContent className="flex min-h-[132px] items-start justify-between gap-3 p-5">
+        <div className="flex min-w-0 flex-col gap-2">
+          <span className="text-[13px] font-medium text-muted-foreground">{label}</span>
           {loading ? (
-            <Skeleton className="h-7 w-24" />
+            <Skeleton className="h-8 w-28 rounded-lg" />
           ) : (
-            <span className="truncate text-2xl font-semibold tracking-tight">
+            <span className={cn("metric-number truncate text-[1.7rem] font-semibold leading-tight", (value == null || value === "—") && "text-foreground/55")}>
               {value}
             </span>
           )}
@@ -48,8 +48,8 @@ export const StatCard = memo(function StatCard({
             </span>
           ) : null}
         </div>
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Icon className="size-5" />
+          <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-[11px] border border-primary/10 bg-primary/[0.07] text-primary">
+          <Icon className="size-[17px]" />
         </span>
       </CardContent>
     </Card>

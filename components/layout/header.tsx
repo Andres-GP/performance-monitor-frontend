@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu, LogOut } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,6 @@ export function Header() {
   const title = useTitle();
   const { signOut } = useClerk();
   const { user } = useUser();
-  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -61,7 +60,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-[4.5rem] items-center gap-3 border-b border-white/[0.08] bg-[#1f3d36]/95 px-4 backdrop-blur-xl md:px-8">
+    <header className="app-header sticky top-0 z-30 flex h-[4.25rem] items-center gap-3 border-b border-white/[0.07] px-4 md:px-8">
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetTrigger
           render={
@@ -75,17 +74,17 @@ export function Header() {
         >
           <Menu className="size-5" />
         </SheetTrigger>
-        <SheetContent side="left" className="w-72 bg-sidebar p-0">
+        <SheetContent side="left" className="w-72 border-r border-white/10 bg-sidebar p-0">
           <SheetTitle className="sr-only">{dict.header.navigation}</SheetTitle>
-          <SidebarNav onNavigate={() => setMobileMenuOpen(false)} />
+          <SidebarNav expanded onNavigate={() => setMobileMenuOpen(false)} />
         </SheetContent>
       </Sheet>
 
       <div className="min-w-0">
-        <p className="hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-[#adc5b7] md:block">
+        <p className="hidden text-[9px] font-semibold uppercase tracking-[0.18em] text-[#859a8e] md:block">
           Alphaca Capital
         </p>
-        <h1 className="truncate text-base font-semibold tracking-tight text-[#f2f5ef] md:text-lg">
+        <h1 className="truncate text-[15px] font-semibold tracking-tight text-[#edf4ef] md:text-base">
           {title}
         </h1>
       </div>
@@ -101,7 +100,7 @@ export function Header() {
 
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <Avatar className="size-9 cursor-pointer ring-1 ring-white/15 transition hover:ring-[#c8f5a8]/60">
+            <Avatar className="user-menu-trigger size-8 cursor-pointer bg-[#c8f5a8]/[0.08] transition">
               <AvatarFallback className="bg-[#c8f5a8]/15 font-semibold text-[#c8f5a8]">
                 {getInitials()}
               </AvatarFallback>

@@ -186,7 +186,7 @@ export function PortfolioView() {
 
       {isFallback && <OfflineBanner />}
       {(weights.isError || metrics.isError) && (
-        <div role="alert" className="flex flex-wrap items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div role="alert" className="notice-error flex flex-wrap items-center gap-3 text-sm text-destructive">
           <span>{dict.portfolio.monitoringError}</span>
           <button type="button" className="font-medium underline underline-offset-4" onClick={() => { void weights.refetch(); void metrics.refetch(); }}>
             {dict.portfolio.retry}
@@ -205,7 +205,7 @@ export function PortfolioView() {
           tabIndex={0}
           aria-label={dict.portfolio.helpSharpeTitle}
           onKeyDown={(event) => openHelpFromKeyboard(event, "helpSharpeTitle", "helpSharpeDesc")}
-          className="flex-1 min-w-[180px] lg:flex-[1_1_calc(33.333%-1rem)] h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30"
+          className="metric-tile flex-1 min-w-[180px] lg:flex-[1_1_calc(33.333%-1rem)] h-full cursor-pointer rounded-xl transition-all duration-200"
           onClick={() => openHelp("helpSharpeTitle", "helpSharpeDesc")}
         >
           <StatCard
@@ -215,7 +215,7 @@ export function PortfolioView() {
             hint={dict.portfolio.portfolioSharpeHint}
             trend="up"
             loading={metrics.isLoading}
-            className="text-left h-45"
+            className="text-left h-full"
           />
         </div>
 
@@ -224,7 +224,7 @@ export function PortfolioView() {
           tabIndex={0}
           aria-label={dict.portfolio.helpDrawdownTitle}
           onKeyDown={(event) => openHelpFromKeyboard(event, "helpDrawdownTitle", "helpDrawdownDesc")}
-          className="flex-1 min-w-[180px] lg:flex-[1_1_calc(33.333%-1rem)] h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30"
+          className="metric-tile flex-1 min-w-[180px] lg:flex-[1_1_calc(33.333%-1rem)] h-full cursor-pointer rounded-xl transition-all duration-200"
           onClick={() => openHelp("helpDrawdownTitle", "helpDrawdownDesc")}
         >
           <StatCard
@@ -234,7 +234,7 @@ export function PortfolioView() {
             hint={dict.portfolio.combinedDrawdownHint}
             trend="down"
             loading={metrics.isLoading}
-            className="text-left h-45"
+            className="text-left h-full"
           />
         </div>
 
@@ -243,7 +243,7 @@ export function PortfolioView() {
           tabIndex={0}
           aria-label={dict.portfolio.helpTransactionCostsTitle}
           onKeyDown={(event) => openHelpFromKeyboard(event, "helpTransactionCostsTitle", "helpTransactionCostsDesc")}
-          className="flex-1 min-w-[180px] lg:flex-[1_1_calc(33.333%-1rem)] h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30"
+          className="metric-tile flex-1 min-w-[180px] lg:flex-[1_1_calc(33.333%-1rem)] h-full cursor-pointer rounded-xl transition-all duration-200"
           onClick={() =>
             openHelp("helpTransactionCostsTitle", "helpTransactionCostsDesc")
           }
@@ -254,7 +254,7 @@ export function PortfolioView() {
             icon={Receipt}
             hint={dict.portfolio.transactionCostsHint}
             loading={metrics.isLoading}
-            className="text-left h-45"
+            className="text-left h-full"
           />
         </div>
 
@@ -263,7 +263,7 @@ export function PortfolioView() {
           tabIndex={0}
           aria-label={dict.portfolio.helpRuinTitle}
           onKeyDown={(event) => openHelpFromKeyboard(event, "helpRuinTitle", "helpRuinDesc")}
-          className="flex-1 min-w-[180px] lg:flex-[1_1_calc(50%-0.5rem)] h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30"
+          className="metric-tile flex-1 min-w-[180px] lg:flex-[1_1_calc(50%-0.5rem)] h-full cursor-pointer rounded-xl transition-all duration-200"
           onClick={() => openHelp("helpRuinTitle", "helpRuinDesc")}
         >
           <StatCard
@@ -272,7 +272,7 @@ export function PortfolioView() {
             icon={Activity}
             hint={dict.portfolio.ruinProbabilityHint}
             loading={metrics.isLoading}
-            className="text-left h-45"
+            className="text-left h-full"
           />
         </div>
 
@@ -281,7 +281,7 @@ export function PortfolioView() {
           tabIndex={0}
           aria-label={dict.portfolio.helpConcentrationTitle}
           onKeyDown={(event) => openHelpFromKeyboard(event, "helpConcentrationTitle", "helpConcentrationDesc")}
-          className="flex-1 min-w-[180px] lg:flex-[1_1_calc(50%-0.5rem)] h-full cursor-pointer rounded-lg border border-border/50 transition-all duration-200 hover:bg-muted/30 hover:-translate-y-1 hover:shadow-md hover:border-primary/30"
+          className="metric-tile flex-1 min-w-[180px] lg:flex-[1_1_calc(50%-0.5rem)] h-full cursor-pointer rounded-xl transition-all duration-200"
           onClick={() =>
             openHelp("helpConcentrationTitle", "helpConcentrationDesc")
           }
@@ -296,7 +296,7 @@ export function PortfolioView() {
             icon={Activity}
             hint={dict.portfolio.concentrationHint}
             loading={metrics.isLoading}
-            className="text-left h-45"
+            className="text-left h-full"
           />
         </div>
       </div>
@@ -528,7 +528,7 @@ export function PortfolioView() {
                   <TableRow>
                     <TableCell
                       colSpan={4}
-                      className="text-center text-muted-foreground"
+                      className="py-8 text-center text-muted-foreground"
                     >
                       {dict.portfolio.noWeightData}
                     </TableCell>
@@ -568,9 +568,7 @@ export function PortfolioView() {
                 matrix={heatmapMatrix}
               />
             ) : (
-              <p className="text-sm text-muted-foreground">
-                {dict.portfolio.noCorrelation}
-              </p>
+              <div className="chart-empty px-5 text-sm">{dict.portfolio.noCorrelation}</div>
             )}
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">{dict.portfolio.correlationDataCaveat}</p>
           </CardContent>
