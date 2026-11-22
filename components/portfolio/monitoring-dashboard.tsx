@@ -17,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { OfflineBanner } from "@/components/shared/offline-banner";
 import { apiGet } from "@/lib/api-client";
 import { useI18n } from "@/lib/i18n/context";
-import { useApiToken, useCapitalSummary, useExecutionEvents, useMarketRegime, usePortfolioTrades } from "@/lib/queries";
+import { useApiToken, useCapitalSummary, useExecutionEvents, usePortfolioTrades } from "@/lib/queries";
 import { formatDate, formatNumber, formatPercentPoints } from "@/lib/format";
 import type { Trade } from "@/types";
 
@@ -164,33 +164,11 @@ export function MonitoringPortfolioDashboard() {
   const getToken = useApiToken();
   const { dict, locale, t } = useI18n();
   const copy = dict.portfolio;
-  const regimeCopy = dict.regimeWidget;
   const [selectedId, setSelectedId] = useState<string>();
   const [tradePage, setTradePage] = useState(0);
   const [executionStrategy, setExecutionStrategy] = useState("");
   const [executionPage, setExecutionPage] = useState(0);
   const capital = useCapitalSummary();
-  const marketRegime = useMarketRegime();
-  const regime = marketRegime.data?.data;
-  const translateRegime = (value: string | null | undefined) => {
-    if (!value) return noSample(locale);
-    const labels: Record<string, string> = {
-      sideways: regimeCopy.sideway,
-      trending: regimeCopy.trending,
-      transition: regimeCopy.transition,
-      normal: regimeCopy.normal,
-      extreme_fear: regimeCopy.extremeFear,
-      extreme_complacency: regimeCopy.extremeComplacency,
-      high: regimeCopy.high,
-      low: regimeCopy.low,
-      strong_upside: regimeCopy.strongUpside,
-      strong_downside: regimeCopy.strongDownside,
-      neutral: regimeCopy.neutral,
-      strong: regimeCopy.strong,
-      weak: regimeCopy.weak,
-    };
-    return labels[value] ?? value.replaceAll("_", " ");
-  };
 
   const portfolios = useQuery({
     queryKey: ["monitoring-portfolios"],
@@ -333,48 +311,6 @@ export function MonitoringPortfolioDashboard() {
             />
             <Metric label={copy.capitalTracked} value={capitalByCurrency(capital.data?.data, locale)} />
           </div>
-          <Card className="border-white/[0.07] bg-gradient-to-br from-white/[0.025] to-transparent">
-            <CardHeader className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <CardTitle className="text-sm">{regimeCopy.title}</CardTitle>
-                <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted-foreground">{regimeCopy.description}</p>
-              </div>
-              {regime?.date || regime?.created_at ? <time className="text-xs text-muted-foreground">{regimeCopy.updated}: {formatDate(regime.date ?? regime.created_at)}</time> : null}
-            </CardHeader>
-            <CardContent>
-              {marketRegime.isLoading ? (
-                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5" aria-label={regimeCopy.title} aria-busy="true">
-                  {Array.from({ length: 5 }, (_, index) => <Skeleton key={index} className="h-16" />)}
-                </div>
-              ) : marketRegime.isError || marketRegime.data?.isFallback ? (
-                <div role="alert" className="notice-error flex flex-wrap items-center justify-between gap-3 text-sm text-destructive">
-                  <span>{regimeCopy.loadError}</span>
-                  <button type="button" className="underline" onClick={() => void marketRegime.refetch()} disabled={marketRegime.isFetching}>{copy.retry}</button>
-                </div>
-              ) : !regime ? (
-                <div className="empty-state flex flex-wrap items-center justify-between gap-3 px-4 py-5 text-sm text-muted-foreground">
-                  <span>{regimeCopy.unavailable}</span>
-                  <button type="button" className="underline underline-offset-4" onClick={() => void marketRegime.refetch()} disabled={marketRegime.isFetching}>{copy.retry}</button>
-                </div>
-              ) : (
-                <>
-                  <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
-                    {[
-                      [regimeCopy.trend, translateRegime(regime.trend)],
-                      [regimeCopy.fear, translateRegime(regime.fear)],
-                      [regimeCopy.volatility, translateRegime(regime.volatility)],
-                      [regimeCopy.breadth, translateRegime(regime.breadth)],
-                      [regimeCopy.strength, translateRegime(regime.strength)],
-                    ].map(([label, value]) => <div key={label} className="rounded-xl border border-white/[0.06] bg-black/[0.08] px-3 py-2.5"><dt className="text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">{label}</dt><dd className="mt-1 text-sm font-semibold capitalize">{value}</dd></div>)}
-                  </dl>
-                  <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground">
-                    <span>{regimeCopy.readings}: {regimeCopy.adx} {sampleNumber(regime.adx, locale)} · {regimeCopy.vixPercentile} {samplePercent(regime.vix_percentile, locale)} · {regimeCopy.atrPercentile} {samplePercent(regime.atr_percentile, locale)}</span>
-                    <span>{regimeCopy.advanceDecline} {sampleNumber(regime.advance_decline_ratio, locale)} · {regimeCopy.newHighsLows} {sampleNumber(regime.nh_nl_ratio, locale)} · {regimeCopy.spyQqqCorrelation} {sampleNumber(regime.correlation_spy_qqq, locale)} · {regimeCopy.spyTltCorrelation} {sampleNumber(regime.correlation_spy_tlt, locale)}</span>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
           {capital.isError || capital.data?.isFallback ? (
           <p role="status" className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-muted-foreground">
               {copy.capitalUnavailable} <button type="button" className="underline underline-offset-4" onClick={() => void capital.refetch()}>{copy.retry}</button>

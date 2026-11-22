@@ -89,9 +89,6 @@ describe("api-client", () => {
       fetchMock.mockResolvedValueOnce(jsonResponse({ detail: "No portfolio metrics available" }, false, 404));
       await expect(getWithFallback("/portfolio/metrics", { emptyOnNotFound: true })).resolves.toEqual({ data: null, isFallback: false });
 
-      fetchMock.mockResolvedValueOnce(jsonResponse({ detail: "No market regime data available" }, false, 404));
-      await expect(getWithFallback("/market/regime", { emptyOnNotFound: true })).resolves.toEqual({ data: null, isFallback: false });
-
       fetchMock.mockResolvedValueOnce(jsonResponse({ detail: "Not Found" }, false, 404));
       await expect(getWithFallback("/unknown", { emptyOnNotFound: true })).rejects.toMatchObject({ status: 404 });
     });

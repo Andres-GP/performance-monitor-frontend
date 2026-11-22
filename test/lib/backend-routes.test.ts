@@ -9,7 +9,6 @@ describe("backend proxy route allowlist", () => {
     ["GET", ["portfolios", "portfolio-1", "correlation"]],
     ["GET", ["portfolio", "metrics"]],
     ["GET", ["weekly", "reports", "latest"]],
-    ["GET", ["market", "regime"]],
     ["POST", ["alerts", "123", "ack"]],
     ["POST", ["portfolio", "weights"]],
   ])("allows %s /%s", (method, path) => {
@@ -22,6 +21,7 @@ describe("backend proxy route allowlist", () => {
     ["POST", ["strategies", "start"]],
     ["POST", ["backtest", "upload"]],
     ["GET", ["admin", "secrets"]],
+    ["GET", ["market", "regime"]],
     ["GET", ["strategies", "strategy-1", "unknown"]],
   ])("blocks %s /%s", (method, path) => {
     expect(isBackendRouteAllowed(method, path)).toBe(false);

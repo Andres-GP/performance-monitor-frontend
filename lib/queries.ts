@@ -28,7 +28,6 @@ export const qk = {
   portfolioMetrics: ["portfolio", "metrics"] as const,
   equityCurve: ["performance", "equity"] as const,
   health: ["health"] as const,
-  marketRegime: ["market", "regime"] as const,
 };
 
 const STALE = 60_000;
@@ -291,38 +290,5 @@ export function useHealth() {
         query.state.status === "error",
         query.state.data?.isFallback ?? false,
       ),
-  });
-}
-
-export interface MarketRegime {
-  date?: string | null;
-  created_at?: string | null;
-  trend?: string | null;
-  fear?: string | null;
-  volatility?: string | null;
-  breadth?: string | null;
-  strength?: string | null;
-  adx?: number | null;
-  vix_percentile?: number | null;
-  atr_percentile?: number | null;
-  advance_decline_ratio?: number | null;
-  nh_nl_ratio?: number | null;
-  correlation_spy_qqq?: number | null;
-  correlation_spy_tlt?: number | null;
-}
-
-export function useMarketRegime() {
-  const getToken = useApiToken();
-  return useQuery({
-    queryKey: qk.marketRegime,
-    queryFn: async ({ signal }) => {
-      const token = await getToken();
-      return getWithFallback<MarketRegime>("/market/regime", {
-        signal,
-        token,
-        emptyOnNotFound: true,
-      });
-    },
-    staleTime: 5 * STALE,
   });
 }
