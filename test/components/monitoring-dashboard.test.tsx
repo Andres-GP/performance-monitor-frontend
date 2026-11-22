@@ -128,4 +128,63 @@ describe("MonitoringPortfolioDashboard", () => {
     expect(screen.getByText("Observed mode differs from configuration")).toBeInTheDocument();
     expect(screen.queryByText("Mode not confirmed")).not.toBeInTheDocument();
   });
+
+  it("shows available OOS, live, and risk baseline data per strategy", () => {
+    useQueryMock
+      .mockReturnValueOnce(
+        queryResult({ data: { items: [{ id: "portfolio-a" }], total: 1 } }),
+      )
+      .mockReturnValueOnce(
+        queryResult({
+          data: {
+            portfolio: { id: "portfolio-a", daily_dd_limit_pct: 5, total_dd_limit_pct: 8 },
+            metrics: null,
+            alerts: [],
+            equity_curve: [],
+            strategies: [{
+              id: "strategy-a",
+              name: "Strategy A",
+              baselines: { oos_profit_factor: 1.4, mc_expected_max_dd_pct: 12, bt_max_loss_streak: 8 },
+              strategy_dd_total_limit_pct: 7,
+              metrics: {
+                profit_factor: 1.6,
+                trade_count: 40,
+                current_loss_streak: 3,
+                total_dd_pct: 4,
+                max_dd_pct: 10,
+                rolling_50: { n_trades: 40, profit_factor: 1.5, win_rate: 55, expectancy_pct: 0.3 },
+                trades_per_year_live_90d: 80,
+                trades_per_year_expected: 100,
+                frequency_vs_expected_pct: -20,
+              },
+              alerts: [],
+            }],
+          },
+        }),
+      )
+      .mockReturnValueOnce(queryResult({ data: { items: [], total: 0 } }));
+
+    render(<MonitoringPortfolioDashboard />);
+
+    expect(screen.getByText("Live profit factor")).toBeInTheDocument();
+    expect(screen.getByText("OOS profit factor")).toBeInTheDocument();
+    expect(screen.getByText("Current / worst backtest streak")).toBeInTheDocument();
+    expect(screen.getByText("Current / historical max DD")).toBeInTheDocument();
+    expect(screen.getByText("Expected MC DD / limit")).toBeInTheDocument();
+    expect(screen.getByText("Historical max drawdown")).toBeInTheDocument();
+  });
+
+  it("shows a correlation load failure separately from an empty correlation set", () => {
+    useQueryMock
+      .mockReturnValueOnce(queryResult({ data: { items: [{ id: "portfolio-a" }], total: 1 } }))
+      .mockReturnValueOnce(queryResult({
+        data: { portfolio: { id: "portfolio-a" }, metrics: null, alerts: [], equity_curve: [], strategies: [] },
+      }))
+      .mockReturnValueOnce(queryResult({ isError: true, error: new Error("offline") }));
+
+    render(<MonitoringPortfolioDashboard />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Could not load portfolio monitoring.");
+    expect(screen.queryByText("No strategy correlations are available.")).not.toBeInTheDocument();
+  });
 });

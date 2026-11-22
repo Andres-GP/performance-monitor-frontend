@@ -40,4 +40,19 @@ describe("AlertsView", () => {
       container.querySelectorAll('[data-slot="skeleton"]').length,
     ).toBeGreaterThan(0);
   });
+
+  it("does not present an outage as an empty alert list", () => {
+    useAlerts.mockReturnValue({
+      data: { data: null, isFallback: true },
+      isLoading: false,
+      isError: false,
+      isFetching: false,
+      refetch: jest.fn(),
+    });
+
+    render(<AlertsView />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Could not load alerts.");
+    expect(screen.queryByText("No alerts match the filters.")).not.toBeInTheDocument();
+  });
 });
