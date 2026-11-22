@@ -3,6 +3,7 @@ const PROXY_BASE = "/api/proxy";
 const EMPTY_ON_NOT_FOUND_PATHS = new Set([
   "/portfolio/metrics",
   "/weekly/reports/latest",
+  "/market/regime",
 ]);
 
 export class ApiError extends Error {

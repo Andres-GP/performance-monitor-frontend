@@ -8,6 +8,7 @@ const routes: Record<BackendMethod, RegExp[]> = {
     /^strategies\/[^/]+\/(?:trades|equity)$/,
     /^strategies\/[^/]+\/execution-events$/,
     /^performance\/metrics\/[^/]+$/,
+    /^market\/regime$/,
     /^alerts$/,
     /^portfolios$/,
     /^portfolios\/[^/]+$/,

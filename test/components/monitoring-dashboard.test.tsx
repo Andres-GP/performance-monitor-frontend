@@ -12,6 +12,7 @@ jest.mock("@/lib/queries", () => ({
   useApiToken: () => jest.fn().mockResolvedValue("session-token"),
   useCapitalSummary: () => ({ data: undefined, isError: false, refetch: jest.fn() }),
   useExecutionEvents: () => ({ data: undefined, isLoading: false, isError: false, refetch: refetchMock }),
+  useMarketRegime: () => ({ data: { data: null, isFallback: false }, isLoading: false, isError: false, isFetching: false, refetch: refetchMock }),
   usePortfolioTrades: () => ({ data: undefined, isLoading: false, isError: false, refetch: refetchMock }),
 }));
 
@@ -26,6 +27,39 @@ jest.mock("@/lib/i18n/context", () => ({
         message,
       ),
     dict: {
+      regimeWidget: {
+        title: "Market context · reference only",
+        description: "Broad market context only.",
+        trend: "Trend",
+        fear: "Fear",
+        volatility: "Volatility",
+        breadth: "Breadth",
+        strength: "Market strength",
+        readings: "Indicator readings",
+        adx: "ADX",
+        vixPercentile: "VIX percentile",
+        atrPercentile: "ATR percentile",
+        advanceDecline: "Advance / decline",
+        newHighsLows: "New highs / lows",
+        spyQqqCorrelation: "SPY / QQQ",
+        spyTltCorrelation: "SPY / TLT",
+        updated: "Snapshot date",
+        unavailable: "No market regime sample is available yet.",
+        loadError: "Could not load market context.",
+        sideway: "Sideways",
+        trending: "Trending",
+        transition: "Transition",
+        normal: "Normal",
+        extremeFear: "Extreme fear",
+        extremeComplacency: "Extreme complacency",
+        high: "High",
+        low: "Low",
+        strongUpside: "Strong upside",
+        strongDownside: "Strong downside",
+        neutral: "Neutral",
+        strong: "Strong",
+        weak: "Weak",
+      },
       portfolio: {
         monitoringTitle: "Portfolio monitoring and EDA",
         monitoringSubtitle: "Portfolio data",
@@ -127,6 +161,8 @@ describe("MonitoringPortfolioDashboard", () => {
     expect(screen.getByText("Observed:")).toBeInTheDocument();
     expect(screen.getByText("Observed mode differs from configuration")).toBeInTheDocument();
     expect(screen.queryByText("Mode not confirmed")).not.toBeInTheDocument();
+    expect(screen.getByText("Market context · reference only")).toBeInTheDocument();
+    expect(screen.getByText("No market regime sample is available yet.")).toBeInTheDocument();
   });
 
   it("shows available OOS, live, and risk baseline data per strategy", () => {

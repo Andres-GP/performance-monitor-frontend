@@ -6,6 +6,7 @@ import {
   healthRefetchInterval,
   useAlerts,
   useHealth,
+  useMarketRegime,
   usePortfolioMetrics,
   useStrategies,
   useStrategy,
@@ -50,6 +51,7 @@ describe("query keys", () => {
     expect(qk.strategy("a")).toEqual(["strategies", "a"]);
     expect(qk.trades("a")).toEqual(["strategies", "a", "trades"]);
     expect(qk.alerts(50)).toEqual(["alerts", 50]);
+    expect(qk.marketRegime).toEqual(["market", "regime"]);
   });
 });
 
@@ -149,6 +151,18 @@ describe("query hooks", () => {
     expect(healthRefetchInterval(false, true)).toBe(5_000);
     expect(healthRefetchInterval(true, false)).toBe(5_000);
     expect(healthRefetchInterval(false, false)).toBe(60_000);
+  });
+
+  it("fetches the latest market regime as reference data", async () => {
+    const payload = { data: { trend: "trending" }, isFallback: false };
+    mockGetWithFallback.mockResolvedValueOnce(payload as never);
+
+    const { result } = renderHook(() => useMarketRegime(), { wrapper: createWrapper() });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockGetWithFallback).toHaveBeenCalledWith(
+      "/market/regime",
+      expect.objectContaining({ token: "mock-token", emptyOnNotFound: true }),
+    );
   });
 
 });
