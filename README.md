@@ -22,6 +22,8 @@ Alerts send supported status, severity, time range, limit, and offset filters to
 
 Run locally with `npm install` and `npm run dev`. Verification commands are `npm test -- --runInBand`, `npm run lint`, and `npm run build`. A working Clerk environment and reachable FastAPI instance are required to verify live authenticated data.
 
+Before pushing from a local clone, run `sh scripts/install-git-hooks.sh`. The pre-push hook requires the full Jest suite, TypeScript, ESLint, and production build to pass. GitHub Actions runs the same checks on pushes and pull requests; the `build-and-test` check is required on `develop`, `staging`, and `main`.
+
 `npx tsc --noEmit` checks the TypeScript project directly, and the production build runs this check by default. The root `proxy.ts` uses Next.js 16's supported convention and protects private routes with Clerk. Current verification passes tests, lint, TypeScript, and production build.
 
 ## 🚀 Live Demo
