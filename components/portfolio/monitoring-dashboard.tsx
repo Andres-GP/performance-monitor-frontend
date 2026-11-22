@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { OfflineBanner } from "@/components/shared/offline-banner";
 import { apiGet } from "@/lib/api-client";
 import { useI18n } from "@/lib/i18n/context";
 import { useApiToken, useCapitalSummary, useExecutionEvents, usePortfolioTrades } from "@/lib/queries";
@@ -28,21 +29,34 @@ interface PortfolioIndex {
 interface PortfolioStrategy {
   id: string;
   name?: string;
+  strategy_dd_total_limit_pct?: number | null;
   expected_mode?: "demo" | "live";
   current_mode?: "demo" | "live" | null;
   mode_status?: "unconfirmed" | "matches_expected" | "mode_mismatch";
   mode_observed_at?: string | null;
   broker_utc_offset_minutes?: number | null;
-  baselines?: { bt_spread_points?: number | null };
+  baselines?: {
+    bt_spread_points?: number | null;
+    oos_profit_factor?: number | null;
+    mc_expected_max_dd_pct?: number | null;
+    bt_max_loss_streak?: number | null;
+  };
   last_heartbeat_at?: string | null;
   metrics?: {
     equity?: number | null;
+    daily_dd_pct?: number | null;
     total_dd_pct?: number | null;
+    max_dd_pct?: number | null;
+    profit_factor?: number | null;
     average_net_per_trade?: number | null;
     t_stat_net_per_trade?: number | null;
+    trades_per_year_live_90d?: number | null;
+    trades_per_year_expected?: number | null;
+    frequency_vs_expected_pct?: number | null;
     rolling_20?: { n_trades?: number; win_rate?: number | null; profit_factor?: number | null; expectancy_pct?: number | null };
     rolling_50?: { n_trades?: number; win_rate?: number | null; profit_factor?: number | null; expectancy_pct?: number | null };
     current_loss_streak?: number;
+    max_loss_streak?: number | null;
     trade_count?: number;
   } | null;
   positions?: Array<{ ticket: string; symbol: string; direction: string; volume: number; profit: number; swap: number; risk_at_stop?: number | null }> | null;
@@ -57,8 +71,19 @@ interface PortfolioStrategy {
 }
 
 interface PortfolioDetail {
-  portfolio: { id: string; name?: string };
-  metrics: { equity?: number | null; total_dd_pct?: number | null } | null;
+  portfolio: {
+    id: string;
+    name?: string;
+    daily_dd_limit_pct?: number | null;
+    total_dd_limit_pct?: number | null;
+    broker_hard_limit_pct?: number | null;
+  };
+  metrics: {
+    equity?: number | null;
+    daily_dd_pct?: number | null;
+    total_dd_pct?: number | null;
+    max_dd_pct?: number | null;
+  } | null;
   strategies: PortfolioStrategy[];
   alerts: Array<{ id: number; status?: string }>;
   equity_curve: Array<{ ts: string; equity: number }>;
@@ -89,13 +114,28 @@ interface PortfolioCorrelation {
 
 const STALE_TIME = 60_000;
 
-function Metric({ label, value }: { label: string; value: string }) {
+function noSample(locale: string) {
+  return locale === "es" ? "Sin muestra" : "No sample";
+}
+
+function sampleNumber(value: number | null | undefined, locale: string, digits = 2) {
+  return value == null ? noSample(locale) : formatNumber(value, digits);
+}
+
+function samplePercent(value: number | null | undefined, locale: string) {
+  return value == null ? noSample(locale) : formatPercentPoints(value);
+}
+
+function Metric({ label, value, detail }: { label: string; value: string; detail?: string }) {
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm">{label}</CardTitle>
       </CardHeader>
-      <CardContent className="break-words text-lg font-semibold leading-7 tabular-nums sm:text-xl">{value}</CardContent>
+      <CardContent>
+        <p className="break-words text-lg font-semibold leading-7 tabular-nums sm:text-xl">{value}</p>
+        {detail ? <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{detail}</p> : null}
+      </CardContent>
     </Card>
   );
 }
@@ -253,14 +293,25 @@ export function MonitoringPortfolioDashboard() {
             <Metric
               label={copy.currentDrawdown}
               value={formatPercentPoints(data.metrics?.total_dd_pct)}
+              detail={`${locale === "es" ? "Límite" : "Limit"}: ${formatPercentPoints(data.portfolio.total_dd_limit_pct)}`}
+            />
+            <Metric
+              label={locale === "es" ? "DD diario" : "Daily drawdown"}
+              value={formatPercentPoints(data.metrics?.daily_dd_pct)}
+              detail={`${locale === "es" ? "Límite" : "Limit"}: ${formatPercentPoints(data.portfolio.daily_dd_limit_pct)}`}
+            />
+            <Metric
+              label={locale === "es" ? "DD máximo histórico" : "Historical max drawdown"}
+              value={formatPercentPoints(data.metrics?.max_dd_pct)}
+              detail={`${locale === "es" ? "Límite broker" : "Broker hard limit"}: ${formatPercentPoints(data.portfolio.broker_hard_limit_pct)}`}
             />
             <Metric
               label={copy.openAlerts}
-              value={String(data.alerts.filter((alert) => alert.status === "open").length)}
+              value={String(new Set(data.alerts.filter((alert) => alert.status === "open").map((alert) => alert.id)).size)}
             />
             <Metric label={copy.capitalTracked} value={capitalByCurrency(capital.data?.data, locale)} />
           </div>
-          {capital.isError ? (
+          {capital.isError || capital.data?.isFallback ? (
           <p role="status" className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-muted-foreground">
               {copy.capitalUnavailable} <button type="button" className="underline underline-offset-4" onClick={() => void capital.refetch()}>{copy.retry}</button>
             </p>
@@ -368,7 +419,14 @@ export function MonitoringPortfolioDashboard() {
               <CardContent>
                 {correlation.isLoading ? (
                   <Skeleton className="h-40" />
-                ) : correlation.isError || !strategyIds.length ? (
+                ) : correlation.isError ? (
+                  <div role="alert" className="notice-error flex flex-wrap items-center justify-between gap-3 text-sm text-destructive">
+                    <span>{copy.monitoringError}</span>
+                    <button type="button" className="underline" onClick={() => void correlation.refetch()} disabled={correlation.isFetching}>
+                      {copy.retry}
+                    </button>
+                  </div>
+                ) : !strategyIds.length ? (
                   <div className="chart-empty px-5 text-sm">
                     <div><HeartPulse className="mx-auto mb-2 size-5 opacity-50" /><p>
                     {copy.noCorrelations}
@@ -434,7 +492,7 @@ export function MonitoringPortfolioDashboard() {
             <CardContent className="grid gap-3 md:grid-cols-2">
               {data.strategies.map((strategy) => {
                 const alerts = strategy.alerts ?? [];
-                const rolling20 = strategy.metrics?.rolling_50 ?? strategy.metrics?.rolling_20;
+                const rolling50 = strategy.metrics?.rolling_50 ?? strategy.metrics?.rolling_20;
                 const openAlerts = alerts.filter((alert) => alert.status === "open");
                 const critical = openAlerts.some(
                   (alert) => alert.severity === "high" || alert.severity === "critical",
@@ -529,15 +587,21 @@ export function MonitoringPortfolioDashboard() {
                         <dd className="inline">{strategy.broker_utc_offset_minutes == null ? (locale === "es" ? "Sin muestra" : "No sample") : `UTC${strategy.broker_utc_offset_minutes >= 0 ? "+" : ""}${strategy.broker_utc_offset_minutes / 60}`}</dd>
                       </div>
                     </dl>
-                    <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-7">
+                    <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
                       {[
-                        [copy.rollingSample, rolling20?.n_trades == null ? (locale === "es" ? "Sin muestra" : "No sample") : `${rolling20.n_trades}/50`],
-                        [copy.winRate, formatPercentPoints(rolling20?.win_rate)],
-                        [copy.profitFactor, formatNumber(rolling20?.profit_factor)],
-                        [copy.expectancy, formatPercentPoints(rolling20?.expectancy_pct)],
-                        [locale === "es" ? "Media neta" : "Avg net trade", strategy.metrics?.average_net_per_trade == null ? (locale === "es" ? "Sin muestra" : "No sample") : formatNumber(strategy.metrics.average_net_per_trade)],
+                        [locale === "es" ? "PF live" : "Live profit factor", sampleNumber(strategy.metrics?.profit_factor, locale)],
+                        [locale === "es" ? "PF OOS" : "OOS profit factor", sampleNumber(strategy.baselines?.oos_profit_factor, locale)],
+                        [copy.rollingSample, rolling50?.n_trades == null ? (locale === "es" ? "Sin muestra" : "No sample") : `${rolling50.n_trades}/50`],
+                        [copy.winRate, samplePercent(rolling50?.win_rate, locale)],
+                        [locale === "es" ? "PF últimos 50" : "Last 50 PF", sampleNumber(rolling50?.profit_factor, locale)],
+                        [copy.expectancy, samplePercent(rolling50?.expectancy_pct, locale)],
+                        [locale === "es" ? "Media neta" : "Avg net trade", sampleNumber(strategy.metrics?.average_net_per_trade, locale)],
                         [locale === "es" ? "T-stat neto" : "Net t-stat", (strategy.metrics?.trade_count ?? 0) < 20 || strategy.metrics?.t_stat_net_per_trade == null ? (locale === "es" ? "Sin muestra" : "No sample") : formatNumber(strategy.metrics.t_stat_net_per_trade)],
-                        [copy.lossStreak, strategy.metrics?.current_loss_streak == null ? (locale === "es" ? "Sin muestra" : "No sample") : String(strategy.metrics.current_loss_streak)],
+                        [locale === "es" ? "Trades/año real / esperado" : "Trades/year live / expected", strategy.metrics?.trades_per_year_live_90d == null ? noSample(locale) : `${formatNumber(strategy.metrics.trades_per_year_live_90d, 1)} / ${sampleNumber(strategy.metrics.trades_per_year_expected, locale, 1)}`],
+                        [locale === "es" ? "Frecuencia vs. esperada" : "Frequency vs. expected", strategy.metrics?.frequency_vs_expected_pct == null ? noSample(locale) : `${formatNumber(strategy.metrics.frequency_vs_expected_pct, 1)}%`],
+                        [locale === "es" ? "Racha actual / peor backtest" : "Current / worst backtest streak", strategy.metrics?.current_loss_streak == null ? noSample(locale) : `${strategy.metrics.current_loss_streak} / ${strategy.baselines?.bt_max_loss_streak ?? noSample(locale)}`],
+                        [locale === "es" ? "DD actual / máximo histórico" : "Current / historical max DD", strategy.metrics?.total_dd_pct == null ? noSample(locale) : `${samplePercent(strategy.metrics.total_dd_pct, locale)} / ${samplePercent(strategy.metrics.max_dd_pct, locale)}`],
+                        [locale === "es" ? "DD esperado MC / límite" : "Expected MC DD / limit", strategy.baselines?.mc_expected_max_dd_pct == null ? noSample(locale) : `${samplePercent(strategy.baselines.mc_expected_max_dd_pct, locale)} / ${samplePercent(strategy.strategy_dd_total_limit_pct, locale)}`],
                       ].map(([label, value]) => (
                         <div key={label} className="min-w-0 rounded-lg border border-white/[0.07] bg-black/10 px-2.5 py-2">
                           <dt className="truncate text-[10px] text-muted-foreground">{label}</dt>
@@ -565,6 +629,10 @@ export function MonitoringPortfolioDashboard() {
               {trades.isError ? (
                 <div role="alert" className="notice-error flex flex-wrap items-center justify-between gap-3 text-sm text-destructive">
                   <span>{copy.monitoringError}</span><button type="button" className="underline" onClick={() => void trades.refetch()}>{copy.retry}</button>
+                </div>
+              ) : trades.data?.isFallback ? (
+                <div role="alert" className="notice-error flex flex-wrap items-center justify-between gap-3 text-sm">
+                  <OfflineBanner /><button type="button" className="underline" onClick={() => void trades.refetch()} disabled={trades.isFetching}>{copy.retry}</button>
                 </div>
               ) : trades.isLoading ? (
                 <div className="space-y-2" aria-live="polite">{Array.from({ length: 4 }, (_, index) => <Skeleton key={index} className="h-12" />)}</div>
@@ -612,6 +680,8 @@ export function MonitoringPortfolioDashboard() {
             <CardContent>
               {executionEvents.isError ? (
                 <div role="alert" className="notice-error flex flex-wrap items-center justify-between gap-3 text-sm text-destructive"><span>{copy.monitoringError}</span><button type="button" onClick={() => void executionEvents.refetch()}>{copy.retry}</button></div>
+              ) : executionEvents.data?.isFallback ? (
+                <div role="alert" className="notice-error flex flex-wrap items-center justify-between gap-3 text-sm"><OfflineBanner /><button type="button" onClick={() => void executionEvents.refetch()} disabled={executionEvents.isFetching}>{copy.retry}</button></div>
               ) : executionEvents.isLoading ? (
                 <div className="space-y-2" aria-live="polite">{Array.from({ length: 3 }, (_, index) => <Skeleton key={index} className="h-16" />)}</div>
               ) : (executionEvents.data?.data?.items.length ?? 0) === 0 ? (

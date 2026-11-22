@@ -171,6 +171,11 @@ export function AlertsView() {
       </div>
 
       {data?.isFallback && <OfflineBanner />}
+      {(strategies.isError || strategies.data?.isFallback) && (
+        <p role="status" className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-xs text-muted-foreground">
+          {dict.alerts.strategiesUnavailable} <button type="button" className="underline underline-offset-4" onClick={() => void strategies.refetch()} disabled={strategies.isFetching}>{dict.alerts.retry}</button>
+        </p>
+      )}
       {dateRangeInvalid && <p role="alert" className="notice-warning rounded-xl px-4 py-3 text-sm text-amber-100">{dict.alerts.dateRangeError}</p>}
       {strategyFilterLimited && <p className="rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">{dict.alerts.strategyFilterLimit}</p>}
 
@@ -261,6 +266,11 @@ export function AlertsView() {
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-12 w-full" />
           ))}
+        </div>
+      ) : data?.isFallback ? (
+        <div role="alert" className="notice-error flex flex-wrap items-center justify-between gap-3 text-sm">
+          <span>{dict.alerts.loadError}</span>
+          <Button variant="outline" size="sm" onClick={() => void alertsQuery.refetch()} disabled={alertsQuery.isFetching}>{dict.alerts.retry}</Button>
         </div>
       ) : totalAlerts === 0 || filtered.length === 0 ? (
         <div className="empty-state px-6 py-14 text-center text-sm text-muted-foreground">
